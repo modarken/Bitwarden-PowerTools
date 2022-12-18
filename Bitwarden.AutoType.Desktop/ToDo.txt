@@ -1,0 +1,5 @@
+1. export to keepass button
+2. AutoType
+3. Select HotKey
+4. On/Off
+5. Specify Vault

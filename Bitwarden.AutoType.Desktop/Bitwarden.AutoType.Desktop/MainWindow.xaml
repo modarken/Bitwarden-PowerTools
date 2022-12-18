@@ -1,0 +1,46 @@
+﻿<mah:MetroWindow  x:Class="Bitwarden.AutoType.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:local="clr-namespace:Bitwarden.AutoType.Desktop"
+        mc:Ignorable="d"
+        Topmost="True"
+        ResizeMode="NoResize"
+        ShowCloseButton="False"
+        ShowInTaskbar="False"
+        ShowMaxRestoreButton="False"
+        IgnoreTaskbarOnMaximize="True"
+        Title="Bitwarden AutoType" Height="450" Width="350">
+    <DockPanel>
+        <DockPanel x:Name="bottomDockPanel" DockPanel.Dock="Bottom">
+            <StatusBar Grid.Row="2">
+                <StatusBarItem>Status:</StatusBarItem>
+                <StatusBarItem>
+                    <TextBlock Text="{Binding StatusSerialPortStatus}" />
+                </StatusBarItem>
+                <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+                <StatusBarItem>
+                    <TextBlock Text="{Binding StatusLastUpdated}" />
+                </StatusBarItem>
+                <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+                <StatusBarItem HorizontalAlignment="Right" Margin="0 0 5 0">
+                    <!--<iconPacks:PackIconForkAwesome Kind="FDroid" Foreground="{Binding StatusHeartbeatColor}" />-->
+                    <iconPacks:PackIconSimpleIcons Kind="Bitwarden" />
+                </StatusBarItem>
+            </StatusBar>
+        </DockPanel>
+        <DockPanel DockPanel.Dock="Bottom">
+            <mah:ToggleSwitch Header="AutoType"
+                              MinWidth="87"
+                              HorizontalAlignment="Center"
+                              OffContent="Off"
+                              OnContent="On"
+                              IsEnabled="{Binding IsUserPerformActionEnabled}"
+                              IsOn="{Binding IsAutoTypeEnabled}"/>
+        </DockPanel>
+        <DockPanel/>
+    </DockPanel>
+</mah:MetroWindow>
