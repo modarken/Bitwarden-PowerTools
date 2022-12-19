@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Biwarden.Security\Biwarden.Security.csproj" />
+    <ProjectReference Include="..\Bitwarden.Core\Bitwarden.Core.csproj" />
   </ItemGroup>
 
 </Project>

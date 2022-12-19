@@ -1,7 +1,9 @@
 ﻿using System.Diagnostics.Metrics;
 using System.Security.Cryptography;
 using System.Text;
-using Biwarden.Security;
+using Bitwarden.Core.API;
+using Bitwarden.Core.Crypto;
+using Bitwarden.Core.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Bitwarden.AutoType;
@@ -22,6 +24,11 @@ public partial class AutoTypeViewModel : IDisposable
 {
     public AutoTypeViewModel()
     {
+
+
+        //var host = "bitwarden.home.mojo.systems";
+        //var baseAddesss = new Uri($"https://{ host }/public/");
+        //var email = "m0norsk@gmail.com";
 
 
         // 1. Get data from database
@@ -57,6 +64,8 @@ public partial class AutoTypeViewModel : IDisposable
         // r5CFRR+n9NQI8a525FY+0BPR0HGOjVJX0cR1KEMnIOo=
         var encryptionKey2 = BitwardenCrypto.DecryptEncryptionKey("0.uRcMe+Mc2nmOet4yWx9BwA==|PGQhpYUlTUq/vBEDj1KOHVMlTIH1eecMl0j80+Zu0VRVfFa7X/MWKdVM6OM/NfSZicFEwaLWqpyBlOrBXhR+trkX/dPRnfwJD2B93hnLNGQ=", masterKey);
         var plainText2 = BitwardenCrypto.DecryptEntry("2.6DmdNKlm3a+9k/5DFg+pTg==|7q1Arwz/ZfKEx+fksV3yo0HMQdypHJvyiix6hzgF3gY=|7lSXqjfq5rD3/3ofNZVpgv1ags696B2XXJryiGjDZvk=", encryptionKey2, true);
+
+
 
 
 

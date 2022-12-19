@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace Biwarden.Security;
+namespace Bitwarden.Core.Crypto;
 
 public static class BitwardenCrypto
 {
@@ -30,7 +30,7 @@ public static class BitwardenCrypto
         byte[] hmac1 = hmac.ComputeHash(mac1);
         byte[] hmac2 = hmac.ComputeHash(mac2);
 
-        return Enumerable.SequenceEqual(hmac1, hmac2);
+        return hmac1.SequenceEqual(hmac2);
     }
 
     public static byte[]? DecryptEncryptionKey(string cipherEncryptionKey, byte[] masterKey)
@@ -51,7 +51,7 @@ public static class BitwardenCrypto
         if (version == 2)
         {
             var cipherMac = items[2];
-            var stetchedMasterKey = BitwardenCrypto.StretchKey(masterKey);
+            var stetchedMasterKey = StretchKey(masterKey);
             var masterMac = stetchedMasterKey[32..64];
             var hash = new HMACSHA256(masterMac);
             var computedMac = hash.ComputeHash(cipherIV.Concat(cipherData).ToArray());
@@ -144,7 +144,7 @@ public static class BitwardenCrypto
     public static (int, byte[], byte[]) DecodeCipherString(string encodedKey)
     {
         var split = encodedKey.Split("|");
-        var version = Int32.Parse(split.First()[0].ToString());//.Take(1).ToString();
+        var version = int.Parse(split.First()[0].ToString());//.Take(1).ToString();
         var iv = split.First().Split(".").Last();
         var key = split.Skip(1).First();
         return (version, Convert.FromBase64String(iv), Convert.FromBase64String(key));

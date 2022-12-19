@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@doc", "@doc", "{12F02CCB-F
 		ToDo.txt = ToDo.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Biwarden.Security", "Biwarden.Security\Biwarden.Security.csproj", "{02D26D9C-7746-4478-A0C8-DBA96DEB4989}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bitwarden.Core", "Bitwarden.Core\Bitwarden.Core.csproj", "{02D26D9C-7746-4478-A0C8-DBA96DEB4989}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
