@@ -31,14 +31,14 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetGetLoginAccessToken(string baseAddesss, string cliendID, string clientSecret, string deviceName, string deviceIdentifier)
+        public static async Task<TokenResponse?> GetGetLoginAccessToken(string baseAddesss, string clientID, string clientSecret, string deviceName, string deviceIdentifier)
         {
             ;
             var content = new Dictionary<string, string>()
             {
                 {"grant_type", "client_credentials"},
                 {"scope", "api"},
-                {"client_id", cliendID},
+                {"client_id", clientID},
                 {"client_secret", clientSecret},
                 {"device_name", deviceName},
                 {"device_identifier", deviceIdentifier},
@@ -60,8 +60,8 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetGetLoginAccessToken(string baseAddesss, string username, string password, string clientID,
-            string deviceType, string deviceIdentifier, string deviceName)
+        public static async Task<TokenResponse?> GetGetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
+            string deviceName)
         {
             var content = new Dictionary<string, string>()
             {
@@ -69,8 +69,8 @@ namespace Bitwarden.Core.API
                 {"scope", "api offline_access"},
                 {"username", username},
                 {"password", password},
-                {"client_id", clientID},
-                {"device_type", deviceType},
+                {"client_id", "browser"},
+                {"device_type", "6"}, // see https://github.com/bitwarden/server/blob/master/src/Core/Enums/DeviceType.cs
                 {"device_identifier", deviceIdentifier},
                 {"device_name", deviceName},
                 {"devicePushToken", ""}
@@ -93,8 +93,8 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetGetLoginAccessToken(string baseAddesss, string username, string password, string clientID, string deviceType
-            , string deviceIdentifier, string deviceName, string twoFactorToken)
+        public static async Task<TokenResponse?> GetGetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
+            string deviceName, string twoFactorToken)
         {
             var content = new Dictionary<string, string>()
             {
@@ -102,8 +102,8 @@ namespace Bitwarden.Core.API
                 {"scope", "api offline_access"},
                 {"username", username},
                 {"password", password},
-                {"client_id", clientID},
-                {"device_type", deviceType},
+                {"client_id", "browser"},
+                {"device_type", "6"}, // see https://github.com/bitwarden/server/blob/master/src/Core/Enums/DeviceType.cs
                 {"device_identifier", deviceIdentifier},
                 {"device_name", deviceName},
                 {"devicePushToken", ""},
