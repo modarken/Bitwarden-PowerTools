@@ -9,7 +9,7 @@ namespace Bitwarden.AutoType.Desktop;
 public partial class AutoTypeViewModel : IDisposable
 {
     //public AutoTypeViewModel(BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
-    AutoTypeViewModel(HotkeyService hotkeyService)
+    public AutoTypeViewModel(HotkeyService hotkeyService)
     {
 
 

@@ -35,20 +35,34 @@ public partial class App : Application
 
         _host = Host.CreateDefaultBuilder()
         .ConfigureUserLocalAppDataJsonFile<Settings>(DesktopConstants.DefaultDataFolderName, "settings.json",
-            out Settings? settings, out Action<Settings>? onSave, true)
+            out Settings? settings, out Action<Settings>? saveToFile, true)
         .ConfigureServices((hostContext, services) =>
         {
             services.AddSingleton(settings!.BitwardenClientConfiguration!);
-            services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { onSave!.Invoke(settings!); }));
+            services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { saveToFile!.Invoke(settings!); }));
         })
         .ConfigureServices((hostContext, services) =>
         {
+            var hotkeyService = new HotkeyService();
+            services.AddSingleton<HotkeyService>(hotkeyService);
+            services.AddHostedService((sp) => hotkeyService);
+
+        })
+        .ConfigureServices((hostContext, services) =>
+        {
+
+
+
+
+
+
             services.AddSingleton<AutoTypeService>();
             services.AddSingleton<BitwardenService>();
-            services.AddSingleton<HotkeyService>();
-            services.AddHostedService<TestService>();
             services.AddSingleton<AutoTypeViewModel>();
             services.AddSingleton<MainWindow>();
+
+            services.AddHostedService<TestService>();
+
         }).Build();
     }
 
@@ -80,4 +94,8 @@ public partial class App : Application
     {
         throw (Exception)e.ExceptionObject;
     }
+
+
+    // TODO Windows shutdown events. ect.
+
 }

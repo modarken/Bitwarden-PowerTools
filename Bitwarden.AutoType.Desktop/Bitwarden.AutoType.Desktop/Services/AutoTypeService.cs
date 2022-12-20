@@ -4,9 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bitwarden.AutoType.Desktop.Services
+namespace Bitwarden.AutoType.Desktop.Services;
+
+public class AutoTypeService
 {
-    internal class AutoTypeService
+    public AutoTypeService()
     {
+
     }
 }
