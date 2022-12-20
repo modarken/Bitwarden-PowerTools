@@ -13,12 +13,6 @@ using Microsoft.Extensions.Hosting;
 
 namespace Bitwarden.AutoType.Desktop;
 
-[JsonSerializable(typeof(Settings))]
-public class Settings
-{
-    public BitwardenClientConfiguration? BitwardenClientConfiguration { get; set; }
-}
-
 public class TestService : WPFBackgroundService
 {
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -30,13 +24,6 @@ public class TestService : WPFBackgroundService
     {
         base.Dispose();
     }
-}
-
-public static class DesktopConstants
-{
-    public static readonly string ExecutionBinaryPathKey = "ExecutionBinaryPath";
-    public static readonly string DataFolderPathKey = "DataPath";
-    public static readonly string DefaultDataFolderName = "BitwardentAutoType";
 }
 
 /// <summary>
@@ -51,51 +38,19 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += UnhandledException;
 
         _host = Host.CreateDefaultBuilder()
-        .ConfigureHostConfiguration(config =>
+        .ConfigureUserLocalAppDataJsonFile<Settings>(DesktopConstants.DefaultDataFolderName, "settings.json",
+            out Settings? settings, out Action<Settings>? onSave, true)
+        .ConfigureServices((hostContext, services) =>
         {
-            var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DesktopConstants.DefaultDataFolderName);
-
-            Directory.CreateDirectory(dataPath); // create folder if not exists
-
-            var settingsPath = Path.Combine(dataPath, "settings.json");
-            var syncPath = Path.Combine(dataPath, "sync.json");
-
-            if (!File.Exists(settingsPath))
-            {
-                var options = new JsonSerializerOptions() { WriteIndented = true };
-                var settingsString = JsonSerializer.Serialize(new Settings() { BitwardenClientConfiguration = new BitwardenClientConfiguration() }, options);
-                File.WriteAllText(settingsPath, settingsString);
-            }
-
-            if (!File.Exists(syncPath))
-            {
-            }
-
-            config.AddEnvironmentVariables();
-            config.AddJsonFile(settingsPath, optional: false, reloadOnChange: false);
-            config.AddJsonFile(syncPath, optional: true, reloadOnChange: false);
-            config.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
+            services.AddSingleton(settings!.BitwardenClientConfiguration!);
+            services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { onSave!.Invoke(settings!); }));
         })
-        .ConfigureAppConfiguration((hostingContext, configuration) =>
+        .ConfigureServices((hostContext, services) =>
         {
-            var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DesktopConstants.DefaultDataFolderName);
-            hostingContext.Configuration[DesktopConstants.DataFolderPathKey] = dataPath;
-            var executionbinaryPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            hostingContext.Configuration[DesktopConstants.ExecutionBinaryPathKey] = executionbinaryPath;
-        })
-
-    .ConfigureServices((hostContext, services) =>
-    {
-        var settings = hostContext.Configuration.GetSection(nameof(BitwardenClientConfiguration)).Get<BitwardenClientConfiguration>();
-        services.AddSingleton(settings!);
-    })
-
-       .ConfigureServices((hostContext, services) =>
-       {
-           services.AddHostedService<TestService>();
-           services.AddSingleton<AutoTypeViewModel>();
-           services.AddSingleton<MainWindow>();
-       }).Build();
+            services.AddHostedService<TestService>();
+            services.AddSingleton<AutoTypeViewModel>();
+            services.AddSingleton<MainWindow>();
+        }).Build();
     }
 
     private void UnhandledException(object sender, UnhandledExceptionEventArgs e)

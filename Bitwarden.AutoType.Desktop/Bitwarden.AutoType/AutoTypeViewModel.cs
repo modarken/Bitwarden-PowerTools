@@ -21,8 +21,16 @@ namespace Bitwarden.AutoType;
 [INotifyPropertyChanged]
 public partial class AutoTypeViewModel : IDisposable
 {
-    public AutoTypeViewModel(BitwardenClientConfiguration bitwardenClientConfiguration)
+    public AutoTypeViewModel(BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
     {
+
+        // save.Invoke(bitwardenClientConfiguration);
+
+
+
+
+
+
         var baseAddesss = bitwardenClientConfiguration.base_address;
         var email = bitwardenClientConfiguration.email;
         var clientID = bitwardenClientConfiguration.client_id;
