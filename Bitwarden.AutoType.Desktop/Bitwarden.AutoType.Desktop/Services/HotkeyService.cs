@@ -17,20 +17,16 @@ namespace Bitwarden.AutoType.Desktop.Services;
 
 public class HotkeyService : WPFBackgroundService
 {
-    private GlobalKeyboardHook _globalKeyboardHook;
-    private Windows.HotKey _hotKey;
+    // private GlobalKeyboardHook _globalKeyboardHook;
 
     private WindowsHotKey _hotKeyNew;
     public HotkeyService()
     {
         //_globalKeyboardHook = new GlobalKeyboardHook();
         //_globalKeyboardHook.KeyboardPressed += OnKeyPressed;
-        //_hotKey = new UnManaged.HotKey(Key.F9, KeyModifier.Shift | KeyModifier.Win, OnHotKeyHandler);
-        //_hotKey = new UnManaged.HotKey(Key.A, KeyModifier.Ctrl | KeyModifier.Alt, OnHotKeyHandler);
-        //_hotKey = new Windows.HotKey(Key.A, KeyModifier.Ctrl | KeyModifier.Alt, OnHotKeyHandler);
-        //_hotKey = new Windows.HotKey(VirtualKeys.A, KeyModifier.Ctrl | KeyModifier.Alt, OnHotKeyHandler);
 
         _hotKeyNew = new WindowsHotKey(VirtualKeys.A, KeyModifier.Ctrl | KeyModifier.Alt, TakAction);
+        var success = _hotKeyNew.RegisterHotKey();
     }
 
     private void TakAction(WindowsHotKey hotKey)
@@ -38,10 +34,7 @@ public class HotkeyService : WPFBackgroundService
         MessageBox.Show("OH YEAH");
     }
 
-    private void OnHotKeyHandler(Windows.HotKey hotKey)
-    {
-        MessageBox.Show("UAA");
-    }
+
 
     private void OnKeyPressed(object? sender, GlobalKeyboardHookEventArgs e)
        {
@@ -79,9 +72,6 @@ public class HotkeyService : WPFBackgroundService
     public override void Dispose()
     {
         base.Dispose();
-
-        _globalKeyboardHook?.Dispose();
-        _hotKey?.Dispose();
         _hotKeyNew?.Dispose();
     }
 }
