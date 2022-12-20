@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Bitwarden.Core;
 
-namespace Bitwarden.AutoType.Desktop;
+namespace Bitwarden.AutoType.Desktop.Helpers;
 
 public class BitwardenClientConfiguration : IBitwardenClientConfiguration
 {

@@ -6,7 +6,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Bitwarden.AutoType.Desktop;
+namespace Bitwarden.AutoType.Desktop.Helpers;
 
 public static class HostBuilderExtensions
 {
@@ -27,7 +27,7 @@ public static class HostBuilderExtensions
         if (!File.Exists(fullPath))
         {
             instance = new T();
-            var content = JsonSerializer.Serialize<T>(instance, SerializerOptions);
+            var content = JsonSerializer.Serialize(instance, SerializerOptions);
             File.WriteAllText(fullPath, content, Encoding.UTF8);
             instance = null;
         }
@@ -41,7 +41,7 @@ public static class HostBuilderExtensions
 
         if (alwaysWriteFileOnLoad)
         {
-            var content = JsonSerializer.Serialize<T>(instance!, SerializerOptions);
+            var content = JsonSerializer.Serialize(instance!, SerializerOptions);
             File.WriteAllText(fullPath, content, Encoding.UTF8);
         }
 
@@ -51,10 +51,10 @@ public static class HostBuilderExtensions
         hostBuilder
         .ConfigureServices((hostContext, services) =>
         {
-            services.AddSingleton<T>(instance);
+            services.AddSingleton(instance);
             services.AddSingleton(new Action<T>((t) =>
             {
-                var content = JsonSerializer.Serialize<T>(t, SerializerOptions);
+                var content = JsonSerializer.Serialize(t, SerializerOptions);
                 File.WriteAllText(fullPath, content, Encoding.UTF8);
             }));
         });
@@ -77,7 +77,7 @@ public static class HostBuilderExtensions
         if (!File.Exists(fullPath))
         {
             instance = new T();
-            var content = JsonSerializer.Serialize<T>(instance, SerializerOptions);
+            var content = JsonSerializer.Serialize(instance, SerializerOptions);
             File.WriteAllText(fullPath, content, Encoding.UTF8);
             instance = null;
         }
@@ -93,13 +93,13 @@ public static class HostBuilderExtensions
 
         var saveMethod = onSave = new Action<T>((t) =>
         {
-            var content = JsonSerializer.Serialize<T>(t, SerializerOptions);
+            var content = JsonSerializer.Serialize(t, SerializerOptions);
             File.WriteAllText(fullPath, content, Encoding.UTF8);
         });
 
         if (alwaysWriteFileOnLoad)
         {
-            var content = JsonSerializer.Serialize<T>(instance, SerializerOptions);
+            var content = JsonSerializer.Serialize(instance, SerializerOptions);
             File.WriteAllText(fullPath, content, Encoding.UTF8);
         }
 
@@ -107,7 +107,7 @@ public static class HostBuilderExtensions
         hostBuilder
         .ConfigureServices((hostContext, services) =>
         {
-            services.AddSingleton<T>(instance);
+            services.AddSingleton(instance);
             services.AddSingleton(saveMethod);
         });
 

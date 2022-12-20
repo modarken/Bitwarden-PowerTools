@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace Bitwarden.AutoType.Desktop
+namespace Bitwarden.AutoType.Desktop.Helpers
 {
     public abstract class WPFBackgroundService : IHostedService, IDisposable
     {

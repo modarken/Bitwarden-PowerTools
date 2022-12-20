@@ -1,13 +1,9 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using Bitwarden.Core;
-using Microsoft.Extensions.Configuration;
+using Bitwarden.AutoType.Desktop.Helpers;
+using Bitwarden.AutoType.Desktop.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -47,14 +43,13 @@ public partial class App : Application
         })
         .ConfigureServices((hostContext, services) =>
         {
+            services.AddSingleton<AutoTypeService>();
+            services.AddSingleton<BitwardenService>();
+            services.AddSingleton<HotkeyService>();
             services.AddHostedService<TestService>();
             services.AddSingleton<AutoTypeViewModel>();
             services.AddSingleton<MainWindow>();
         }).Build();
-    }
-
-    private void UnhandledException(object sender, UnhandledExceptionEventArgs e)
-    {
     }
 
     private async void Application_Startup(object sender, StartupEventArgs e)
@@ -79,5 +74,10 @@ public partial class App : Application
         finally
         {
         }
+    }
+
+    private void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        throw (Exception)e.ExceptionObject;
     }
 }

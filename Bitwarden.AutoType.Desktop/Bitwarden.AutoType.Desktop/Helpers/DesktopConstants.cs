@@ -1,4 +1,4 @@
-﻿namespace Bitwarden.AutoType.Desktop;
+﻿namespace Bitwarden.AutoType.Desktop.Helpers;
 
 public static class DesktopConstants
 {
