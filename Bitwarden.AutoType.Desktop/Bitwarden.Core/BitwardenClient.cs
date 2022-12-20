@@ -8,23 +8,25 @@ using System.Text.Json.Serialization;
 
 namespace Bitwarden.Core
 {
-    public class BitwardenClientConfiguration
+
+    // TODO remove ProtectedDataConverter from this library, needs to go to Bitwarden.AutoType.Desktop
+    public class DefaultBitwardenClientConfiguration : IBitwardenClientConfiguration
     {
-        [JsonConverter(typeof(ProtectedDataConverter))] public string? base_address { get; set; }
-        [JsonConverter(typeof(ProtectedDataConverter))] public string? email { get; set; }
-        [JsonConverter(typeof(ProtectedDataConverter))] public string? master_key { get; set; }
-        [JsonConverter(typeof(ProtectedDataConverter))] public string? client_id { get; set; }
-        [JsonConverter(typeof(ProtectedDataConverter))] public string? client_secret { get; set; }
-        [JsonConverter(typeof(ProtectedDataConverter))] public string? refresh_token { get; set; }
-        [JsonConverter(typeof(ProtectedDataConverter))] public string? device_name { get; set; }
-        [JsonConverter(typeof(ProtectedDataConverter))] public string? device_identifier { get; set; }
+        public string? base_address { get; set; }
+        public string? email { get; set; }
+        public string? master_key { get; set; }
+        public string? client_id { get; set; }
+        public string? client_secret { get; set; }
+        public string? refresh_token { get; set; }
+        public string? device_name { get; set; }
+        public string? device_identifier { get; set; }
     }
 
     public class BitwardenClient
     {
-        private readonly BitwardenClientConfiguration _configuration;
+        private readonly IBitwardenClientConfiguration _configuration;
 
-        public BitwardenClient(BitwardenClientConfiguration configuration)
+        public BitwardenClient(IBitwardenClientConfiguration configuration)
         {
             _configuration = configuration;
         }

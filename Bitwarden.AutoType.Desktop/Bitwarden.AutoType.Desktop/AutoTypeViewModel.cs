@@ -1,11 +1,12 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using Bitwarden.Core;
 using Bitwarden.Core.API;
 using Bitwarden.Core.Crypto;
 using Bitwarden.Core.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace Bitwarden.AutoType;
+namespace Bitwarden.AutoType.Desktop;
 
 //internal class Person
 //{
@@ -23,6 +24,10 @@ public partial class AutoTypeViewModel : IDisposable
 {
     public AutoTypeViewModel(BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
     {
+
+
+
+
 
         // save.Invoke(bitwardenClientConfiguration);
 
