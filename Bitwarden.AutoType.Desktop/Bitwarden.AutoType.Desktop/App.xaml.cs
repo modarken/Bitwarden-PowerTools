@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Services;
+using Bitwarden.AutoType.Desktop.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -50,17 +51,10 @@ public partial class App : Application
         })
         .ConfigureServices((hostContext, services) =>
         {
-
-
-
-
-
-
             services.AddSingleton<AutoTypeService>();
             services.AddSingleton<BitwardenService>();
             services.AddSingleton<AutoTypeViewModel>();
             services.AddSingleton<MainWindow>();
-
             services.AddHostedService<TestService>();
 
         }).Build();
@@ -95,7 +89,5 @@ public partial class App : Application
         throw (Exception)e.ExceptionObject;
     }
 
-
     // TODO Windows shutdown events. ect.
-
 }

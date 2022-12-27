@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Windows;
+using Bitwarden.AutoType.Desktop.Windows.Native;
 
 namespace Bitwarden.AutoType.Desktop.Services;
 
@@ -12,7 +13,7 @@ public class HotkeyService : WPFBackgroundService
 
     public HotkeyService()
     {
-        _hotKeyNew = new WindowsHotKey(VirtualKeys.A, KeyModifier.Ctrl | KeyModifier.Alt, TakAction);
+        _hotKeyNew = new WindowsHotKey(VirtualKeys.A, RegisterHotKeyModifiers.Ctrl | RegisterHotKeyModifiers.Alt, TakAction);
         var success = _hotKeyNew.RegisterHotKey();
     }
 

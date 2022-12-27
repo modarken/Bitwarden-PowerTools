@@ -1,5 +1,4 @@
 ﻿using System;
-using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -9,12 +8,8 @@ namespace Bitwarden.AutoType.Desktop;
 public partial class AutoTypeViewModel : IDisposable
 {
     //public AutoTypeViewModel(BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
-    public AutoTypeViewModel(HotkeyService hotkeyService)
+    public AutoTypeViewModel(HotkeyService hotkeyService, AutoTypeService autoTypeService)
     {
-
-
-
-
         // save.Invoke(bitwardenClientConfiguration);
 
         //var baseAddesss = bitwardenClientConfiguration.base_address;
