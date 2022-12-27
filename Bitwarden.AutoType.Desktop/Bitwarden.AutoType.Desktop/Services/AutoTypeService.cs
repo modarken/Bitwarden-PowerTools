@@ -52,9 +52,9 @@ public class AutoTypeService
             { DelayBetweenKeystrokes= TimeSpan.FromMilliseconds(10),
                 PressKeyTime= TimeSpan.FromMilliseconds(10) };
         var y = new KeystrokeSequence("Hello My name is Baby, hello my name is Bobby.{}", c);
-        //var z = new KeystrokeSequence("Hello 1234567890  !@#$%^&*()", c);
-        //var z = new SpecialKeystrokeSequence("123{Shift}456{Shift}789", c);
-        var z = new KeywordKeystrokeSequence("{Shift}{Shift}", c);
+        //var z = new KeystrokeSequence("Hello 1234567890 !@#$%^&*()", c);
+        var z = new SpecialKeystrokeSequence("{leftcurlybrace}{tab}123{Shift:Down}456{Shift:Up}78{Shift:3000}9", c);
+        //var z = new SpecialKeystrokeSequence("{Shift}{Shift}", c);
 
 
 

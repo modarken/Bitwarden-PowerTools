@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using Bitwarden.AutoType.Desktop.Windows.Native;
 
 namespace Bitwarden.AutoType.Desktop.Windows;
@@ -34,11 +33,12 @@ public enum EmulatedKeystrokeTypes
     Up
 }
 
-public class EmulatedKeystroke
+public class EmulatedKeystroke : ICloneable
 {
     public EmulatedKeystrokeTypes DirectionType { get; set; }
     public byte? VirtualKey { get; set; }
     public byte? KeyModifierFlags { get; set; }
+    public TimeSpan? PressTime { get; set; }
     public TimeSpan? Delay { get; set; }
 
     #region Helpers
@@ -48,6 +48,11 @@ public class EmulatedKeystroke
     public bool IsCtrlModifier { get => (KeyModifierFlags & 0x02) == 2; }
     public bool IsAltModifier { get => (KeyModifierFlags & 0x04) == 4; }
     public bool IsHankakuModifier { get => (KeyModifierFlags & 0x08) == 8; }
+
+    public object Clone()
+    {
+        return this.MemberwiseClone();
+    }
 
     #endregion Helpers
 }
@@ -59,43 +64,46 @@ public interface IKeystrokeProvider
     IEnumerable<EmulatedKeystroke> Provide();
 }
 
-public class KeywordKeystrokeSequence : KeystrokeSequence
+public class SpecialKeystrokeSequence : KeystrokeSequence
 {
     private static readonly Regex _specialKeyRegEx = new(@"{.*?}", RegexOptions.Compiled);
 
-    private static readonly Dictionary<string, EmulatedKeystroke> _keywords = new Dictionary<string, EmulatedKeystroke>
+    private static readonly Dictionary<string, EmulatedKeystroke> _specialKeywords = new()
     {
         {"shift", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.Shift } },
-
+        {"leftcurlybrace", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.OEM4, KeyModifierFlags = 0x01 } },
+        {"rightcurlybrace", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.OEM6, KeyModifierFlags = 0x01 } },
+        {"tab", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.Tab } },
+        {"alt", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.Menu } },
     };
 
     //public enum SpecialKeys
     //{
-    //    LEFTCURLYBRACE,
-    //    RIGHTCURLYBRACE,
-    //    SHIFT,
-    //    ALT,
-    //    TAB,
-    //    ENTER,
-    //    SPACE,
-    //    BACKSPACE,
-    //    UP,
-    //    DOWN,
-    //    LEFT,
-    //    RIGHT,
-    //    INSERT,
-    //    DELETE,
-    //    HOME,
-    //    END,
-    //    PGUP,
-    //    PGDOWN,
-    //    CAPSLOCK,
-    //    ESCAPE,
-    //    NUMLOCK,
-    //    PRINTSCREEN,
-    //    SCROLLLOCK,
-    //    F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
-    //    WIN,
+    //    leftcurlybrace,
+    //    rightcurlybrace,
+    //    shift,
+    //    alt,
+    //    tab,
+    //    enter,
+    //    space,
+    //    backspace,
+    //    up,
+    //    down,
+    //    left,
+    //    right,
+    //    insert,
+    //    delete,
+    //    home,
+    //    end,
+    //    pgup,
+    //    pgdown,
+    //    capslock,
+    //    escape,
+    //    numlock,
+    //    printscreen,
+    //    scrolllock,
+    //    f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12,
+    //    win,
     //}
 
     //public enum KeyDirections
@@ -104,7 +112,7 @@ public class KeywordKeystrokeSequence : KeystrokeSequence
     //    Up
     //}
 
-    public KeywordKeystrokeSequence(string sequence, IKeystrokeConfiguration? configuration) : base(sequence, configuration)
+    public SpecialKeystrokeSequence(string sequence, IKeystrokeConfiguration? configuration) : base(sequence, configuration)
     {
     }
 
@@ -112,64 +120,60 @@ public class KeywordKeystrokeSequence : KeystrokeSequence
     /// Processes the keyword sequence.
     ///
     /// Keyword
-    /// Keyword:KeyDirections
+    /// Keyword:KeyDirections   up, down, or press
     /// Keyword:int             time for keypress in milliseconds
     ///
     /// </summary>
     /// <param name="sequence">The sequence.</param>
     /// <returns></returns>
-    private IEnumerable<EmulatedKeystroke> ProcessKeywordSequence(string sequence)
+    private IEnumerable<EmulatedKeystroke> ProcessSpecialSequence(string sequence)
     {
-        var s = sequence.Substring(1,sequence.Length-2);
-
-
+        var innerSequence = sequence[1..^1].ToLower();
 
         string keyword = "";
-        EmulatedKeystrokeTypes? keystrokeType= null;
-        TimeSpan? timeSpan= null;
-        EmulatedKeystroke? emulatedKeystroke= null;
-        if (s.Contains(":"))
+        EmulatedKeystrokeTypes? keystrokeType = null;
+        TimeSpan? timeSpan = null;
+        EmulatedKeystroke? emulatedKeystroke = null;
+
+        if (innerSequence.Contains(':'))
         {
-            var split = s.Split(':');
+            var split = innerSequence.Split(':');
             keyword = split[0];
-            var unknown = split[1].ToLower();
+            var unknown = split[1];
 
             if (Int32.TryParse(unknown, out int result))
             {
                 timeSpan = TimeSpan.FromMilliseconds(result);
             }
-
-            if (Enum.IsDefined(typeof(EmulatedKeystrokeTypes), unknown))
+            else if (Enum.TryParse(typeof(EmulatedKeystrokeTypes), unknown, true, out object? parsed))
             {
-                keystrokeType = (EmulatedKeystrokeTypes ?)Enum.Parse(typeof(EmulatedKeystrokeTypes), unknown);
+                keystrokeType = (EmulatedKeystrokeTypes?)parsed;
             }
         }
         else
         {
-            keyword = s;
+            keyword = innerSequence;
         }
 
-
-
-        if (_keywords.ContainsKey(keyword))
+        if (_specialKeywords.ContainsKey(keyword))
         {
-            emulatedKeystroke = _keywords[keyword];
+            emulatedKeystroke = (EmulatedKeystroke?)_specialKeywords[keyword].Clone();
+            if (keystrokeType is EmulatedKeystrokeTypes ks)
+            {
+                emulatedKeystroke!.DirectionType = ks;
+            }
+            if (timeSpan is TimeSpan ts)
+            {
+                emulatedKeystroke!.PressTime = ts;
+            }
+            return new EmulatedKeystroke[] { emulatedKeystroke! };
         }
 
-
-
-
-
-
-
-
-
-        return new EmulatedKeystroke[] {  };
+        return new EmulatedKeystroke[] { };
     }
 
     protected override IEnumerable<EmulatedKeystroke> Process(string keystrokes)
     {
-
         var matches = _specialKeyRegEx.Matches(_sequence).ToArray();
         var splits = _specialKeyRegEx.Split(_sequence);
         var chunks = new List<string>();
@@ -195,35 +199,16 @@ public class KeywordKeystrokeSequence : KeystrokeSequence
 
             if (_specialKeyRegEx.IsMatch(item))
             {
-                processedChunks.Add(ProcessKeywordSequence(item));
+                processedChunks.Add(ProcessSpecialSequence(item));
             }
             else
             {
-
                 processedChunks.Add(base.Process(item));
             }
         }
 
-        var xx = processedChunks.SelectMany(i => i).ToArray();
-        var len = xx.Length;
-        return xx;
-
-
+        return processedChunks.SelectMany(i => i).ToArray();
     }
-}
-
-public interface IKeystrokeConfiguration
-{
-    TimeSpan DelayBetweenKeystrokes { get; set; }
-    TimeSpan PressKeyTime { get; set; }
-}
-
-public class DefaultKeystrokeConfiguration : IKeystrokeConfiguration
-{
-    private static readonly int _delayBetweenKeyStrokes = 15;
-    private static readonly int _pressKeyTime = 15;
-    public TimeSpan DelayBetweenKeystrokes { get; set; } = TimeSpan.FromMilliseconds(_delayBetweenKeyStrokes);
-    public TimeSpan PressKeyTime { get; set; } = TimeSpan.FromMilliseconds(_pressKeyTime);
 }
 
 public class KeystrokeSequence : IKeystrokeProvider
@@ -242,15 +227,18 @@ public class KeystrokeSequence : IKeystrokeProvider
     protected virtual IEnumerable<EmulatedKeystroke> Process(string keystrokes)
     {
         return keystrokes.Select(c => WindowsDLLs.VkKeyScan(c))
-            .Select(c => new { a = (byte)((c >> 8) & 0x00FF), b = (byte)((c >> 0) & 0x00FF) })
-            .Select(i => new EmulatedKeystroke { DirectionType = EmulatedKeystrokeTypes.Press, VirtualKey = i.b, KeyModifierFlags = i.a });
+            .Select(c => new { KeyModifierFlags = (byte)((c >> 8) & 0x00FF), VirtualKey = (byte)((c >> 0) & 0x00FF) })
+            .Select(i => new EmulatedKeystroke
+            {
+                DirectionType = EmulatedKeystrokeTypes.Press,
+                VirtualKey = i.VirtualKey,
+                KeyModifierFlags = i.KeyModifierFlags
+            });
     }
-
 
     public virtual IEnumerable<EmulatedKeystroke> Provide()
     {
         _emulatedKeyStrokes ??= Process(_sequence).ToArray();
-
         return _emulatedKeyStrokes;
     }
 }
@@ -260,9 +248,11 @@ public static class WindowsKeyboard
     public static async Task SendKeystrokes(IKeystrokeProvider keystrokeProvider)
     {
         var isShiftVirtualKeyDown = false;
-
-        foreach (var item in keystrokeProvider.Provide())
+        var onLastItem = false;
+        var items = keystrokeProvider.Provide().ToArray();
+        foreach (var item in items)
         {
+            if (item == items[^1]) onLastItem = true;
             if (item.VirtualKey is byte)
             {
                 if (item.IsShiftVirtualKey && item.DirectionType == EmulatedKeystrokeTypes.Down)
@@ -281,7 +271,7 @@ public static class WindowsKeyboard
 
                 if (item.DirectionType == EmulatedKeystrokeTypes.Press)
                 {
-                    await SendKeyPress((VirtualKeys)item.VirtualKey, keystrokeProvider.Configuration.PressKeyTime).ConfigureAwait(false);
+                    await SendKeyPress((VirtualKeys)item.VirtualKey, item.PressTime ?? keystrokeProvider.Configuration.PressKeyTime).ConfigureAwait(false);
                 }
                 else
                 {
@@ -295,7 +285,7 @@ public static class WindowsKeyboard
                     }
                 }
 
-                await Task.Delay(keystrokeProvider.Configuration.DelayBetweenKeystrokes).ConfigureAwait(false);
+                if (!onLastItem) await Task.Delay(keystrokeProvider.Configuration.DelayBetweenKeystrokes).ConfigureAwait(false);
 
                 if (!isShiftVirtualKeyDown && item.IsShiftModifier)
                 {
