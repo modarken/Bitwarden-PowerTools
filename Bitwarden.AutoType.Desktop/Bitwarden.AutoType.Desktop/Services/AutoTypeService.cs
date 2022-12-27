@@ -26,8 +26,6 @@ public class AutoTypeService
 {
     public AutoTypeService()
     {
-
-
         //var task = Task.Run(async () =>
         //{
         //    WindowsDLLs.keybd_event((byte)49, 0, WindowsConstants.KEYEVENTF_KEYDOWN, 0);
@@ -53,7 +51,8 @@ public class AutoTypeService
                 PressKeyTime= TimeSpan.FromMilliseconds(10) };
         var y = new KeystrokeSequence("Hello My name is Baby, hello my name is Bobby.{}", c);
         //var z = new KeystrokeSequence("Hello 1234567890 !@#$%^&*()", c);
-        var z = new SpecialKeystrokeSequence("{leftcurlybrace}{tab}123{Shift:Down}456{Shift:Up}78{Shift:3000}9", c);
+        var z = new SpecialKeystrokeSequence("{vk54}{1500}{tab}{leftcurlybrace}{1500}{rightcurlybrace}123{Shift:Down}456{Shift:Up}789{vk57}", c);
+        //var z = new DelayKeystrokeSequence("{vk54}{1500}{leftcurlybrace}{1500}123{Shift:Down}456{Shift:Up}78{Shift:3000}9{vk57}", c);
         //var z = new SpecialKeystrokeSequence("{Shift}{Shift}", c);
 
 
