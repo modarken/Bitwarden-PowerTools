@@ -1,7 +1,19 @@
-﻿using System.Net.Http.Headers;
+﻿/*
+ * Most useful sites:
+ * https://bitwarden.com/crypto.html
+ * https://github.com/jcs/rubywarden/blob/master/API.md
+ * https://docs.cozy.io/en/cozy-stack/bitwarden/
+ * https://bitwarden.com/help/api/
+ * https://bitwarden.com/help/vault-management-api/
+ * https://bitwarden.com/help/public-api/
+ * https://bitwarden.com/help/personal-api-key/
+ *
+*/
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Bitwarden.Core.Models;
+
 
 namespace Bitwarden.Core.API
 {
