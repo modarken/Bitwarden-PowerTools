@@ -32,7 +32,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetLoginAccessToken(string baseAddesss, string clientID, string clientSecret, string deviceName, string deviceIdentifier)
+        public static async Task<TokenResponse?> GetLoginAccessTokenFromAPIKey(string baseAddesss, string clientID, string clientSecret, string deviceName = "", string deviceIdentifier = "")
         {
             ;
             var content = new Dictionary<string, string>()
@@ -61,8 +61,35 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
-            string deviceName)
+        public static async Task<TokenResponse?> GetLoginAccessTokenFromRefreshToken(string baseAddesss, string refreshToken, string deviceName = "", string deviceIdentifier = "")
+        {
+            var content = new Dictionary<string, string>()
+            {
+                {"grant_type", "refresh_token"},
+                {"client_id", "browser"},
+                {"refresh_token", refreshToken},
+                {"device_name", deviceName},
+                {"device_identifier", deviceIdentifier},
+            };
+
+            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "identity/connect/token")
+            { Content = new FormUrlEncodedContent(content) };
+            using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
+
+            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            // response.EnsureSuccessStatusCode();
+
+            if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.TokenResponse);
+            }
+            return null;
+        }
+
+        public static async Task<TokenResponse?> GetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier = "",
+            string deviceName = "")
         {
             var content = new Dictionary<string, string>()
             {
@@ -95,7 +122,7 @@ namespace Bitwarden.Core.API
         }
 
         public static async Task<TokenResponse?> GetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
-            string deviceName, string twoFactorToken)
+            string deviceName = "", string twoFactorToken = "")
         {
             var content = new Dictionary<string, string>()
             {

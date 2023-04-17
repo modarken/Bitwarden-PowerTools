@@ -13,13 +13,16 @@ using Bitwarden.Core.Models;
 
 Console.WriteLine("Hello, World!");
 
+// TODO: Consider adding revision date check (GET /bitwarden/api/accounts/revision-date)
+// TODO: Consider getting ciphers instead of sync (GET /bitwarden/api/ciphers)
 // Test1();
 
 var config = LoadConfig();
-// TokenResponse tokenResponse = TestViaPasswordAndTOTP(config);
-TokenResponse tokenResponse = TestViaAPIKey(config);
-
-TestUseAccessToken(config, tokenResponse);
+var tokenResponse = TestViaAPIKey(config);
+// var tokenResponse = TestViaPasswordAndTOTP(config);
+// var tokenResponse = TestViaRefreshToken(config);
+// TestUseAccessToken(config, tokenResponse);
+TestUseAccessTokenPasswordFromConfig(config, tokenResponse);
 
 void Test1()
 {
@@ -29,6 +32,8 @@ void Test1()
     var masterPassword = "p4ssw0rd";
     var iterations = 5000;
 
+    // used as the client side main secret. When hashed it can be sent to server for login
+    // it can also be used to decrypt the vault (server side) protectedSymmetricKey which is generated on the server and used to (d)encrypt ciphers.
     var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, userName, iterations);
     var masterKeyBase64 = Convert.ToBase64String(masterKey);
     var masterPasswordHash1 = BitwardenCrypto.DerriveMasterPasswordHash(masterPassword, userName, iterations);
@@ -41,11 +46,11 @@ void Test1()
     var protectedSymmetricKey = "2.CdcCLIkHMhhq0Q+Dw5RP3Q==|0GA/0NktAiCyL7UEdqOPXzVnEPVxr0r063ok+yoreNRyVc373gGw/Y5Pr8nYUfXGheX1pYoSwirWTRr7/O7uGDb6KmJQprk8QcDEm0uwQQM=|vKYPpiBmhZQooUSbegtVHxFVa2M+jwIGML7MZHDFDb4=";
 
     // This is the encrypted data: 1234567
-    var ciptherString = "2.i1oLb5fvcnZf4Mg113bY1A==|Tt8eC5yTXLlBF0AKDNwkIw==|nQ+bec9UNDVGdJgtYZXYYQHDhmNagE79jxEWqsDnA+s=";
+    var cipherString = "2.i1oLb5fvcnZf4Mg113bY1A==|Tt8eC5yTXLlBF0AKDNwkIw==|nQ+bec9UNDVGdJgtYZXYYQHDhmNagE79jxEWqsDnA+s=";
 
     var unprotectedSymmetricKey0 = BitwardenCrypto.DecryptEncryptionKey(protectedSymmetricKey, masterKey);
     var unprotectedSymmetricKey0Base64 = Convert.ToBase64String(unprotectedSymmetricKey0);
-    var plainText0 = BitwardenCrypto.DecryptEntry(ciptherString, unprotectedSymmetricKey0, true);
+    var plainText0 = BitwardenCrypto.DecryptEntry(cipherString, unprotectedSymmetricKey0, true);
 
     var unprotectedSymmetricKey1 = BitwardenCrypto.DecryptEncryptionKey("2.uKntnrd31vxE2XptUOEJDw==|Bgtw3NbARqEvLGZhw4b0+oHUbO8s8KvGI7ISRj/HUpZd/pUyYwM03taCIXFgweOuf5TeS0shuya/L1XLpkkB24PPzd/SKVhwMD9E4XT8F6A=|VHOabQCGcZQiL9o5hWaoEp+ZxaHdIYGNPiNNjf6bakE=", masterKey);
     var unprotectedSymmetricKey1Base64 = Convert.ToBase64String(unprotectedSymmetricKey1);
@@ -71,6 +76,20 @@ BitwardenClientConfiguration LoadConfig()
     return bitwardenClientConfiguration;
 }
 
+TokenResponse TestViaAPIKey(BitwardenClientConfiguration bitwardenClientConfiguration)
+{
+    var baseAddesss = bitwardenClientConfiguration.base_address;
+    var email = bitwardenClientConfiguration.email;
+
+    var clientID = bitwardenClientConfiguration.client_id;
+    var clientSecret = bitwardenClientConfiguration.client_secret;
+
+    var deviceName = bitwardenClientConfiguration.device_name;
+    var deviceIdentifier = bitwardenClientConfiguration.device_identifier;
+    var accessToken = BitwardenProtocol.GetLoginAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
+
+    return accessToken;
+}
 
 TokenResponse TestViaPasswordAndTOTP(BitwardenClientConfiguration bitwardenClientConfiguration)
 {
@@ -90,10 +109,11 @@ TokenResponse TestViaPasswordAndTOTP(BitwardenClientConfiguration bitwardenClien
     // We want to get the master password hash, this is whats sent to the server and checked for valid server access to get a token
     var masterPassword = GetPassword().ToUnsecureString();
     var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, email, preLogin.KdfIterations);
+    var masterKeyBase64 = Convert.ToBase64String(masterKey);
     var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
 
     // Three methods to get an access token
-    // var accessToken = BitwardenProtocol.GetLoginAccessToken(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
+    // var accessToken = BitwardenProtocol.GetLoginAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
     // var accessToken2 = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName).GetAwaiter().GetResult();
     // var accessToken3 = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
 
@@ -105,63 +125,21 @@ TokenResponse TestViaPasswordAndTOTP(BitwardenClientConfiguration bitwardenClien
     var accessToken = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, email, masterPasswordHash, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
 
     return accessToken;
-
-
 }
 
-TokenResponse TestViaAPIKey(BitwardenClientConfiguration bitwardenClientConfiguration)
+TokenResponse TestViaRefreshToken(BitwardenClientConfiguration bitwardenClientConfiguration)
 {
     var baseAddesss = bitwardenClientConfiguration.base_address;
     var email = bitwardenClientConfiguration.email;
 
-    var clientID = bitwardenClientConfiguration.client_id;
-    var clientSecret = bitwardenClientConfiguration.client_secret;
+    var refreshToken = bitwardenClientConfiguration.refresh_token;
 
     var deviceName = bitwardenClientConfiguration.device_name;
     var deviceIdentifier = bitwardenClientConfiguration.device_identifier;
-    var accessToken = BitwardenProtocol.GetLoginAccessToken(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
-
-
+    var accessToken = BitwardenProtocol.GetLoginAccessTokenFromRefreshToken(baseAddesss, refreshToken, deviceName, deviceIdentifier).GetAwaiter().GetResult();
 
     return accessToken;
-
-
-    // var masterkey = bitwardenClientConfiguration.master_key; //password -> PBKDF2 10,000 iterations -> master key
-    // var twoFactorToken = "123456";
-
-
-
-
-    //           var preLogin = BitwardenProtocol.GetPreLogin(baseAddesss, email).GetAwaiter().GetResult();
-    //
-    //           // In this case the master password is still needed for accessing the data
-    //           Console.WriteLine("Enter master password");
-    //
-    //           // We want to get the master password hash, this is whats sent to the server as the password
-    //           var masterPassword = GetPassword().ToUnsecureString();
-    //           var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, email, preLogin.KdfIterations);
-    //           var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
-    //
-    //           // Three methods to get an access token
-    //           // var accessToken = BitwardenProtocol.GetLoginAccessToken(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
-    //           // var accessToken2 = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName).GetAwaiter().GetResult();
-    //           // var accessToken3 = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
-    //
-    //           // If TOTP is setup, must use TOTP token
-    //           Console.WriteLine("Enter TOTP password");
-    //           var twoFactorToken = GetPassword().ToUnsecureString();
-    //
-    //           var accessToken = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, email, masterPasswordHash, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
-    //
-    //           if (accessToken?.access_token is not null)
-    //           {
-    //               // Now that I have a working access token, run some API Requests such as
-    //               // Profile  https://bitwarden.home.mojo.systems/public/api/accounts/profile
-    //               // Sync     https://bitwarden.home.mojo.systems/public/api/sync
-    //
-    //           }
 }
-
 
 void TestUseAccessToken(BitwardenClientConfiguration config, TokenResponse tokenResponse)
 {
@@ -178,9 +156,6 @@ void TestUseAccessToken(BitwardenClientConfiguration config, TokenResponse token
 
         SyncResponse? syncResponse = BitwardenProtocol.GetSync(config!.base_address!, bearerToken).GetAwaiter().GetResult();
 
-
-
-
         if (syncResponse != null)
         {
             Console.WriteLine("Enter master password");
@@ -192,13 +167,49 @@ void TestUseAccessToken(BitwardenClientConfiguration config, TokenResponse token
             var protectedEncyptionKey = tokenResponse.Key;
             var encryptionKey = BitwardenCrypto.DecryptEncryptionKey(protectedEncyptionKey, masterKey);
 
-
             foreach (var item in syncResponse!.Ciphers!)
             {
                 // need to dec
 
                 var plainText = BitwardenCrypto.DecryptEntry(item.Name, encryptionKey, true);
 
+                Console.WriteLine(plainText);
+            }
+        }
+    }
+}
+
+void TestUseAccessTokenPasswordFromConfig(BitwardenClientConfiguration config, TokenResponse tokenResponse)
+{
+
+    if (tokenResponse?.access_token is not null)
+    {
+        // Now that I have a working access token, run some API Requests such as
+        // Profile  https://bitwarden.home.mojo.systems/public/api/accounts/profile
+        // Sync     https://bitwarden.home.mojo.systems/public/api/sync
+        //return accessToken;
+
+        var bearerToken = tokenResponse!.access_token!;
+        ProfileResponse? profile = BitwardenProtocol.GetProfile(config!.base_address!, bearerToken).GetAwaiter().GetResult();
+
+        SyncResponse? syncResponse = BitwardenProtocol.GetSync(config!.base_address!, bearerToken).GetAwaiter().GetResult();
+
+        if (syncResponse != null)
+        {
+            // need to encryption decryption key
+            // var masterPassword = GetPassword().ToUnsecureString();
+            // var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, config!.email!, tokenResponse.KdfIterations);
+            var masterKey =  Convert.FromBase64String(config.master_key);
+
+            // the encryption key is stored on the server and is not to encrypt/decrypt all of the cipher text.
+            var protectedEncyptionKey = tokenResponse.Key;
+            var encryptionKey = BitwardenCrypto.DecryptEncryptionKey(protectedEncyptionKey, masterKey);
+
+            foreach (var item in syncResponse!.Ciphers!)
+            {
+                // need to dec
+
+                var plainText = BitwardenCrypto.DecryptEntry(item.Name, encryptionKey, true);
 
                 Console.WriteLine(plainText);
             }

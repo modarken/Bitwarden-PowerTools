@@ -23,7 +23,7 @@ public partial class AutoTypeViewModel : IDisposable
         //var twoFactorToken = "123456";
 
         //var preLogin = BitwardenProtocol.GetPreLogin(baseAddesss, email).GetAwaiter().GetResult();
-        //var accessToken = BitwardenProtocol.GetGetLoginAccessToken(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
+        //var accessToken = BitwardenProtocol.GetLoginAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
         //var accessToken2 = BitwardenProtocol.GetGetLoginAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName).GetAwaiter().GetResult();
         //var accessToken3 = BitwardenProtocol.GetGetLoginAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
         //var bearerToken = accessToken!.access_token;
