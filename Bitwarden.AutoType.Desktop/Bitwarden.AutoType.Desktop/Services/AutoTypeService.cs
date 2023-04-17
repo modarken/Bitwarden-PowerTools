@@ -58,8 +58,8 @@ public class AutoTypeService
 
 
         System.Threading.Thread.Sleep(4000);
-        //WindowsKeyboard.SendKeystrokes(y).GetAwaiter().GetResult();
-        WindowsKeyboard.SendKeystrokes(z).GetAwaiter().GetResult();
+        // WindowsKeyboard.SendKeystrokes(y).GetAwaiter().GetResult();
+        // WindowsKeyboard.SendKeystrokes(z).GetAwaiter().GetResult();
         System.Threading.Thread.Sleep(2000);
 
 

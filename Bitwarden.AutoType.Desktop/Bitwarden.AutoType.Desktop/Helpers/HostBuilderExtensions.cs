@@ -63,11 +63,8 @@ public static class HostBuilderExtensions
     }
 
     public static IHostBuilder ConfigureUserLocalAppDataJsonFile<T>(this IHostBuilder hostBuilder, string folderName,
-        string fileName, out T? singleton, out Action<T>? saveToFile, bool alwaysWriteFileOnLoad = false) where T : class, new()
+        string fileName, out T instance, out Action<T> saveToFile, bool alwaysWriteFileOnLoad = false) where T : class, new()
     {
-        saveToFile = null;
-        T? instance = singleton = null;
-
         // create folder if not exists
         var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), folderName);
         Directory.CreateDirectory(dataPath); // create folder if not exists
@@ -79,14 +76,18 @@ public static class HostBuilderExtensions
             instance = new T();
             var content = JsonSerializer.Serialize(instance, SerializerOptions);
             File.WriteAllText(fullPath, content, Encoding.UTF8);
-            instance = null;
         }
-
-        // load json file if exists
-        if (File.Exists(fullPath))
+        else
         {
             var json = File.ReadAllText(fullPath, Encoding.UTF8);
-            instance = singleton = JsonSerializer.Deserialize<T>(json, SerializerOptions);
+            if (JsonSerializer.Deserialize<T>(json, SerializerOptions) is T t)
+            {
+                instance = t;
+            }
+            else
+            {
+                throw new Exception("Unable to load instance from file");
+            }
         }
 
         ArgumentNullException.ThrowIfNull(instance);
@@ -103,11 +104,13 @@ public static class HostBuilderExtensions
             File.WriteAllText(fullPath, content, Encoding.UTF8);
         }
 
+        var singleton = instance;
+
         // add to DI
         hostBuilder
         .ConfigureServices((hostContext, services) =>
         {
-            services.AddSingleton(instance);
+            services.AddSingleton(singleton);
             services.AddSingleton(saveMethod);
         });
 
@@ -120,7 +123,6 @@ public static class HostBuilderExtensions
 ////    public IConfigurationProvider Build(IConfigurationBuilder builder)
 ////    {
 ////        //return new JsonFileConfigurationSource();
-
 ////    }
 ////}
 //public class SecurityMetadata
@@ -134,7 +136,6 @@ public static class HostBuilderExtensions
 //    public override void Set(string key, string value)
 //    {
 //        base.Set(key, value);
-
 //        ////Get Whole json file and change only passed key with passed value. It requires modification if you need to support change multi level json structure
 //        //var fileFullPath = base.Source.FileProvider.GetFileInfo(base.Source.Path).PhysicalPath;
 //        //string json = File.ReadAllText(fileFullPath);

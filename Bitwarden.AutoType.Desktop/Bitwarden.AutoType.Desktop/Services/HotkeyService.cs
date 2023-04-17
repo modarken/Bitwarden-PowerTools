@@ -13,11 +13,11 @@ public class HotkeyService : WPFBackgroundService
 
     public HotkeyService()
     {
-        _hotKeyNew = new WindowsHotKey(VirtualKeys.A, RegisterHotKeyModifiers.Ctrl | RegisterHotKeyModifiers.Alt, TakAction);
+        _hotKeyNew = new WindowsHotKey(VirtualKeys.A, RegisterHotKeyModifiers.Ctrl | RegisterHotKeyModifiers.Alt, TakeAction);
         var success = _hotKeyNew.RegisterHotKey();
     }
 
-    private void TakAction(WindowsHotKey hotKey)
+    private void TakeAction(WindowsHotKey hotKey)
     {
         MessageBox.Show("OH YEAH");
     }

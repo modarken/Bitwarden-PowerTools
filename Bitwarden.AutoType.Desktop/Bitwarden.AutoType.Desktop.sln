@@ -12,6 +12,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@doc", "@doc", "{12F02CCB-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bitwarden.Core", "Bitwarden.Core\Bitwarden.Core.csproj", "{02D26D9C-7746-4478-A0C8-DBA96DEB4989}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bitwarden.API.Test", "Bitwarden.API.Test\Bitwarden.API.Test.csproj", "{14D03994-406A-47CD-ACB4-C056BB994B75}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{9027FBBE-522A-46B6-997D-A7180DD32AAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,9 +35,18 @@ Global
 		{02D26D9C-7746-4478-A0C8-DBA96DEB4989}.FDroid|Any CPU.Build.0 = Debug|Any CPU
 		{02D26D9C-7746-4478-A0C8-DBA96DEB4989}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02D26D9C-7746-4478-A0C8-DBA96DEB4989}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14D03994-406A-47CD-ACB4-C056BB994B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14D03994-406A-47CD-ACB4-C056BB994B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14D03994-406A-47CD-ACB4-C056BB994B75}.FDroid|Any CPU.ActiveCfg = Debug|Any CPU
+		{14D03994-406A-47CD-ACB4-C056BB994B75}.FDroid|Any CPU.Build.0 = Debug|Any CPU
+		{14D03994-406A-47CD-ACB4-C056BB994B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14D03994-406A-47CD-ACB4-C056BB994B75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{14D03994-406A-47CD-ACB4-C056BB994B75} = {9027FBBE-522A-46B6-997D-A7180DD32AAD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CEB3FC01-85D6-4410-829F-44D6F8497E6D}

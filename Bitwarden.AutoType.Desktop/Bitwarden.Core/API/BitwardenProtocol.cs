@@ -9,7 +9,8 @@ namespace Bitwarden.Core.API
     {
         public static async Task<PreLoginResponse?> GetPreLogin(string baseAddesss, string email)
         {
-            var content = $$"""
+            var content =
+                $$"""
                 {
                     "email": "{{email}}"
                 }
@@ -31,7 +32,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetGetLoginAccessToken(string baseAddesss, string clientID, string clientSecret, string deviceName, string deviceIdentifier)
+        public static async Task<TokenResponse?> GetLoginAccessToken(string baseAddesss, string clientID, string clientSecret, string deviceName, string deviceIdentifier)
         {
             ;
             var content = new Dictionary<string, string>()
@@ -60,7 +61,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetGetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
+        public static async Task<TokenResponse?> GetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
             string deviceName)
         {
             var content = new Dictionary<string, string>()
@@ -93,7 +94,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetGetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
+        public static async Task<TokenResponse?> GetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
             string deviceName, string twoFactorToken)
         {
             var content = new Dictionary<string, string>()
