@@ -25,7 +25,7 @@ public static class BitwardenCrypto
 
     public static bool MacsEqual(byte[] macKey, byte[] mac1, byte[] mac2)
     {
-        using HMACSHA256 hmac = new HMACSHA256(macKey);
+        using HMACSHA256 hmac = new(macKey);
 
         byte[] hmac1 = hmac.ComputeHash(mac1);
         byte[] hmac2 = hmac.ComputeHash(mac2);
@@ -101,8 +101,8 @@ public static class BitwardenCrypto
         aes.Key = key;
 
         using var decryptor = aes.CreateDecryptor();
-        using MemoryStream ms = new MemoryStream();
-        using CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write);
+        using MemoryStream ms = new();
+        using CryptoStream cs = new(ms, decryptor, CryptoStreamMode.Write);
         cs.Write(data, 0, data.Length);
         cs.FlushFinalBlock();
         var decrypted = ms.ToArray();
@@ -112,7 +112,7 @@ public static class BitwardenCrypto
     public static byte[] PBKDF2Hash(byte[] password, byte[] salt, int iterations)
     {
         // Generate the hash
-        Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(password, salt, iterations, new HashAlgorithmName("SHA256"));
+        Rfc2898DeriveBytes pbkdf2 = new(password, salt, iterations, new HashAlgorithmName("SHA256"));
         return pbkdf2.GetBytes(32); //20 bytes length is 160 bits
     }
 

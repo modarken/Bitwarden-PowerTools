@@ -86,7 +86,7 @@ TokenResponse TestViaAPIKey(BitwardenClientConfiguration bitwardenClientConfigur
 
     var deviceName = bitwardenClientConfiguration.device_name;
     var deviceIdentifier = bitwardenClientConfiguration.device_identifier;
-    var accessToken = BitwardenProtocol.GetLoginAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
+    var accessToken = BitwardenProtocol.PostAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
 
     return accessToken;
 }
@@ -102,7 +102,7 @@ TokenResponse TestViaPasswordAndTOTP(BitwardenClientConfiguration bitwardenClien
     // var masterkey = bitwardenClientConfiguration.master_key; //password -> PBKDF2 10,000 iterations -> master key
     // var twoFactorToken = "123456";
 
-    var preLogin = BitwardenProtocol.GetPreLogin(baseAddesss, email).GetAwaiter().GetResult();
+    var preLogin = BitwardenProtocol.PostPreLogin(baseAddesss, email).GetAwaiter().GetResult();
 
     Console.WriteLine("Enter master password");
 
@@ -113,16 +113,16 @@ TokenResponse TestViaPasswordAndTOTP(BitwardenClientConfiguration bitwardenClien
     var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
 
     // Three methods to get an access token
-    // var accessToken = BitwardenProtocol.GetLoginAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
-    // var accessToken2 = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName).GetAwaiter().GetResult();
-    // var accessToken3 = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
+    // var accessToken = BitwardenProtocol.PostAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
+    // var accessToken2 = BitwardenProtocol.PostAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName).GetAwaiter().GetResult();
+    // var accessToken3 = BitwardenProtocol.PostAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
 
     // If TOTP is setup, must use TOTP token
     Console.WriteLine("Enter TOTP password");
     var twoFactorToken = GetPassword().ToUnsecureString();
     var deviceName = bitwardenClientConfiguration.device_name;
     var deviceIdentifier = bitwardenClientConfiguration.device_identifier;
-    var accessToken = BitwardenProtocol.GetLoginAccessTokenFromPassword(baseAddesss, email, masterPasswordHash, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
+    var accessToken = BitwardenProtocol.PostAccessTokenFromPassword(baseAddesss, email, masterPasswordHash, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
 
     return accessToken;
 }
@@ -136,7 +136,7 @@ TokenResponse TestViaRefreshToken(BitwardenClientConfiguration bitwardenClientCo
 
     var deviceName = bitwardenClientConfiguration.device_name;
     var deviceIdentifier = bitwardenClientConfiguration.device_identifier;
-    var accessToken = BitwardenProtocol.GetLoginAccessTokenFromRefreshToken(baseAddesss, refreshToken, deviceName, deviceIdentifier).GetAwaiter().GetResult();
+    var accessToken = BitwardenProtocol.PostAccessTokenFromRefreshToken(baseAddesss, refreshToken, deviceName, deviceIdentifier).GetAwaiter().GetResult();
 
     return accessToken;
 }

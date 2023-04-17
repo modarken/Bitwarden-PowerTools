@@ -9,17 +9,17 @@
  * https://bitwarden.com/help/personal-api-key/
  *
 */
+
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using Bitwarden.Core.Models;
 
-
 namespace Bitwarden.Core.API
 {
     public static class BitwardenProtocol
     {
-        public static async Task<PreLoginResponse?> GetPreLogin(string baseAddesss, string email)
+        public static async Task<PreLoginResponse?> PostPreLogin(string baseAddesss, string email)
         {
             var content =
                 $$"""
@@ -28,7 +28,7 @@ namespace Bitwarden.Core.API
                 }
                 """;
 
-            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "identity/accounts/prelogin")
+            using HttpRequestMessage request = new(HttpMethod.Post, "identity/accounts/prelogin")
             { Content = new StringContent(content, Encoding.UTF8, "application/json") };
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
@@ -44,7 +44,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetLoginAccessTokenFromAPIKey(string baseAddesss, string clientID, string clientSecret, string deviceName = "", string deviceIdentifier = "")
+        public static async Task<TokenResponse?> PostAccessTokenFromAPIKey(string baseAddesss, string clientID, string clientSecret, string deviceName = "", string deviceIdentifier = "")
         {
             ;
             var content = new Dictionary<string, string>()
@@ -57,7 +57,7 @@ namespace Bitwarden.Core.API
                 {"device_identifier", deviceIdentifier},
             };
 
-            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "identity/connect/token")
+            using HttpRequestMessage request = new(HttpMethod.Post, "identity/connect/token")
             { Content = new FormUrlEncodedContent(content) };
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
@@ -73,7 +73,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetLoginAccessTokenFromRefreshToken(string baseAddesss, string refreshToken, string deviceName = "", string deviceIdentifier = "")
+        public static async Task<TokenResponse?> PostAccessTokenFromRefreshToken(string baseAddesss, string refreshToken, string deviceName = "", string deviceIdentifier = "")
         {
             var content = new Dictionary<string, string>()
             {
@@ -84,7 +84,7 @@ namespace Bitwarden.Core.API
                 {"device_identifier", deviceIdentifier},
             };
 
-            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "identity/connect/token")
+            using HttpRequestMessage request = new(HttpMethod.Post, "identity/connect/token")
             { Content = new FormUrlEncodedContent(content) };
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
@@ -100,7 +100,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier = "",
+        public static async Task<TokenResponse?> PostAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier = "",
             string deviceName = "")
         {
             var content = new Dictionary<string, string>()
@@ -116,7 +116,7 @@ namespace Bitwarden.Core.API
                 {"devicePushToken", ""}
             };
 
-            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "identity/connect/token")
+            using HttpRequestMessage request = new(HttpMethod.Post, "identity/connect/token")
             { Content = new FormUrlEncodedContent(content) };
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
@@ -133,7 +133,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> GetLoginAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
+        public static async Task<TokenResponse?> PostAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
             string deviceName = "", string twoFactorToken = "")
         {
             var content = new Dictionary<string, string>()
@@ -152,7 +152,7 @@ namespace Bitwarden.Core.API
                 {"twoFactorRemember", "1"}
             };
 
-            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "identity/connect/token")
+            using HttpRequestMessage request = new(HttpMethod.Post, "identity/connect/token")
             { Content = new FormUrlEncodedContent(content) };
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
@@ -171,7 +171,7 @@ namespace Bitwarden.Core.API
 
         public static async Task<ProfileResponse?> GetProfile(string baseAddesss, string? bearerToken)
         {
-            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "api/accounts/profile");
+            using HttpRequestMessage request = new(HttpMethod.Get, "api/accounts/profile");
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
@@ -182,8 +182,6 @@ namespace Bitwarden.Core.API
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            // response.EnsureSuccessStatusCode();
 
             if (response.IsSuccessStatusCode)
             {
@@ -195,19 +193,12 @@ namespace Bitwarden.Core.API
 
         public static async Task<SyncResponse?> GetSync(string baseAddesss, string? bearerToken)
         {
-            using HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "api/sync");
+            using HttpRequestMessage request = new(HttpMethod.Get, "api/sync");
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
-            //httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {bearerToken}");
-            //httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-            //httpClient.DefaultRequestHeaders.Add("Content-Type", "application/json");
-            //httpClient.DefaultRequestHeaders.Add("Content-Length", content.Length.ToString());
-
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            // response.EnsureSuccessStatusCode();
 
             if (response.IsSuccessStatusCode)
             {
