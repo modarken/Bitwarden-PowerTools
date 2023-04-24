@@ -7,40 +7,6 @@ using Bitwarden.Core.Models;
 
 namespace Bitwarden.AutoType.Desktop.Services;
 
-/// <summary>
-/// Types the specified keystrokes.
-///
-///
-/// TODO
-///
-///
-///
-///
-/// abc                         // key press characters abc
-/// {1000}                      // delay for 1 second
-/// {DELAY=X}                   // delay for x milliseconds for all subsequent keypresses
-/// {VKEY=X}                    // key press virtual key of value x
-/// {VKEY=X:1500}               // key press virtual key of value x for 1.5 seconds
-/// {[X]}                       // key press specified character
-/// {[X]:1500}                  /}123$%^/ key press specified character for 1.5 seconds
-/// {SPECIALKEY}                // key press special character
-/// {SPECIALKEY:1500}           // hold special down key for 1.5 seconds
-/// {SPECIALKEY:DOWN}           // special key press down
-/// {SPECIALKEY:UP}             // special key press up
-/// {APPACTIVATE:WindowTitleRegEx}   // App activate Tiyle
-///
-///
-/// {bw:title}   // App activate Tiyle
-/// {bw:username}   // App activate Tiyle
-/// {bw:password}   // App activate Tiyle
-/// {bw:url}   // App activate Tiyle
-/// {bw:notes}   // App activate Tiyle
-///
-///
-///
-/// </summary>
-/// <param name="keystrokes">The keystrokes.</param>
-///
 public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
 {
     private readonly Regex _keyRegEx = new(@"{.*?}", RegexOptions.Compiled);

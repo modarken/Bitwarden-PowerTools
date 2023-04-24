@@ -21,7 +21,7 @@ public class BitwardenService : WPFBackgroundService
     private TokenResponse? _accessToken;
     private SyncResponse? _syncResponse;
     private DateTimeOffset? _revisionDate;
-    private readonly List<Action<SyncResponse>> _syncResponseActions;
+    private readonly List<Action<SyncResponse>>? _syncResponseActions;
     private object _syncLock = new object();
 
     public BitwardenService(BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
@@ -49,11 +49,13 @@ public class BitwardenService : WPFBackgroundService
                 await Task.Delay(TimeSpan.FromMinutes(15), stoppingToken).ConfigureAwait(false);
                 //logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waited TimeSpan.FromMinutes(15).");
             }
-            catch (TaskCanceledException e)
+            //catch (TaskCanceledException e)
+            catch (TaskCanceledException)
             {
                 //_logger.Log(LogLevel.Warning, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Exception:'{e.Message}'");
             }
-            catch (Exception e)
+            //catch (Exception e)
+            catch (Exception)
             {
                 //_logger.Log(LogLevel.Error, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Exception:'{e.Message}'");
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken).ConfigureAwait(false);
