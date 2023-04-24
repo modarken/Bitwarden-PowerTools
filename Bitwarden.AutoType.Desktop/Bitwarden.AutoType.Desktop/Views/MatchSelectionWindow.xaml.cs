@@ -1,35 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Data;
 using Bitwarden.Core.Models;
+using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls;
 
 namespace Bitwarden.AutoType.Desktop.Views
 {
-    //public class ToStringConverter : IValueConverter
-    //{
-    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        return value?.ToString()!;
-    //    }
-
-    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
-
     public class ToAutoTypeCustomFieldConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-
             if (value is KeyValuePair<AutoTypeCustomField, Cipher> valueKeyValuePair)
             {
-                return $"{ valueKeyValuePair.Key.Name }   {valueKeyValuePair.Key.UserName}   { valueKeyValuePair.Key.Target }   {valueKeyValuePair.Key.Sequence }";
+                return $"{valueKeyValuePair.Key.Name}   {valueKeyValuePair.Key.UserName}   {valueKeyValuePair.Key.Target}   {valueKeyValuePair.Key.Sequence}";
             }
 
             return value?.ToString()!;
@@ -50,6 +36,7 @@ namespace Bitwarden.AutoType.Desktop.Views
 
         public MatchSelectionWindow(IEnumerable<KeyValuePair<AutoTypeCustomField, Cipher>> matches)
         {
+            DataContext = this;
             InitializeComponent();
             MatchListBox.ItemsSource = matches;
         }
@@ -70,6 +57,17 @@ namespace Bitwarden.AutoType.Desktop.Views
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
+        }
+
+        // CommandParameter="{Binding MySourceItemId}"
+        [RelayCommand]
+        private void SelectedMatchDoubleClicked()
+        {
+            if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
+            {
+                SelectedMatch = selectedMatch;
+                DialogResult = true;
+            }
         }
     }
 }

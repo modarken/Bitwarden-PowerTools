@@ -7,6 +7,8 @@
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:local="clr-namespace:Bitwarden.AutoType.Desktop.Views"
         mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"  ResizeMode="NoResize"
+        ShowInTaskbar="False" Topmost="True" WindowStyle="ToolWindow"
         Title="Select Match" Height="300" Width="600">
     <Window.Resources>
         <local:ToAutoTypeCustomFieldConverter x:Key="ToAutoTypeCustomFieldConverter"/>
@@ -17,10 +19,17 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ListBox x:Name="MatchListBox" Grid.Row="0" Margin="10">
+        <ListBox x:Name="MatchListBox" Grid.Row="0" Margin="10" >
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Path=., Mode=OneWay, Converter={StaticResource ToAutoTypeCustomFieldConverter}}"/>
+                    <TextBlock
+                        Text="{Binding Path=., Mode=OneWay, Converter={StaticResource ToAutoTypeCustomFieldConverter}}">
+                        <TextBlock.InputBindings>
+                            <MouseBinding MouseAction="LeftDoubleClick"
+                                          Command="{Binding Path=SelectedMatchDoubleClickedCommand, RelativeSource={RelativeSource AncestorType={x:Type local:MatchSelectionWindow}}}"
+                                          />
+                        </TextBlock.InputBindings>
+                    </TextBlock>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

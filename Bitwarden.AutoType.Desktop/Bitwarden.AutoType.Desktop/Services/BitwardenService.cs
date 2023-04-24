@@ -22,7 +22,7 @@ public class BitwardenService : WPFBackgroundService
     private SyncResponse? _syncResponse;
     private DateTimeOffset? _revisionDate;
     private readonly List<Action<SyncResponse>>? _syncResponseActions;
-    private object _syncLock = new object();
+    private readonly object _syncLock = new();
 
     public BitwardenService(BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
     {
