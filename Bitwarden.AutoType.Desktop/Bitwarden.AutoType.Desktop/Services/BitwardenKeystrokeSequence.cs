@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using Bitwarden.AutoType.Desktop.Windows.Native;
 using Bitwarden.AutoType.Desktop.Windows;
+using Bitwarden.Core.Models;
 
 namespace Bitwarden.AutoType.Desktop.Services;
 
 /// <summary>
 /// Types the specified keystrokes.
+///
+///
+/// TODO
+///
+///
+///
 ///
 /// abc                         // key press characters abc
 /// {1000}                      // delay for 1 second
@@ -41,81 +45,54 @@ public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
 {
     private readonly Regex _keyRegEx = new(@"{.*?}", RegexOptions.Compiled);
 
-    private static readonly Dictionary<string, EmulatedKeystroke> _specialKeywords = new()
+    public enum BitwardenPlaceholders
     {
-        {"name", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.OEM4, KeyModifierFlags = 0x01 } },
-        {"username", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.OEM4, KeyModifierFlags = 0x01 } },
-        {"password", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.OEM4, KeyModifierFlags = 0x01 } },
-        {"totp", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.OEM4, KeyModifierFlags = 0x01 } },
-        //{"uri1", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.OEM4, KeyModifierFlags = 0x01 } },
-        // field:uri1
-        // field:key2
-        {"notes", new EmulatedKeystroke { VirtualKey = (byte)VirtualKeys.OEM4, KeyModifierFlags = 0x01 } },
+        NAME,
+        USERNAME,
+        PASSWORD,
+        URL,
+        NOTES,
+    }
 
-    };
+    private readonly Cipher _cipher;
+    private readonly Func<string, string?> _decryptor;
 
-    public BitwardenKeystrokeSequence(string sequence, IKeystrokeConfiguration? configuration) : base(sequence, configuration)
+    public BitwardenKeystrokeSequence(string sequence, IKeystrokeConfiguration? configuration, Cipher cipher, Func<string, string?> decryptor) : base(sequence, configuration)
     {
+        _cipher = cipher;
+        _decryptor = decryptor;
     }
 
     private IEnumerable<EmulatedKeystroke>? ProcessRegExSequence(string sequence)
     {
-        throw new NotImplementedException();
-        //var innerSequence = sequence[1..^1].ToLower();
+        var keyword = sequence[1..^1].ToLower();
 
-        //string keyword = "";
-        //EmulatedKeystrokeTypes? keystrokeType = null;
-        //TimeSpan? timeSpan = null;
-        //EmulatedKeystroke? emulatedKeystroke = null;
+        if (Enum.TryParse(keyword, true, out BitwardenPlaceholders placeHolder))
+        {
+            // Console.WriteLine($"The input '{input}' matches the enum case: {color}");
+            var cipherText = placeHolder switch
+            {
+                BitwardenPlaceholders.NAME => _cipher.Name,
+                BitwardenPlaceholders.USERNAME => _cipher.Login?.Username,
+                BitwardenPlaceholders.PASSWORD => _cipher.Login?.Password,
+                BitwardenPlaceholders.URL => _cipher.Login?.Uri,
+                BitwardenPlaceholders.NOTES => _cipher.Notes,
+                _ => throw new ArgumentOutOfRangeException(nameof(placeHolder), placeHolder, null),
+            };
 
-        //if (innerSequence.Contains(':'))
-        //{
-        //    var split = innerSequence.Split(':');
-        //    keyword = split[0];
-        //    var unknown = split[1];
+            if (cipherText is string)
+            {
+                var plainText = _decryptor(cipherText);
+                if (plainText is string)
+                {
+                    var plainTextSequence = new KeystrokeSequence(plainText, Configuration);
 
-        //    if (Int32.TryParse(unknown, out int result))
-        //    {
-        //        timeSpan = TimeSpan.FromMilliseconds(result);
-        //    }
-        //    else if (Enum.TryParse(typeof(EmulatedKeystrokeTypes), unknown, true, out object? parsed))
-        //    {
-        //        keystrokeType = (EmulatedKeystrokeTypes?)parsed;
-        //    }
-        //}
-        //else
-        //{
-        //    keyword = innerSequence;
-        //}
+                    return plainTextSequence.Provide();
+                }
+            }
+        }
 
-        //if (_specialKeywords.ContainsKey(keyword))
-        //{
-        //    emulatedKeystroke = (EmulatedKeystroke?)_specialKeywords[keyword].Clone();
-        //}
-        //else if (keyword.StartsWith("vk") && keyword.Length > 2)
-        //{
-        //    var tryGetByte = keyword[2..];
-
-        //    if (Byte.TryParse(tryGetByte, out byte outByte))
-        //    {
-        //        emulatedKeystroke = new EmulatedKeystroke { VirtualKey = outByte };
-        //    }
-        //}
-
-        //if (emulatedKeystroke is EmulatedKeystroke)
-        //{
-        //    if (keystrokeType is EmulatedKeystrokeTypes ks)
-        //    {
-        //        emulatedKeystroke!.DirectionType = ks;
-        //    }
-        //    if (timeSpan is TimeSpan ts)
-        //    {
-        //        emulatedKeystroke!.PressTime = ts;
-        //    }
-        //    return new EmulatedKeystroke[] { emulatedKeystroke! };
-        //}
-
-        //return null;
+        return null;
     }
 
     protected override IEnumerable<EmulatedKeystroke> Process(string keystrokes, string sequence)

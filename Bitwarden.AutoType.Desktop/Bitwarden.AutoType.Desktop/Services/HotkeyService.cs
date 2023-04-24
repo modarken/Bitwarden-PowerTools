@@ -1,35 +1,41 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows;
-using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.AutoType.Desktop.Windows.Native;
 
 namespace Bitwarden.AutoType.Desktop.Services;
 
-public class HotkeyService : WPFBackgroundService
+public class HotkeyService : IDisposable
 {
     private WindowsHotKey _hotKeyNew;
+    private readonly List<Action<WindowsHotKey>> _hotKeyActions;
 
     public HotkeyService()
     {
-        _hotKeyNew = new WindowsHotKey(VirtualKeys.A, RegisterHotKeyModifiers.Ctrl | RegisterHotKeyModifiers.Alt, TakeAction);
+        _hotKeyActions = new List<Action<WindowsHotKey>>();
+        _hotKeyNew = new WindowsHotKey(VirtualKeys.A, RegisterHotKeyModifiers.Ctrl | RegisterHotKeyModifiers.Alt, ExecuteOnHotKey);
         var success = _hotKeyNew.RegisterHotKey();
     }
 
-    private void TakeAction(WindowsHotKey hotKey)
+    public void RegisterOnHotKey(Action<WindowsHotKey> onHotKey)
     {
-        MessageBox.Show("OH YEAH");
+        if (onHotKey != null)
+        {
+            _hotKeyActions.Add(onHotKey);
+        }
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    private void ExecuteOnHotKey(WindowsHotKey hotKey)
     {
-        await Task.Delay(Timeout.Infinite, stoppingToken).ConfigureAwait(false);
+        foreach (var action in _hotKeyActions)
+        {
+            action.Invoke(hotKey);
+        }
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
-        base.Dispose();
         _hotKeyNew?.Dispose();
     }
 }

@@ -5,6 +5,7 @@ using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.AutoType.Desktop.Windows;
+using Bitwarden.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -37,27 +38,30 @@ public partial class App : Application
         _host = Host.CreateDefaultBuilder()
         .ConfigureUserLocalAppDataJsonFile<Settings>(DesktopConstants.DefaultDataFolderName, "settings.json",
             out Settings? settings, out Action<Settings>? saveToFile, true)
-        .ConfigureServices((hostContext, services) =>
+        .ConfigureServices((hostContext, services) => // configuration
         {
             services.AddSingleton(settings!.BitwardenClientConfiguration!);
             services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { saveToFile!.Invoke(settings!); }));
         })
-        .ConfigureServices((hostContext, services) =>
-        {
-            var hotkeyService = new HotkeyService();
-            services.AddSingleton<HotkeyService>(hotkeyService);
-            services.AddHostedService((sp) => hotkeyService);
-
-        })
-        .ConfigureServices((hostContext, services) =>
+        .ConfigureServices((hostContext, services) => // regular services
         {
             services.AddSingleton<AutoTypeService>();
-            services.AddSingleton<BitwardenService>();
+            services.AddSingleton<HotkeyService>();
             services.AddSingleton<AutoTypeViewModel>();
             services.AddSingleton<MainWindow>();
-            services.AddHostedService<TestService>();
 
-        }).Build();
+        })
+        .ConfigureServices((hostContext, services) => // hosted services
+        {
+            var config = services.BuildServiceProvider().GetService<BitwardenClientConfiguration>()!;
+            var save = services.BuildServiceProvider().GetService<Action<BitwardenClientConfiguration>>()!;
+            var bitwardenService = new BitwardenService(config, save);
+            services.AddSingleton<BitwardenService>(bitwardenService);
+            services.AddHostedService((sp) => bitwardenService);
+            services.AddHostedService<TestService>();
+        })
+
+        .Build();
     }
 
     private async void Application_Startup(object sender, StartupEventArgs e)

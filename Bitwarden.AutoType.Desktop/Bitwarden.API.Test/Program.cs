@@ -2,14 +2,13 @@
 
 using System.Runtime.InteropServices;
 using System.Security;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Bitwarden.Core.API;
 using Bitwarden.Core.Crypto;
 using Bitwarden.Core.Models;
+using Bitwarden.Utilities;
 
 Console.WriteLine("Hello, World!");
 
@@ -64,7 +63,7 @@ BitwardenClientConfiguration LoadConfig()
     var fileName = "settings.json";
     var fullPath = Path.Combine(dataPath, fileName);
     var json = File.ReadAllText(fullPath, Encoding.UTF8);
-    var bitwardenClientConfiguration = default(BitwardenClientConfiguration);
+    BitwardenClientConfiguration? bitwardenClientConfiguration;
     if (JsonSerializer.Deserialize<Settings>(json, serializerOptions) is Settings t)
     {
         bitwardenClientConfiguration = t.BitwardenClientConfiguration;
@@ -114,15 +113,15 @@ TokenResponse TestViaPasswordAndTOTP(BitwardenClientConfiguration bitwardenClien
 
     // Three methods to get an access token
     // var accessToken = BitwardenProtocol.PostAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
-    // var accessToken2 = BitwardenProtocol.PostAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName).GetAwaiter().GetResult();
-    // var accessToken3 = BitwardenProtocol.PostAccessTokenFromPassword(baseAddesss, userName, password, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
+    // var accessToken2 = BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(baseAddesss, userName, password, deviceIdentifier, deviceName).GetAwaiter().GetResult();
+    // var accessToken3 = BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(baseAddesss, userName, password, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
 
     // If TOTP is setup, must use TOTP token
     Console.WriteLine("Enter TOTP password");
     var twoFactorToken = GetPassword().ToUnsecureString();
     var deviceName = bitwardenClientConfiguration.device_name;
     var deviceIdentifier = bitwardenClientConfiguration.device_identifier;
-    var accessToken = BitwardenProtocol.PostAccessTokenFromPassword(baseAddesss, email, masterPasswordHash, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
+    var accessToken = BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(baseAddesss, email, masterPasswordHash, deviceIdentifier, deviceName, twoFactorToken).GetAwaiter().GetResult();
 
     return accessToken;
 }
@@ -246,6 +245,11 @@ static SecureString GetPassword()
     return pwd;
 }
 
+public static class DesktopConstants
+{
+    public static readonly string DefaultDataFolderName = "BitwardenAutoType";
+}
+
 internal static class Helpers
 {
     public static string ToUnsecureString(this SecureString secureString)
@@ -264,87 +268,4 @@ internal static class Helpers
     }
 }
 
-public class BitwardenClientConfiguration : IBitwardenClientConfiguration
-{
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? base_address { get; set; }
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? email { get; set; }
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? master_key { get; set; }
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? client_id { get; set; }
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? client_secret { get; set; }
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? refresh_token { get; set; }
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? device_name { get; set; }
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? device_identifier { get; set; }
-}
-
-public interface IBitwardenClientConfiguration
-{
-    string? base_address { get; set; }
-    string? client_id { get; set; }
-    string? client_secret { get; set; }
-    string? device_identifier { get; set; }
-    string? device_name { get; set; }
-    string? email { get; set; }
-    string? master_key { get; set; }
-    string? refresh_token { get; set; }
-}
-
-public class DefaultBitwardenClientConfiguration : IBitwardenClientConfiguration
-{
-    public string? base_address { get; set; }
-    public string? email { get; set; }
-    public string? master_key { get; set; }
-    public string? client_id { get; set; }
-    public string? client_secret { get; set; }
-    public string? refresh_token { get; set; }
-    public string? device_name { get; set; }
-    public string? device_identifier { get; set; }
-}
-
-public class Settings
-{
-    public BitwardenClientConfiguration? BitwardenClientConfiguration { get; set; } = new BitwardenClientConfiguration();
-}
-
-public static class DesktopConstants
-{
-    public static readonly string DefaultDataFolderName = "BitwardenAutoType";
-}
-
-public class ProtectedDataConverter : JsonConverter<string?>
-{
-    public static readonly string Key = "<Protected>";
-    public static readonly byte[] Entropy = new byte[] { 77, 54, 8, 44, 1 };
-
-    public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        var value = reader.GetString();
-        if (value is null ||
-            value.Length < Key.Length ||
-            !value.StartsWith(Key))
-        {
-            return value;
-        }
-
-        var base64 = String.Concat(value.Skip(Key.Length));
-        var binary = Convert.FromBase64String(base64);
-        var data = ProtectedData.Unprotect(binary, Entropy, DataProtectionScope.CurrentUser);
-        return Encoding.ASCII.GetString(data);
-    }
-
-    public override void Write(Utf8JsonWriter writer, string? value, JsonSerializerOptions options)
-    {
-        if (writer is null) return;
-        var plainText = value!.ToString();
-        if (plainText.Length == 0)
-        {
-            writer.WriteStringValue(string.Empty);
-            return;
-        }
-
-        var plainBytes = Encoding.ASCII.GetBytes(plainText);
-        var encryptedBytes = ProtectedData.Protect(plainBytes, Entropy, DataProtectionScope.CurrentUser);
-        var encryptedBytesBase64 = $"{Key}{Convert.ToBase64String(encryptedBytes)}";
-        writer.WriteStringValue(encryptedBytesBase64);
-    }
-}
-#endregion
+#endregion Support

@@ -303,7 +303,7 @@ public class KeystrokeSequence : IKeystrokeProvider
     {
         _sequence = sequence;
         Configuration = configuration ?? new DefaultKeystrokeConfiguration();
-        Provide();
+        // Provide();
     }
 
     protected virtual IEnumerable<EmulatedKeystroke> Process(string keystrokes, string sequence)

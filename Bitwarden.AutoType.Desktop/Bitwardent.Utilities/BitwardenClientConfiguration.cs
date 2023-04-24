@@ -1,7 +1,13 @@
-﻿using System.Text.Json.Serialization;
-using Bitwarden.Core;
+﻿// See https://aka.ms/new-console-template for more information
 
-namespace Bitwarden.AutoType.Desktop.Helpers;
+using System.Text.Json.Serialization;
+
+namespace Bitwarden.Utilities;
+
+public class Settings
+{
+    public BitwardenClientConfiguration? BitwardenClientConfiguration { get; set; } = new BitwardenClientConfiguration();
+}
 
 public class BitwardenClientConfiguration : IBitwardenClientConfiguration
 {
@@ -20,7 +26,18 @@ public class BitwardenClientConfiguration : IBitwardenClientConfiguration
     /// The email.
     /// </value>
     [JsonConverter(typeof(ProtectedDataConverter))] public string? email { get; set; }
+
+    /// <summary>
+    /// Gets or sets the master key. The master key has several uses.
+    /// 1. Used to decrypt the server side protected symmetric key to the generated symmetric key.
+    /// Which used to (d)encrypt the data.
+    /// 2. Used when logging into the server by calculating the Master Password Hash and sending it to the server.
+    /// </summary>
+    /// <value>
+    /// The master key.
+    /// </value>
     [JsonConverter(typeof(ProtectedDataConverter))] public string? master_key { get; set; }
+
     /// <summary>
     /// Gets or sets the client identifier used in API ACCESS.
     /// </summary>
@@ -28,6 +45,7 @@ public class BitwardenClientConfiguration : IBitwardenClientConfiguration
     /// The client identifier.
     /// </value>
     [JsonConverter(typeof(ProtectedDataConverter))] public string? client_id { get; set; }
+
     /// <summary>
     /// Gets or sets the client secret used in API ACCESS..
     /// </summary>
@@ -59,9 +77,4 @@ public class BitwardenClientConfiguration : IBitwardenClientConfiguration
     /// The device identifier.
     /// </value>
     [JsonConverter(typeof(ProtectedDataConverter))] public string? device_identifier { get; set; }
-}
-
-public class Settings
-{
-    public BitwardenClientConfiguration? BitwardenClientConfiguration { get; set; } = new BitwardenClientConfiguration();
 }

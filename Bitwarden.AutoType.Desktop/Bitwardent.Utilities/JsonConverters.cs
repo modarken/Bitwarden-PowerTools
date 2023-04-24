@@ -1,7 +1,12 @@
-﻿using System.Linq;
-using System.Security.Cryptography;
+﻿// See https://aka.ms/new-console-template for more information
 
-namespace System.Text.Json.Serialization;
+using System.Runtime.Versioning;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace Bitwarden.Utilities;
 
 // ENCRYPTION SCHEME
 // <Protected>{base64}
@@ -11,6 +16,7 @@ public class ProtectedDataConverter : JsonConverter<string?>
     public static readonly string Key = "<Protected>";
     public static readonly byte[] Entropy = new byte[] { 77, 54, 8, 44, 1 };
 
+    [SupportedOSPlatform("windows")]
     public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         var value = reader.GetString();
@@ -27,6 +33,7 @@ public class ProtectedDataConverter : JsonConverter<string?>
         return Encoding.ASCII.GetString(data);
     }
 
+    [SupportedOSPlatform("windows")]
     public override void Write(Utf8JsonWriter writer, string? value, JsonSerializerOptions options)
     {
         if (writer is null) return;

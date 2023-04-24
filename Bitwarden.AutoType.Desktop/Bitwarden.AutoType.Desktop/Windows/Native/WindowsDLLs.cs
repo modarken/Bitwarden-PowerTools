@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Bitwarden.AutoType.Desktop.Windows.Native;
 
@@ -24,4 +25,14 @@ public static class WindowsDLLs
 
     [DllImport("user32.dll")]
     public static extern ushort VkKeyScan(char ch); // https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-vkkeyscana?redirectedfrom=MSDN
+
+    [DllImport("user32.dll")]
+    public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern int GetWindowText(IntPtr hWnd, StringBuilder lpString, int nMaxCount);
+
 }

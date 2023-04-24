@@ -100,7 +100,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> PostAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier = "",
+        public static async Task<TokenResponse?> PostAccessTokenFrommasterPasswordHash(string baseAddesss, string username, string masterPasswordHash, string deviceIdentifier = "",
             string deviceName = "")
         {
             var content = new Dictionary<string, string>()
@@ -108,7 +108,7 @@ namespace Bitwarden.Core.API
                 {"grant_type", "password"},
                 {"scope", "api offline_access"},
                 {"username", username},
-                {"password", password},
+                {"password", masterPasswordHash},
                 {"client_id", "browser"},
                 {"device_type", "6"}, // see https://github.com/bitwarden/server/blob/master/src/Core/Enums/DeviceType.cs
                 {"device_identifier", deviceIdentifier},
@@ -133,7 +133,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> PostAccessTokenFromPassword(string baseAddesss, string username, string password, string deviceIdentifier,
+        public static async Task<TokenResponse?> PostAccessTokenFromMasterPasswordHash(string baseAddesss, string username, string masterPasswordHash, string deviceIdentifier,
             string deviceName = "", string twoFactorToken = "")
         {
             var content = new Dictionary<string, string>()
@@ -141,7 +141,7 @@ namespace Bitwarden.Core.API
                 {"grant_type", "password"},
                 {"scope", "api offline_access"},
                 {"username", username},
-                {"password", password},
+                {"password", masterPasswordHash},
                 {"client_id", "browser"},
                 {"device_type", "6"}, // see https://github.com/bitwarden/server/blob/master/src/Core/Enums/DeviceType.cs
                 {"device_identifier", deviceIdentifier},
@@ -164,6 +164,23 @@ namespace Bitwarden.Core.API
             if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.BadRequest)
             {
                 return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.TokenResponse);
+            }
+
+            return null;
+        }
+
+        public static async Task<string?> GetRevisionDate(string baseAddesss, string? bearerToken)
+        {
+            using HttpRequestMessage request = new(HttpMethod.Get, "api/accounts/revision-date");
+            using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+            var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return responseString;
             }
 
             return null;
