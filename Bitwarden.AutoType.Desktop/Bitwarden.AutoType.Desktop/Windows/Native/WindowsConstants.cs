@@ -9,4 +9,7 @@ public static class WindowsConstants
     public const int KEYEVENTF_KEYUP = 0x0002;
     public const int KEYEVENTF_SILENT = 0x0004;
     public const int KEYEVENTF_VK_OFF = 0x00DF;
+
+    public const uint EVENT_SYSTEM_FOREGROUND = 0x0003;
+    public const uint WINEVENT_OUTOFCONTEXT = 0x0000;
 }

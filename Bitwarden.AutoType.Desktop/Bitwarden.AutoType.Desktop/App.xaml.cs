@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Services;
-using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Win32;
 
 namespace Bitwarden.AutoType.Desktop;
 
@@ -34,14 +34,15 @@ public partial class App : Application
     public App()
     {
         AppDomain.CurrentDomain.UnhandledException += UnhandledException;
+        SystemEvents.SessionEnding += OnSessionEnding;
 
         _host = Host.CreateDefaultBuilder()
-        .ConfigureUserLocalAppDataJsonFile<Settings>(DesktopConstants.DefaultDataFolderName, "settings.json",
-            out Settings? settings, out Action<Settings>? saveToFile, true)
+        .ConfigureUserLocalAppDataJsonFile<Settings>(DesktopConstants.DefaultDataFolderName, "appSettings.json",
+            out Settings? appSettings, out Action<Settings>? saveSettingsToFile, true)
         .ConfigureServices((hostContext, services) => // configuration
         {
-            services.AddSingleton(settings!.BitwardenClientConfiguration!);
-            services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { saveToFile!.Invoke(settings!); }));
+            services.AddSingleton(appSettings!.BitwardenClientConfiguration!);
+            services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { saveSettingsToFile!.Invoke(appSettings!); }));
         })
         .ConfigureServices((hostContext, services) => // regular services
         {
@@ -49,7 +50,6 @@ public partial class App : Application
             services.AddSingleton<HotkeyService>();
             services.AddSingleton<AutoTypeViewModel>();
             services.AddSingleton<MainWindow>();
-
         })
         .ConfigureServices((hostContext, services) => // hosted services
         {
@@ -75,6 +75,21 @@ public partial class App : Application
 
     private async void Application_Exit(object sender, ExitEventArgs e)
     {
+        await CleanupAsync();
+    }
+
+    private void UnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        throw (Exception)e.ExceptionObject;
+    }
+
+    private async void OnSessionEnding(object sender, SessionEndingEventArgs e)
+    {
+        await CleanupAsync();
+    }
+
+    private async Task CleanupAsync()
+    {
         using var host = _host;
 
         try
@@ -83,16 +98,11 @@ public partial class App : Application
         }
         catch
         {
+            // Handle exceptions, if necessary.
         }
         finally
         {
+            // Perform any additional cleanup operations here.
         }
     }
-
-    private void UnhandledException(object sender, UnhandledExceptionEventArgs e)
-    {
-        throw (Exception)e.ExceptionObject;
-    }
-
-    // TODO Windows shutdown events. ect.
 }

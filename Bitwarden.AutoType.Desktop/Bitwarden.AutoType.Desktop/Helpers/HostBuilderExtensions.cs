@@ -63,7 +63,7 @@ public static class HostBuilderExtensions
     }
 
     public static IHostBuilder ConfigureUserLocalAppDataJsonFile<T>(this IHostBuilder hostBuilder, string folderName,
-        string fileName, out T instance, out Action<T> saveToFile, bool alwaysWriteFileOnLoad = false) where T : class, new()
+        string fileName, out T instance, out Action<T> saveSettingsToFile, bool alwaysWriteFileOnLoad = false) where T : class, new()
     {
         // create folder if not exists
         var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), folderName);
@@ -92,7 +92,7 @@ public static class HostBuilderExtensions
 
         ArgumentNullException.ThrowIfNull(instance);
 
-        var saveMethod = saveToFile = new Action<T>((t) =>
+        var saveMethod = saveSettingsToFile = new Action<T>((t) =>
         {
             var content = JsonSerializer.Serialize(t, SerializerOptions);
             File.WriteAllText(fullPath, content, Encoding.UTF8);

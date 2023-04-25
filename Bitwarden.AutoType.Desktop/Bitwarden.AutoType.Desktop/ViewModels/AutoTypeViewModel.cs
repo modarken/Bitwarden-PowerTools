@@ -17,6 +17,7 @@ using Bitwarden.Core.Crypto;
 using Bitwarden.Core.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.Logging;
+using static Bitwarden.AutoType.Desktop.Windows.Native.WindowsDLLs;
 
 namespace Bitwarden.AutoType.Desktop;
 
@@ -172,14 +173,32 @@ public partial class AutoTypeViewModel : IDisposable
         }
     }
 
+    #region Windows Event Handling
+
     private async void ExecuteMatchHandler(KeyValuePair<AutoTypeCustomField, Cipher>? match, IntPtr handle)
     {
         var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 
-        _ = WindowsDLLs.SetForegroundWindow(handle);
+        WinEventDelegate windEventHandler = (IntPtr hWinEventHook, uint eventType, IntPtr hWnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime) =>
+        {
+            if (eventType == WindowsConstants.EVENT_SYSTEM_FOREGROUND)
+            {
+                // The window focus has changed
+                tokenSource?.Cancel();
+                // Console.WriteLine($"Window focus changed: {hWnd}");
+            }
+        };
+        IntPtr winEventHook = default;
 
         try
         {
+            _ = SetForegroundWindow(handle);
+
+            winEventHook = SetWinEventHook(
+                WindowsConstants.EVENT_SYSTEM_FOREGROUND,
+                WindowsConstants.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, windEventHandler, 0, 0,
+                WindowsConstants.WINEVENT_OUTOFCONTEXT);
+
             await Task.Delay(TimeSpan.FromMilliseconds(300), tokenSource.Token); // in testing must sleep
             await ExecuteMatchFunctionAsync(match, tokenSource.Token);
         }
@@ -187,16 +206,19 @@ public partial class AutoTypeViewModel : IDisposable
         {
             _logger.LogWarning($"{nameof(AutoTypeViewModel)}.{nameof(OnHotKeyHandler)}() {nameof(TaskCanceledException)}");
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             _logger.LogError(e, $"{nameof(AutoTypeViewModel)}.{nameof(OnHotKeyHandler)}() Exception:'{e.Message}'");
         }
         finally
         {
             tokenSource?.Dispose();
+            // Unhook the event
+            UnhookWinEvent(winEventHook);
         }
-
     }
+
+    #endregion Windows Event Handling
 
     private async Task ExecuteMatchFunctionAsync(KeyValuePair<AutoTypeCustomField, Cipher>? match, CancellationToken token = default)
     {
