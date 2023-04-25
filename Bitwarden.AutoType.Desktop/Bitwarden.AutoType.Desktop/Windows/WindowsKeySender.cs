@@ -31,11 +31,13 @@ public static class WindowsKeyboard
 
                 if (!isShiftVirtualKeyDown && item.IsShiftModifier)
                 {
+                    token.ThrowIfCancellationRequested();
                     SendKeyDown(VirtualKeys.Shift);
                 }
 
                 if (item.DirectionType == EmulatedKeystrokeTypes.Press)
                 {
+                    token.ThrowIfCancellationRequested();
                     await SendKeyPressAsync(
                         (VirtualKeys)item.VirtualKey,
                         item.PressTime ?? keystrokeProvider.Configuration.PressKeyTime,
@@ -45,10 +47,12 @@ public static class WindowsKeyboard
                 {
                     if (item.DirectionType == EmulatedKeystrokeTypes.Down)
                     {
+                        token.ThrowIfCancellationRequested();
                         SendKey((VirtualKeys)item.VirtualKey, WindowsConstants.KEYEVENTF_KEYDOWN);
                     }
                     else if (item.DirectionType == EmulatedKeystrokeTypes.Up)
                     {
+                        token.ThrowIfCancellationRequested();
                         SendKey((VirtualKeys)item.VirtualKey, WindowsConstants.KEYEVENTF_KEYUP);
                     }
                 }
@@ -57,6 +61,7 @@ public static class WindowsKeyboard
 
                 if (!isShiftVirtualKeyDown && item.IsShiftModifier)
                 {
+                    token.ThrowIfCancellationRequested();
                     SendKeyUp(VirtualKeys.Shift);
                 }
             }

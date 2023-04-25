@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.INotifyPropertyChangedGenerator", "MVVMTK0032:Inherit from ObservableObject instead of using [INotifyPropertyChanged]", Justification = "<Pending>", Scope = "type", Target = "~T:Bitwarden.AutoType.Desktop.AutoTypeViewModel")]
+[assembly: SuppressMessage("CommunityToolkit.Mvvm.SourceGenerators.INotifyPropertyChangedGenerator", "MVVMTK0032:Inherit from ObservableObject instead of using [INotifyPropertyChanged]", Justification = "<Pending>", Scope = "type", Target = "~T:Bitwarden.AutoType.Desktop.SettingsControlViewModel")]

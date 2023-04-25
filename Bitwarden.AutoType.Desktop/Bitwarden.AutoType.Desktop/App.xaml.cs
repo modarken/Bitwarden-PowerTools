@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Services;
+using Bitwarden.AutoType.Desktop.Views;
 using Bitwarden.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,6 +30,7 @@ public class TestService : WPFBackgroundService
 /// </summary>
 public partial class App : Application
 {
+    public IHost Host => _host;
     private readonly IHost _host;
 
     public App()
@@ -36,8 +38,8 @@ public partial class App : Application
         AppDomain.CurrentDomain.UnhandledException += UnhandledException;
         SystemEvents.SessionEnding += OnSessionEnding;
 
-        _host = Host.CreateDefaultBuilder()
-        .ConfigureUserLocalAppDataJsonFile<Settings>(DesktopConstants.DefaultDataFolderName, "appSettings.json",
+        _host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
+        .ConfigureUserLocalAppDataJsonFile<Settings>(DesktopConstants.DefaultDataFolderName, "settings.json",
             out Settings? appSettings, out Action<Settings>? saveSettingsToFile, true)
         .ConfigureServices((hostContext, services) => // configuration
         {
@@ -49,6 +51,7 @@ public partial class App : Application
             services.AddSingleton<AutoTypeService>();
             services.AddSingleton<HotkeyService>();
             services.AddSingleton<AutoTypeViewModel>();
+            services.AddSingleton<SettingsControlViewModel>();
             services.AddSingleton<MainWindow>();
         })
         .ConfigureServices((hostContext, services) => // hosted services

@@ -21,7 +21,7 @@ public class BitwardenService : WPFBackgroundService
     private TokenResponse? _accessToken;
     private SyncResponse? _syncResponse;
     private DateTimeOffset? _revisionDate;
-    private readonly List<Action<SyncResponse>>? _syncResponseActions;
+    private readonly List<Action<SyncResponse>> _syncResponseActions;
     private readonly object _syncLock = new();
 
     public BitwardenService(BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
@@ -29,6 +29,7 @@ public class BitwardenService : WPFBackgroundService
         //_logger = logger;
         _bitwardenClientConfiguration = bitwardenClientConfiguration;
         _save = save;
+        _syncResponseActions = new List<Action<SyncResponse>>();
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -99,7 +100,7 @@ public class BitwardenService : WPFBackgroundService
         }
     }
 
-    private void RefreshLocalDatabase()
+    public void RefreshLocalDatabase()
     {
         RefreshAccessTokenIfNeeded();
 

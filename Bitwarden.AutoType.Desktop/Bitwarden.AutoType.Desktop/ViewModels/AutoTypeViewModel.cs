@@ -15,7 +15,9 @@ using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.AutoType.Desktop.Windows.Native;
 using Bitwarden.Core.Crypto;
 using Bitwarden.Core.Models;
+using Bitwarden.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using static Bitwarden.AutoType.Desktop.Windows.Native.WindowsDLLs;
 
@@ -42,7 +44,7 @@ public partial class AutoTypeViewModel : IDisposable
     private readonly BitwardenService _bitwardenService;
     private Dictionary<AutoTypeCustomField, Cipher>? _regexLookup;
 
-    #region Bound Properties
+    #region Bound
 
     [ObservableProperty]
     private bool _isAutoTypeEnabled = false;
@@ -51,7 +53,14 @@ public partial class AutoTypeViewModel : IDisposable
     {
     }
 
-    #endregion Bound Properties
+
+    [RelayCommand]
+    public void Refresh()
+    {
+        _bitwardenService.RefreshLocalDatabase();
+    }
+
+    #endregion Bound
 
     public AutoTypeViewModel(ILogger<AutoTypeViewModel> logger,
         HotkeyService hotkeyService,
