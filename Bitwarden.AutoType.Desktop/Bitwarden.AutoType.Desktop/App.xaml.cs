@@ -76,6 +76,7 @@ public partial class App : Application
     private async void Application_Exit(object sender, ExitEventArgs e)
     {
         using var host = _host;
+
         try
         {
             await host.StopAsync();

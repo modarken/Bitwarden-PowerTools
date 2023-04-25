@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.Core.Models;
 
@@ -18,10 +20,10 @@ public class AutoTypeService
         };
     }
 
-    public void TypeSequence(KeyValuePair<AutoTypeCustomField, Cipher> match, Func<string, string?> decryptor)
+    public Task TypeSequenceAsync(KeyValuePair<AutoTypeCustomField, Cipher> match, Func<string, string?> decryptor, CancellationToken token = default)
     {
         var sequence = match.Key.Sequence;
         BitwardenKeystrokeSequence bitwardenKeystrokeSequence = new(sequence!, _config, match.Value, decryptor);
-        WindowsKeyboard.SendKeystrokes(bitwardenKeystrokeSequence).GetAwaiter().GetResult();
+        return WindowsKeyboard.SendKeystrokesAsync(bitwardenKeystrokeSequence, token);
     }
 }

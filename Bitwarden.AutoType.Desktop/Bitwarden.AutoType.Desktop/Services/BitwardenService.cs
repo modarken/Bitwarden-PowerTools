@@ -63,11 +63,6 @@ public class BitwardenService : WPFBackgroundService
         }
     }
 
-    public override void Dispose()
-    {
-        base.Dispose();
-    }
-
     private void RefreshAccessTokenIfNeeded()
     {
         // check if access token is valid, if not , make it null so it will be refreshed
@@ -190,5 +185,10 @@ public class BitwardenService : WPFBackgroundService
 
         var protectedEncyptionKey = _accessToken!.Key!;
         return BitwardenCrypto.DecryptEncryptionKey(protectedEncyptionKey, masterKey);
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
     }
 }

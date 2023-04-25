@@ -7,6 +7,8 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.AutoType.Desktop.Views;
 using Bitwarden.AutoType.Desktop.Windows;
@@ -62,6 +64,8 @@ public partial class AutoTypeViewModel : IDisposable
         InitializeRegexList();
         _hotkeyService.RegisterOnHotKey(OnHotKeyHandler);
     }
+
+    #region Database Management
 
     private void InitializeRegexList()
     {
@@ -122,18 +126,9 @@ public partial class AutoTypeViewModel : IDisposable
         _regexLookup = expressions;
     }
 
-    private string GetWindowTitle(IntPtr hWnd)
-    {
-        const int maxTitleLength = 256;
-        var titleBuilder = new StringBuilder(maxTitleLength);
+    #endregion Database Management
 
-        if (WindowsDLLs.GetWindowText(hWnd, titleBuilder, maxTitleLength) > 0)
-        {
-            return titleBuilder.ToString();
-        }
-
-        return string.Empty;
-    }
+    #region OnHotKey pressed
 
     private void OnHotKeyHandler(WindowsHotKey windowsHotKey)
     {
@@ -150,36 +145,17 @@ public partial class AutoTypeViewModel : IDisposable
                 //.ToList()
                 ;
 
-            if (matchedRegex.Count() == 1)
+            if (matchedRegex.Any())
             {
-                ExecuteMatchFunction(matchedRegex.First());
+                if (matchedRegex.Count() == 1)
+                {
+                    ExecuteMatchHandler(matchedRegex.First(), currentHandle);
+                }
+                else if (matchedRegex.Count() > 1)
+                {
+                    ShowPopup(matchedRegex, currentHandle);
+                }
             }
-            else if (matchedRegex.Count() > 1)
-            {
-                ShowPopup(matchedRegex, currentHandle);
-            }
-        }
-    }
-
-    private static (IntPtr, Process) GetForegroundProcess()
-    {
-        IntPtr hWnd = WindowsDLLs.GetForegroundWindow();
-        _ = WindowsDLLs.GetWindowThreadProcessId(hWnd, out uint processId);
-        return (hWnd, Process.GetProcessById((int)processId));
-    }
-
-    private void ExecuteMatchFunction(KeyValuePair<AutoTypeCustomField, Cipher>? match)
-    {
-        if (match is KeyValuePair<AutoTypeCustomField, Cipher> actualMatch)
-        {
-            var decryptionKey = _bitwardenService.GetDecryptionKey();
-
-            Func<string, string?> func = (s) =>
-            {
-                return BitwardenCrypto.DecryptEntry(s, decryptionKey!, true);
-            };
-
-            _autoTypeService.TypeSequence(actualMatch, func);
         }
     }
 
@@ -192,14 +168,76 @@ public partial class AutoTypeViewModel : IDisposable
 
         if (userResult == true)
         {
-            _ = WindowsDLLs.SetForegroundWindow(handle);
-
-            System.Threading.Thread.Sleep(400);
-
-            // Restore the focus to the original foreground window
-            ExecuteMatchFunction(matchSelectionWindow.SelectedMatch!);
+            ExecuteMatchHandler(matchSelectionWindow.SelectedMatch!, handle);
         }
     }
+
+    private async void ExecuteMatchHandler(KeyValuePair<AutoTypeCustomField, Cipher>? match, IntPtr handle)
+    {
+        var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+
+        _ = WindowsDLLs.SetForegroundWindow(handle);
+
+        try
+        {
+            await Task.Delay(TimeSpan.FromMilliseconds(300), tokenSource.Token); // in testing must sleep
+            await ExecuteMatchFunctionAsync(match, tokenSource.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            _logger.LogWarning($"{nameof(AutoTypeViewModel)}.{nameof(OnHotKeyHandler)}() {nameof(TaskCanceledException)}");
+        }
+        catch(Exception e)
+        {
+            _logger.LogError(e, $"{nameof(AutoTypeViewModel)}.{nameof(OnHotKeyHandler)}() Exception:'{e.Message}'");
+        }
+        finally
+        {
+            tokenSource?.Dispose();
+        }
+
+    }
+
+    private async Task ExecuteMatchFunctionAsync(KeyValuePair<AutoTypeCustomField, Cipher>? match, CancellationToken token = default)
+    {
+        if (match is KeyValuePair<AutoTypeCustomField, Cipher> actualMatch)
+        {
+            var decryptionKey = _bitwardenService.GetDecryptionKey();
+
+            Func<string, string?> func = (s) =>
+            {
+                return BitwardenCrypto.DecryptEntry(s, decryptionKey!, true);
+            };
+
+            await _autoTypeService.TypeSequenceAsync(actualMatch, func, token);
+        }
+    }
+
+    #endregion OnHotKey pressed
+
+    #region Helpers
+
+    private static (IntPtr, Process) GetForegroundProcess()
+    {
+        IntPtr hWnd = WindowsDLLs.GetForegroundWindow();
+        _ = WindowsDLLs.GetWindowThreadProcessId(hWnd, out uint processId);
+        return (hWnd, Process.GetProcessById((int)processId));
+    }
+
+    private string GetWindowTitle(IntPtr hWnd)
+    {
+        const int maxTitleLength = 256;
+        var titleBuilder = new StringBuilder(maxTitleLength);
+
+        if (WindowsDLLs.GetWindowText(hWnd, titleBuilder, maxTitleLength) > 0)
+        {
+            return titleBuilder.ToString();
+        }
+
+        return string.Empty;
+    }
+
+    #endregion Helpers
 
     #region IDisposable
 

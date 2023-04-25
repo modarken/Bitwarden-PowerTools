@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.AutoType.Desktop.Windows.Native;
+using MahApps.Metro.Controls;
 
 namespace Bitwarden.AutoType.Desktop.Services;
 
@@ -18,11 +21,11 @@ public class HotkeyService : IDisposable
         var success = _hotKeyNew.RegisterHotKey();
     }
 
-    public void RegisterOnHotKey(Action<WindowsHotKey> onHotKey)
+    public void RegisterOnHotKey(Action<WindowsHotKey> onHotkey)
     {
-        if (onHotKey != null)
+        if (onHotkey != null)
         {
-            _hotKeyActions.Add(onHotKey);
+            _hotKeyActions.Add(onHotkey);
         }
     }
 

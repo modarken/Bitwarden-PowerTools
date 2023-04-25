@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Windows.Native;
 
@@ -7,13 +8,15 @@ namespace Bitwarden.AutoType.Desktop.Windows;
 
 public static class WindowsKeyboard
 {
-    public static async Task SendKeystrokes(IKeystrokeProvider keystrokeProvider)
+    public static async Task SendKeystrokesAsync(IKeystrokeProvider keystrokeProvider, CancellationToken token = default)
     {
         var isShiftVirtualKeyDown = false;
         var onLastItem = false;
         var items = keystrokeProvider.Provide().ToArray();
         foreach (var item in items)
         {
+            token.ThrowIfCancellationRequested();
+
             if (item == items[^1]) onLastItem = true;
             if (item.VirtualKey is byte)
             {
@@ -33,7 +36,10 @@ public static class WindowsKeyboard
 
                 if (item.DirectionType == EmulatedKeystrokeTypes.Press)
                 {
-                    await SendKeyPress((VirtualKeys)item.VirtualKey, item.PressTime ?? keystrokeProvider.Configuration.PressKeyTime).ConfigureAwait(false);
+                    await SendKeyPressAsync(
+                        (VirtualKeys)item.VirtualKey,
+                        item.PressTime ?? keystrokeProvider.Configuration.PressKeyTime,
+                        token).ConfigureAwait(false);
                 }
                 else
                 {
@@ -47,7 +53,7 @@ public static class WindowsKeyboard
                     }
                 }
 
-                if (!onLastItem) await Task.Delay(keystrokeProvider.Configuration.DelayBetweenKeystrokes).ConfigureAwait(false);
+                if (!onLastItem) await Task.Delay(keystrokeProvider.Configuration.DelayBetweenKeystrokes, token).ConfigureAwait(false);
 
                 if (!isShiftVirtualKeyDown && item.IsShiftModifier)
                 {
@@ -56,7 +62,7 @@ public static class WindowsKeyboard
             }
             else if (item.Delay is TimeSpan delayTime)
             {
-                await Task.Delay(delayTime).ConfigureAwait(false);
+                await Task.Delay(delayTime, token).ConfigureAwait(false);
             }
         }
     }
@@ -67,10 +73,10 @@ public static class WindowsKeyboard
         WindowsDLLs.keybd_event((byte)key, 0, WindowsConstants.KEYEVENTF_KEYUP, 0);
     }
 
-    public static async Task SendKeyPress(VirtualKeys key, TimeSpan pressKeyTime)
+    public static async Task SendKeyPressAsync(VirtualKeys key, TimeSpan pressKeyTime, CancellationToken token = default)
     {
         WindowsDLLs.keybd_event((byte)key, 0, WindowsConstants.KEYEVENTF_KEYDOWN, 0);
-        await Task.Delay(pressKeyTime).ConfigureAwait(false);
+        await Task.Delay(pressKeyTime, token).ConfigureAwait(false);
         WindowsDLLs.keybd_event((byte)key, 0, WindowsConstants.KEYEVENTF_KEYUP, 0);
     }
 

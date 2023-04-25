@@ -34,8 +34,8 @@ using Bitwarden.AutoType.Desktop.Windows.Native;
 //var z = new SpecialKeystrokeSequence("{Shift}{Shift}", c);
 
 //System.Threading.Thread.Sleep(4000);
-// WindowsKeyboard.SendKeystrokes(y).GetAwaiter().GetResult();
-// WindowsKeyboard.SendKeystrokes(z).GetAwaiter().GetResult();
+// WindowsKeyboard.SendKeystrokesAsync(y).GetAwaiter().GetResult();
+// WindowsKeyboard.SendKeystrokesAsync(z).GetAwaiter().GetResult();
 //System.Threading.Thread.Sleep(2000);
 
 //var x = new WindowsKeyboard();
@@ -44,7 +44,7 @@ using Bitwarden.AutoType.Desktop.Windows.Native;
 
 //if (WindowsDLLs.SetForegroundWindow(calcWindow))
 //{
-//    _ = WindowsKeyboard.SendKeyPress(VirtualKeys.N7, TimeSpan.FromMilliseconds(230));
+//    _ = WindowsKeyboard.SendKeyPressAsync(VirtualKeys.N7, TimeSpan.FromMilliseconds(230));
 //    //WindowsDLLs.SendKeys.Send("10{+}10=");
 //}
 
