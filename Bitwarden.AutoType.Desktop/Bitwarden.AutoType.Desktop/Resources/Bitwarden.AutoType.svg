@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- ####################################################################
+
+This file was generates automatically via the
+IconPacks.Browser (MIT-License).
+
+Visit https://github.com/MahApps/MahApps.Metro.IconPacks and
+https://github.com/MahApps/MahApps.Metro.IconPacks/blob/develop/LICENSE
+for more information.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Icon-Name: 			Rodent
+Iconpack:			Material
+Iconpack-Homepage: 	https://materialdesignicons.com/
+Iconpack-License:	https://github.com/Templarian/MaterialDesign/blob/master/LICENSE
+
+#####################################################################-->
+
+<svg
+   width="48"
+   height="48"
+   version="1.1"
+   id="svg12"
+   sodipodi:docname="Bitwarden.AutoType.svg"
+   inkscape:version="1.2.1 (9c6d41e410, 2022-07-14)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs16" />
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     showgrid="false"
+     inkscape:zoom="12.477488"
+     inkscape:cx="22.881208"
+     inkscape:cy="25.32561"
+     inkscape:window-width="1920"
+     inkscape:window-height="1027"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12" />
+  <g
+     id="g863">
+    <path
+       d="M3.75 0A3.75 3.75 0 000 3.75v16.5A3.75 3.75 0 003.75 24h16.5A3.75 3.75 0 0024 20.25V3.75A3.75 3.75 0 0020.25 0zm1.36 2.92h13.8c.208 0 .388.076.54.228a.737.737 0 01.227.539v9.2c0 .687-.134 1.367-.401 2.042a7.618 7.618 0 01-.995 1.797 11.097 11.097 0 01-1.413 1.528c-.547.495-1.052.906-1.515 1.234-.464.327-.947.636-1.45.928-.503.291-.86.489-1.072.593-.212.104-.381.184-.51.24a.687.687 0 01-.31.071.688.688 0 01-.312-.072 13.784 13.784 0 01-.51-.24 20.61 20.61 0 01-1.071-.592 19.133 19.133 0 01-1.45-.928 16.457 16.457 0 01-1.515-1.234 11.11 11.11 0 01-1.414-1.528 7.617 7.617 0 01-.994-1.797 5.502 5.502 0 01-.401-2.042v-9.2c0-.208.076-.387.227-.54a.737.737 0 01.54-.227zm6.9 2.3v13.62c.95-.502 1.801-1.05 2.552-1.64 1.877-1.47 2.815-2.907 2.815-4.313V5.22Z"
+       style="fill:#000000;                  stroke:none                  stroke-width:0;                  stroke-linecap:flat;                  stroke-linejoin:miter;"
+       transform="matrix(2.3994668237972787,0,0,2.3994668237972787,-4.798933647594557,-4.793601885567344)"
+       id="path10" />
+    <g
+       aria-label="A"
+       id="text287"
+       style="font-weight:bold;font-size:27.6303px;font-family:Calibri;-inkscape-font-specification:'Calibri, Bold';fill:#ffffff;stroke-width:3.45379">
+      <path
+         d="m 22.760055,27.087223 q 0.161896,0.485689 0.20237,0.769007 0.04047,0.283319 -0.107931,0.431724 -0.148405,0.134914 -0.526163,0.161896 -0.377758,0.04047 -1.038834,0.04047 -0.688059,0 -1.079309,-0.02698 -0.377758,-0.01349 -0.580128,-0.06746 -0.20237,-0.06746 -0.283319,-0.175388 -0.08095,-0.107931 -0.134913,-0.283318 L 18.03808,24.429426 h -6.5568 l -1.106291,3.413313 q -0.05397,0.188879 -0.148405,0.323793 -0.08095,0.121422 -0.2833189,0.20237 -0.188879,0.06746 -0.5531456,0.09444 -0.3507753,0.02698 -0.9309037,0.02698 -0.6206025,0 -0.9713778,-0.04047 Q 7.1370627,28.409376 7.0021492,28.260971 6.8672356,28.099075 6.9077097,27.815756 6.9481837,27.532438 7.11008,27.06024 l 5.383052,-15.488078 q 0.08095,-0.229353 0.188879,-0.364267 0.107931,-0.148405 0.337284,-0.215862 0.242844,-0.08095 0.661076,-0.09444 0.418232,-0.02698 1.106292,-0.02698 0.79599,0 1.268187,0.02698 0.472198,0.01349 0.728533,0.09444 0.269828,0.06746 0.377758,0.215862 0.121423,0.148405 0.202371,0.404741 z M 14.746188,14.283925 h -0.01349 l -2.468918,7.420246 h 4.951328 z"
+         style="fill:#000000"
+         id="path849" />
+    </g>
+  </g>
+</svg>

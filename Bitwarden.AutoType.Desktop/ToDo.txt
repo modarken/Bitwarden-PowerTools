@@ -3,3 +3,20 @@
 3. Select HotKey
 4. On/Off
 5. Specify Vault
+
+
+1. Finish Configuration Tailoring
+
+2. Add Installer
+
+3. Add Feature for drop target to get window title
+    -> Auto make target window regex
+    -> Auto fille out default login
+
+4. Have helper for adding AutoType to field.
+
+    CUSTOME FIELDS:
+
+    AutoType:Custom
+    {"Target":"^Riot Client Main$","Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
+    {"Target":"^.*Riot Client.*$","Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}

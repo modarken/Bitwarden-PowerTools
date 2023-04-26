@@ -9,59 +9,65 @@
                   xmlns:views="clr-namespace:Bitwarden.AutoType.Desktop.Views"
                   xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                   mc:Ignorable="d"
-        Topmost="True"
-        ResizeMode="NoResize"
-        ShowCloseButton="False"
-        ShowInTaskbar="False"
-        ShowMaxRestoreButton="False"
-        IgnoreTaskbarOnMaximize="True"
-        Title="Bitwarden AutoType" Height="480" Width="390">
+                  Topmost="True"
+                  ResizeMode="NoResize"
+                  ShowCloseButton="False"
+                  ShowInTaskbar="False"
+                  ShowMaxRestoreButton="False"
+                  IgnoreTaskbarOnMaximize="True"
+                  Title="Bitwarden AutoType" Height="480" Width="390">
+    <mah:MetroWindow.Resources>
+    </mah:MetroWindow.Resources>
     <DockPanel>
-        <DockPanel x:Name="bottomDockPanel" DockPanel.Dock="Bottom">
+        <!--<DockPanel x:Name="bottomDockPanel" DockPanel.Dock="Bottom">
             <StatusBar Grid.Row="2">
-                <StatusBarItem>Status:</StatusBarItem>
+                -->
+        <!--<StatusBarItem>Status:</StatusBarItem>
                 <StatusBarItem>
-                    <TextBlock Text="{Binding StatusSerialPortStatus}" />
+                    <TextBlock Text="{Binding StatusInfo}" />
                 </StatusBarItem>
                 <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
                 <StatusBarItem>
                     <TextBlock Text="{Binding StatusLastUpdated}" />
-                </StatusBarItem>
+                </StatusBarItem>-->
+        <!--
                 <Separator Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
                 <StatusBarItem HorizontalAlignment="Right" Margin="0 0 5 0">
-                    <!--<iconPacks:PackIconForkAwesome Kind="FDroid" Foreground="{Binding StatusHeartbeatColor}" />-->
+                    -->
+        <!--<iconPacks:PackIconForkAwesome Kind="FDroid" Foreground="{Binding StatusHeartbeatColor}" />-->
+        <!--
                     <iconPacks:PackIconSimpleIcons Kind="Bitwarden" />
                 </StatusBarItem>
             </StatusBar>
-        </DockPanel>
+        </DockPanel>-->
         <DockPanel DockPanel.Dock="Bottom">
             <DockPanel Margin="10">
-                <Button DockPanel.Dock="Left"
-                        Margin="20 0 0 0"
-                        x:Name="RefreshButton" Style="{DynamicResource MahApps.Styles.Button.Square}"
-                        Height="35"
-                        Width="180"
-
-                        Command="{Binding RefreshCommand}">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Refresh" VerticalAlignment="Center" Margin="0,0,5,0" />
-
-                        <iconPacks:PackIconMaterial Kind="Refresh" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
-                    </StackPanel>
-                </Button>
-
                 <mah:ToggleSwitch Header="AutoType"
+                              Margin="50 0 0 0"
                               MinWidth="87"
                               HorizontalAlignment="Center"
+                              VerticalAlignment="Center"
                               OffContent="Off"
                               OnContent="On"
                               IsEnabled="{Binding IsUserPerformActionEnabled}"
                               IsOn="{Binding IsAutoTypeEnabled}" />
+                <Button DockPanel.Dock="Left"
+
+                        x:Name="RefreshButton" Style="{DynamicResource MahApps.Styles.Button.Square}"
+                        Height="35"
+                        Width="100"
+                        Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Refresh" VerticalAlignment="Center" Margin="0,0,5,0" />
+                        <iconPacks:PackIconMaterial Kind="Refresh" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                    </StackPanel>
+                </Button>
             </DockPanel>
         </DockPanel>
         <DockPanel DockPanel.Dock="Bottom" Margin="10">
-            <views:SettingsControl DockPanel.Dock="Top" x:Name="SettingsControlInstance"
-                               DataContext="{helpers:ServiceLocator ServiceType={x:Type local:SettingsControlViewModel}}" />
+            <views:SettingsControl DockPanel.Dock="Top"
+                                   x:Name="SettingsControlInstance"
+                                   DataContext="{helpers:ServiceLocator ServiceType={x:Type local:SettingsControlViewModel}}" />
         </DockPanel>
         <DockPanel DockPanel.Dock="Bottom">
         </DockPanel>

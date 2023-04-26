@@ -5,14 +5,26 @@
     <TargetFramework>net7.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
     <UserSecretsId>de054478-1190-4365-a42d-94fe77898644</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\Bitwarden.AutoType.ico" />
+    <None Remove="Resources\Bitwarden.AutoType.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Bitwarden.AutoType.ico" />
+    <EmbeddedResource Include="Resources\Bitwarden.AutoType.svg" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.1.0" />
     <PackageReference Include="MahApps.Metro" Version="2.4.9" />
     <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="Svg" Version="3.4.4" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.29.0" />
   </ItemGroup>
 

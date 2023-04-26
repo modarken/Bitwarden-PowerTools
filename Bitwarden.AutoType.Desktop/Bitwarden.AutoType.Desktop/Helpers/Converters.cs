@@ -22,7 +22,5 @@ namespace Bitwarden.AutoType.Desktop.Helpers
                 throw new ArgumentException("Invalid epoch time string format.");
             }
         }
-
-
     }
 }

@@ -12,6 +12,12 @@ using Microsoft.Win32;
 
 namespace Bitwarden.AutoType.Desktop;
 
+
+
+
+
+
+
 public class TestService : WPFBackgroundService
 {
     protected async override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -53,6 +59,9 @@ public partial class App : Application
             services.AddSingleton<AutoTypeViewModel>();
             services.AddSingleton<SettingsControlViewModel>();
             services.AddSingleton<MainWindow>();
+            services.AddSingleton<System.Windows.Forms.NotifyIcon>();
+            services.AddSingleton<NotifyIconService>();
+            services.AddSingleton(this);
         })
         .ConfigureServices((hostContext, services) => // hosted services
         {
@@ -74,6 +83,9 @@ public partial class App : Application
         //var window2 = _host.Services.GetRequiredService<TestService>();
         window.PositionWindow();
         window.Show();
+
+        var iconService = _host.Services.GetRequiredService<NotifyIconService>();
+        iconService.Configure(window);
     }
 
     private async void Application_Exit(object sender, ExitEventArgs e)
