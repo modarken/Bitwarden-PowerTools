@@ -33,6 +33,12 @@ namespace Bitwarden.Core.API
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return null;
+            }
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             // response.EnsureSuccessStatusCode();
@@ -62,6 +68,12 @@ namespace Bitwarden.Core.API
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return null;
+            }
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             // response.EnsureSuccessStatusCode();
@@ -89,6 +101,12 @@ namespace Bitwarden.Core.API
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return null;
+            }
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             // response.EnsureSuccessStatusCode();
@@ -100,7 +118,7 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> PostAccessTokenFrommasterPasswordHash(string baseAddesss, string username, string masterPasswordHash, string deviceIdentifier = "",
+        public static async Task<TokenResponse?> PostAccessTokenFromMasterPasswordHash(string baseAddesss, string username, string masterPasswordHash, string deviceIdentifier = "",
             string deviceName = "")
         {
             var content = new Dictionary<string, string>()
@@ -121,6 +139,12 @@ namespace Bitwarden.Core.API
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return null;
+            }
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             // response.EnsureSuccessStatusCode();
@@ -133,8 +157,8 @@ namespace Bitwarden.Core.API
             return null;
         }
 
-        public static async Task<TokenResponse?> PostAccessTokenFromMasterPasswordHash(string baseAddesss, string username, string masterPasswordHash, string deviceIdentifier,
-            string deviceName = "", string twoFactorToken = "")
+        public static async Task<TokenResponse?> PostAccessTokenFromMasterPasswordHash(string baseAddesss, string username, string masterPasswordHash, string twoFactorToken, string deviceIdentifier = "",
+            string deviceName = "")
         {
             var content = new Dictionary<string, string>()
             {
@@ -157,6 +181,12 @@ namespace Bitwarden.Core.API
             using var httpClient = new HttpClient() { BaseAddress = new System.Uri(baseAddesss) };
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return null;
+            }
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             // response.EnsureSuccessStatusCode();
@@ -176,6 +206,12 @@ namespace Bitwarden.Core.API
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return null;
+            }
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
@@ -198,6 +234,12 @@ namespace Bitwarden.Core.API
             //httpClient.DefaultRequestHeaders.Add("Content-Length", content.Length.ToString());
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return null;
+            }
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)
@@ -215,6 +257,12 @@ namespace Bitwarden.Core.API
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
             var response = await httpClient.SendAsync(request).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode == false)
+            {
+                return null;
+            }
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (response.IsSuccessStatusCode)

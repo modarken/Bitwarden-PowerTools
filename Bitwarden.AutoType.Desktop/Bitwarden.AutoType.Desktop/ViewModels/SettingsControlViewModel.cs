@@ -1,16 +1,29 @@
 ﻿using System;
 using Bitwarden.AutoType.Desktop.Services;
+using Bitwarden.Core.Models;
 using Bitwarden.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.Logging;
 
 namespace Bitwarden.AutoType.Desktop;
 
 [INotifyPropertyChanged]
 public partial class SettingsControlViewModel
 {
+    private readonly ILogger<SettingsControlViewModel>? _logger;
+
     [ObservableProperty]
     private BitwardenClientConfiguration? _bitwardenClientConfiguration;
+
+    [ObservableProperty]
+    private int? _accessMethod;
+
+    [ObservableProperty]
+    private string? _totp;
+
+    [ObservableProperty]
+    private string? _masterPassword;
 
     private readonly Action<BitwardenClientConfiguration>? _save;
     private readonly BitwardenService? _bitwardenService;
@@ -23,26 +36,94 @@ public partial class SettingsControlViewModel
     /// </summary>
     public SettingsControlViewModel()
     {
+        _logger = null;
         _bitwardenClientConfiguration = default;
         _save = default;
         _bitwardenService = default;
+        AccessMethod = 0;
     }
 
-    public SettingsControlViewModel(BitwardenClientConfiguration bitwardenClientConfiguration,
+    public SettingsControlViewModel(ILogger<SettingsControlViewModel> logger, BitwardenClientConfiguration bitwardenClientConfiguration,
         Action<BitwardenClientConfiguration> save,
         BitwardenService bitwardenService)
     {
+        _logger = logger;
         _bitwardenClientConfiguration = bitwardenClientConfiguration;
         _save = save;
         _bitwardenService = bitwardenService;
+
+        ConfigureMode(bitwardenClientConfiguration);
+    }
+
+    private void ConfigureMode(BitwardenClientConfiguration bitwardenClientConfiguration)
+    {
+        AccessMethod = string.IsNullOrEmpty(bitwardenClientConfiguration.refresh_token) ? 0 : 1;
     }
 
     [RelayCommand]
     public void SaveConfig()
     {
+        if (BitwardenClientConfiguration == null)
+        {
+            return;
+        }
+        if (_bitwardenService == null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(MasterPassword))
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(BitwardenClientConfiguration.device_identifier))
+        {
+            BitwardenClientConfiguration.device_identifier = Guid.NewGuid().ToString();
+        }
+
+        if (string.IsNullOrEmpty(BitwardenClientConfiguration.device_name))
+        {
+            BitwardenClientConfiguration.device_name = Constants.BitwardenClientConfigurationDeviceName;
+        }
+
+        if (AccessMethod == 0)
+        {
+            var encryptionKey = _bitwardenService.GetEncryptionKey(MasterPassword!, out TokenResponse? tokenResponse);
+            MasterPassword = null;
+            Totp = null;
+
+            if (encryptionKey is null)
+            {
+                return;
+            }
+
+            BitwardenClientConfiguration.encryption_key = encryptionKey;
+            BitwardenClientConfiguration.refresh_token = null;
+        }
+        else
+        {
+            var encryptionKey = _bitwardenService.GetEncryptionKey(MasterPassword!, Totp, out TokenResponse? tokenResponse);
+            MasterPassword = null;
+            Totp = null;
+
+            if (encryptionKey is null)
+            {
+                return;
+            }
+
+            BitwardenClientConfiguration.encryption_key = encryptionKey;
+            BitwardenClientConfiguration.refresh_token = tokenResponse!.refresh_token;
+            BitwardenClientConfiguration.client_id = null;
+            BitwardenClientConfiguration.client_secret = null;
+        }
+
+        _bitwardenService.RefreshLocalDatabase();
+
         if (_save != null && BitwardenClientConfiguration != null)
         {
             _save(BitwardenClientConfiguration);
         }
+
     }
 }

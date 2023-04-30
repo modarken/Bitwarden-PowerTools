@@ -3,15 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:helpers="clr-namespace:Bitwarden.AutoType.Desktop.Helpers"
              xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:fa="http://schemas.fontawesome.io/icons/"
              xmlns:local="clr-namespace:Bitwarden.AutoType.Desktop.Views"
+             Loaded="UserControl_Loaded"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="400" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -26,33 +27,38 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-
         <TextBlock Text="Base Address:" Grid.Row="0" Grid.Column="0" Margin="5"/>
         <TextBox Text="{Binding Path=BitwardenClientConfiguration.base_address, Mode=TwoWay}" Grid.Row="0" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
 
         <TextBlock Text="Email:" Grid.Row="1" Grid.Column="0" Margin="5"/>
         <TextBox Text="{Binding Path=BitwardenClientConfiguration.email, Mode=TwoWay}" Grid.Row="1" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
 
-        <TextBlock Text="Master Key:" Grid.Row="2" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding Path=BitwardenClientConfiguration.master_key, Mode=TwoWay}" Grid.Row="2" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
+        <TextBlock Text="Access Method:" Grid.Row="2" Grid.Column="0" Margin="5"/>
+        <ComboBox x:Name="AccessMethodComboBox" Grid.Row="2" Grid.Column="1" Margin="5"
+                  SelectedIndex="{Binding AccessMethod, Mode=TwoWay}"
+                  SelectionChanged="AccessMethodComboBox_SelectionChanged">
+            <ComboBoxItem Content="API Key"/>
+            <ComboBoxItem Content="Token"/>
+        </ComboBox>
 
-        <TextBlock Text="Client ID:" Grid.Row="3" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding Path=BitwardenClientConfiguration.client_id, Mode=TwoWay}" Grid.Row="3" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
+        <TextBlock Text="Master Password:" Grid.Row="3" Grid.Column="0" Margin="5"/>
+        <PasswordBox x:Name="MasterPasswordBox" Grid.Row="3" Grid.Column="1" Margin="5"
+                     helpers:PasswordBoxBindingBehavior.PasswordBinding="{Binding MasterPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource MahApps.Styles.PasswordBox}"/>
+        <!--<PasswordBox x:Name="MasterPasswordBox" Grid.Row="3" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.PasswordBox}"
+             local:PasswordBoxHelper.Password="{Binding Path=MasterPassword, Mode=TwoWay}" />-->
+        <!--<PasswordBox x:Name="MasterPasswordBox" Grid.Row="3" Grid.Column="1" Margin="5" />-->
 
-        <TextBlock Text="Client Secret:" Grid.Row="4" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding Path=BitwardenClientConfiguration.client_secret, Mode=TwoWay}" Grid.Row="4" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
+        <TextBlock x:Name="TOTPTextBlock" Text="TOTP:" Grid.Row="4" Grid.Column="0" Margin="5" Visibility="Collapsed"/>
+        <TextBox x:Name="TOTPTextBox" Grid.Row="4" Grid.Column="1" Margin="5" Text="{Binding Totp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MahApps.Styles.TextBox}" Visibility="Collapsed" />
 
-        <TextBlock Text="Refresh Token:" Grid.Row="5" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding Path=BitwardenClientConfiguration.refresh_token, Mode=TwoWay}" Grid.Row="5" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
+        <TextBlock x:Name="ClientIDTextBlock" Text="Client ID:" Grid.Row="5" Grid.Column="0" Margin="5"/>
+        <TextBox x:Name="ClientIDTextBox" Text="{Binding Path=BitwardenClientConfiguration.client_id, Mode=TwoWay}" Grid.Row="5" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
 
-        <TextBlock Text="Device Name:" Grid.Row="6" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding Path=BitwardenClientConfiguration.device_name, Mode=TwoWay}" Grid.Row="6" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
+        <TextBlock x:Name="ClientSecretTextBlock" Text="Client Secret:" Grid.Row="6" Grid.Column="0" Margin="5"/>
+        <TextBox x:Name="ClientSecretTextBox" Text="{Binding Path=BitwardenClientConfiguration.client_secret, Mode=TwoWay}" Grid.Row="6" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
 
-        <TextBlock Text="Device Identifier:" Grid.Row="7" Grid.Column="0" Margin="5"/>
-        <TextBox Text="{Binding Path=BitwardenClientConfiguration.device_identifier, Mode=TwoWay}" Grid.Row="7" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.TextBox}" />
-
-
-        <Button Grid.Row="8" Grid.Column="1" x:Name="SaveButton" Style="{DynamicResource MahApps.Styles.Button.Square}" Content="Save"
-                Command="{Binding SaveConfigCommand}"/>
+        <Button Grid.Row="7" Grid.Column="1" Margin="5" x:Name="SaveButton" Style="{DynamicResource MahApps.Styles.Button.Square}" Content="Save"
+            Command="{Binding SaveConfigCommand}"></Button>
     </Grid>
 </UserControl>

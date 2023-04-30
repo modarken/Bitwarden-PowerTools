@@ -37,7 +37,15 @@ public class BitwardenClientConfiguration : IBitwardenClientConfiguration
     /// <value>
     /// The master key.
     /// </value>
-    [JsonConverter(typeof(ProtectedDataConverter))] public string? master_key { get; set; }
+    // [JsonConverter(typeof(ProtectedDataConverter))] public string? master_key { get; set; }
+
+    /// <summary>
+    /// Gets or sets the encryption_key otherwise known as the unprotected symmetric_key used in (d)ecryption of ciphers.
+    /// </summary>
+    /// <value>
+    /// The client encryption key.
+    /// </value>
+    [JsonConverter(typeof(ProtectedDataConverter))] public string? encryption_key { get; set; }
 
     /// <summary>
     /// Gets or sets the client identifier used in API ACCESS.

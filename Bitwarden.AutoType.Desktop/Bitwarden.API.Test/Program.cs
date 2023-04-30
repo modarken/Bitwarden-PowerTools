@@ -198,11 +198,13 @@ void TestUseAccessTokenPasswordFromConfig(BitwardenClientConfiguration config, T
             // need to encryption decryption key
             // var masterPassword = GetPassword().ToUnsecureString();
             // var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, config!.email!, tokenResponse.KdfIterations);
-            var masterKey =  Convert.FromBase64String(config.master_key);
+            // var masterKey =  Convert.FromBase64String(config.master_key);
 
             // the encryption key is stored on the server and is not to encrypt/decrypt all of the cipher text.
-            var protectedEncyptionKey = tokenResponse.Key;
-            var encryptionKey = BitwardenCrypto.DecryptEncryptionKey(protectedEncyptionKey, masterKey);
+            // var protectedEncyptionKey = tokenResponse.Key;
+            // var encryptionKey = BitwardenCrypto.DecryptEncryptionKey(protectedEncyptionKey, masterKey);
+
+            var encryptionKey = Convert.FromBase64String(config.encryption_key);
 
             foreach (var item in syncResponse!.Ciphers!)
             {

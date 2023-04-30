@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Helpers;
@@ -85,17 +86,33 @@ public class BitwardenService : WPFBackgroundService
         // if access token is null, get a new one
         if (_accessToken == null)
         {
-            var accessToken = BitwardenProtocol.PostAccessTokenFromAPIKey(
-                _bitwardenClientConfiguration.base_address!,
-                _bitwardenClientConfiguration.client_id!,
-                _bitwardenClientConfiguration.client_secret!,
-                _bitwardenClientConfiguration.device_name!,
-                _bitwardenClientConfiguration.device_identifier!)
-                .GetAwaiter().GetResult();
+            TokenResponse? accessToken = default;
+            if (_bitwardenClientConfiguration.client_id != null && _bitwardenClientConfiguration.client_secret != null)
+            {
+                accessToken = BitwardenProtocol.PostAccessTokenFromAPIKey(
+                    _bitwardenClientConfiguration.base_address!,
+                    _bitwardenClientConfiguration.client_id!,
+                    _bitwardenClientConfiguration.client_secret!,
+                    _bitwardenClientConfiguration.device_name!,
+                    _bitwardenClientConfiguration.device_identifier!)
+                    .GetAwaiter().GetResult();
+            }
+
+            if (_bitwardenClientConfiguration.refresh_token != null)
+            {
+                accessToken = BitwardenProtocol.PostAccessTokenFromRefreshToken(
+                    _bitwardenClientConfiguration.base_address!,
+                    _bitwardenClientConfiguration.refresh_token!,
+                    _bitwardenClientConfiguration.device_name!,
+                    _bitwardenClientConfiguration.device_identifier!)
+                    .GetAwaiter().GetResult();
+            }
+
             if (accessToken == null)
             {
                 throw new ArgumentNullException(nameof(accessToken));
             }
+
             _accessToken = accessToken;
         }
     }
@@ -113,7 +130,7 @@ public class BitwardenService : WPFBackgroundService
             throw new ArgumentNullException(nameof(revisonDate));
         }
 
-        // If I device to sync the revsion date, I need to do it here
+        // If I decide to sync the revsion date, I need to do it here
 
         //if (revisonDate != null)
         //{
@@ -175,17 +192,113 @@ public class BitwardenService : WPFBackgroundService
         }
     }
 
-    public byte[]? GetDecryptionKey()
+    public string? GetEncryptionKey(string masterPassword, out TokenResponse? tokenResponse)
     {
-        var masterKey = Convert.FromBase64String(_bitwardenClientConfiguration.master_key!);
-
-        lock (_syncLock)
+        tokenResponse = default;
+        if (_bitwardenClientConfiguration.base_address is null || _bitwardenClientConfiguration.email is null)
         {
-            RefreshAccessTokenIfNeeded();
+            return null;
         }
 
-        var protectedEncyptionKey = _accessToken!.Key!;
-        return BitwardenCrypto.DecryptEncryptionKey(protectedEncyptionKey, masterKey);
+        var preLogin = BitwardenProtocol.PostPreLogin(_bitwardenClientConfiguration.base_address, _bitwardenClientConfiguration.email).GetAwaiter().GetResult();
+
+        if (preLogin is null)
+        {
+            return null;
+        }
+
+        var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, _bitwardenClientConfiguration.email, preLogin.KdfIterations);
+
+        var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
+
+        tokenResponse = BitwardenProtocol.PostAccessTokenFromAPIKey(
+            _bitwardenClientConfiguration.base_address,
+            _bitwardenClientConfiguration.client_id,
+            _bitwardenClientConfiguration.client_secret,
+            _bitwardenClientConfiguration.device_identifier,
+            _bitwardenClientConfiguration.device_name).GetAwaiter().GetResult();
+
+        if (tokenResponse is null)
+        {
+            return null;
+        }
+
+        var protectedKey = tokenResponse.Key;
+
+        var encryptionKeyBytes = BitwardenCrypto.DecryptEncryptionKey(protectedKey, masterKey);
+        if (encryptionKeyBytes is null)
+        {
+            return null;
+        }
+
+        var encryptionKey = Convert.ToBase64String(encryptionKeyBytes);
+
+        return encryptionKey;
+    }
+
+    public string? GetEncryptionKey(string masterPassword, string? twoFactorToken, out TokenResponse? tokenResponse)
+    {
+        tokenResponse = default;
+        if (_bitwardenClientConfiguration.base_address is null || _bitwardenClientConfiguration.email is null)
+        {
+            return null;
+        }
+
+        var preLogin = BitwardenProtocol.PostPreLogin(_bitwardenClientConfiguration.base_address, _bitwardenClientConfiguration.email).GetAwaiter().GetResult();
+
+        if (preLogin is null)
+        {
+            return null;
+        }
+
+        var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, _bitwardenClientConfiguration.email, preLogin.KdfIterations);
+        var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
+
+        if (twoFactorToken is null)
+        {
+            tokenResponse = BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(
+                _bitwardenClientConfiguration.base_address,
+                _bitwardenClientConfiguration.email,
+                masterPasswordHash,
+                _bitwardenClientConfiguration.device_identifier,
+                _bitwardenClientConfiguration.device_name).GetAwaiter().GetResult();
+        }
+        else
+        {
+            tokenResponse = BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(
+                _bitwardenClientConfiguration.base_address,
+                _bitwardenClientConfiguration.email,
+                masterPasswordHash,
+                twoFactorToken,
+                _bitwardenClientConfiguration.device_identifier,
+                _bitwardenClientConfiguration.device_name).GetAwaiter().GetResult();
+        }
+
+        if (tokenResponse is null)
+        {
+            return null;
+        }
+
+        var protectedKey = tokenResponse.Key;
+
+        var encryptionKeyBytes = BitwardenCrypto.DecryptEncryptionKey(protectedKey, masterKey);
+        if (encryptionKeyBytes is null)
+        {
+            return null;
+        }
+
+        var encryptionKey = Convert.ToBase64String(encryptionKeyBytes);
+
+        return encryptionKey;
+    }
+
+    public byte[]? GetEncryptionKey()
+    {
+        if (_bitwardenClientConfiguration?.encryption_key is null) return null;
+
+        var encryption_key = Convert.FromBase64String(_bitwardenClientConfiguration.encryption_key!);
+
+        return encryption_key;
     }
 
     public override void Dispose()

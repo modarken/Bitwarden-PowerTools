@@ -97,10 +97,16 @@ public partial class AutoTypeViewModel : IDisposable
 
         var key = "AutoType:Custom";
 
-        var decryptionKey = _bitwardenService.GetDecryptionKey();
+        var decryptionKey = _bitwardenService.GetEncryptionKey();
+
+        if (decryptionKey is null)
+        {
+            throw new Exception("Unable to get decryption key from configuration");
+        }
+
         var serializerOptions = new JsonSerializerOptions() { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
 
-        if (syncResponse.Ciphers != null)
+        if (syncResponse.Ciphers != null && decryptionKey != null)
         {
             // Iterate through ciphers and check for custom fields with the specified title name
             foreach (Cipher cipher in syncResponse.Ciphers)
@@ -233,7 +239,7 @@ public partial class AutoTypeViewModel : IDisposable
     {
         if (match is KeyValuePair<AutoTypeCustomField, Cipher> actualMatch)
         {
-            var decryptionKey = _bitwardenService.GetDecryptionKey();
+            var decryptionKey = _bitwardenService.GetEncryptionKey();
 
             Func<string, string?> func = (s) =>
             {
