@@ -45,9 +45,6 @@
         <PasswordBox x:Name="MasterPasswordBox" Grid.Row="3" Grid.Column="1" Margin="5"
                      helpers:PasswordBoxBindingBehavior.PasswordBinding="{Binding MasterPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource MahApps.Styles.PasswordBox}"/>
-        <!--<PasswordBox x:Name="MasterPasswordBox" Grid.Row="3" Grid.Column="1" Margin="5" Style="{StaticResource MahApps.Styles.PasswordBox}"
-             local:PasswordBoxHelper.Password="{Binding Path=MasterPassword, Mode=TwoWay}" />-->
-        <!--<PasswordBox x:Name="MasterPasswordBox" Grid.Row="3" Grid.Column="1" Margin="5" />-->
 
         <TextBlock x:Name="TOTPTextBlock" Text="TOTP:" Grid.Row="4" Grid.Column="0" Margin="5" Visibility="Collapsed"/>
         <TextBox x:Name="TOTPTextBox" Grid.Row="4" Grid.Column="1" Margin="5" Text="{Binding Totp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MahApps.Styles.TextBox}" Visibility="Collapsed" />

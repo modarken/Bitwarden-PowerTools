@@ -4,32 +4,31 @@ using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Services;
-using Bitwarden.AutoType.Desktop.Views;
 using Bitwarden.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 
 namespace Bitwarden.AutoType.Desktop;
 
+// Example Template for WPFBackgroundService
+//
+//      public class TestService : WPFBackgroundService
+//      {
+//          protected async override Task ExecuteAsync(CancellationToken stoppingToken)
+//          {
+//              await Task.Delay(Timeout.Infinite, stoppingToken).ConfigureAwait(false);
+//          }
 
-
-
-
-
-
-public class TestService : WPFBackgroundService
-{
-    protected async override Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        await Task.Delay(Timeout.Infinite, stoppingToken).ConfigureAwait(false);
-    }
-
-    public override void Dispose()
-    {
-        base.Dispose();
-    }
-}
+//          public override void Dispose()
+//          {
+//              base.Dispose();
+//          }
+//      }
+//
+//      services.AddHostedService<TestService>();
+//      var testService = _host.Services.GetRequiredService<TestService>();
 
 /// <summary>
 /// Interaction logic for App.xaml
@@ -51,36 +50,41 @@ public partial class App : Application
         {
             services.AddSingleton(appSettings!.BitwardenClientConfiguration!);
             services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { saveSettingsToFile!.Invoke(appSettings!); }));
-        })
-        .ConfigureServices((hostContext, services) => // regular services
-        {
-            services.AddSingleton<AutoTypeService>();
-            services.AddSingleton<HotkeyService>();
-            services.AddSingleton<AutoTypeViewModel>();
-            services.AddSingleton<SettingsControlViewModel>();
-            services.AddSingleton<MainWindow>();
-            services.AddSingleton<System.Windows.Forms.NotifyIcon>();
-            services.AddSingleton<NotifyIconService>();
-            services.AddSingleton(this);
-        })
-        .ConfigureServices((hostContext, services) => // hosted services
-        {
-            var config = services.BuildServiceProvider().GetService<BitwardenClientConfiguration>()!;
-            var save = services.BuildServiceProvider().GetService<Action<BitwardenClientConfiguration>>()!;
-            var bitwardenService = new BitwardenService(config, save);
-            services.AddSingleton<BitwardenService>(bitwardenService);
-            services.AddHostedService((sp) => bitwardenService);
-            services.AddHostedService<TestService>();
+            RegisterRegularServices(services);
+            RegisterHostedServices(services);
         })
 
         .Build();
+    }
+
+    private void RegisterRegularServices(IServiceCollection services)
+    {
+        services.AddSingleton<AutoTypeService>();
+        services.AddSingleton<HotkeyService>();
+        services.AddSingleton<AutoTypeViewModel>();
+        services.AddSingleton<SettingsControlViewModel>();
+        services.AddSingleton<MainWindow>();
+        services.AddSingleton<System.Windows.Forms.NotifyIcon>();
+        services.AddSingleton<NotifyIconService>();
+        services.AddSingleton(this);
+    }
+
+    private void RegisterHostedServices(IServiceCollection services)
+    {
+        var logger = services.BuildServiceProvider().GetService<ILogger<BitwardenService>>()!;
+        var config = services.BuildServiceProvider().GetService<BitwardenClientConfiguration>()!;
+        var save = services.BuildServiceProvider().GetService<Action<BitwardenClientConfiguration>>()!;
+        var bitwardenService = new BitwardenService(logger, config, save);
+        services.AddSingleton<BitwardenService>(bitwardenService);
+        services.AddHostedService((sp) => bitwardenService);
+
     }
 
     private async void Application_Startup(object sender, StartupEventArgs e)
     {
         await _host.StartAsync();
         var window = _host.Services.GetRequiredService<MainWindow>();
-        //var window2 = _host.Services.GetRequiredService<TestService>();
+
         window.PositionWindow();
         window.Show();
 
@@ -95,7 +99,8 @@ public partial class App : Application
 
     private void UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        throw (Exception)e.ExceptionObject;
+        var logger = _host.Services.GetRequiredService<ILogger<App>>();
+        logger.LogError((Exception)e.ExceptionObject, "Unhandled exception occurred");
     }
 
     private async void OnSessionEnding(object sender, SessionEndingEventArgs e)

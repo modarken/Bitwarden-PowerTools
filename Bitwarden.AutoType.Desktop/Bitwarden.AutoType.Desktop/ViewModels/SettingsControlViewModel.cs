@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.Core.Models;
 using Bitwarden.Utilities;
@@ -61,7 +62,7 @@ public partial class SettingsControlViewModel
     }
 
     [RelayCommand]
-    public void SaveConfig()
+    public async Task SaveConfig()
     {
         if (BitwardenClientConfiguration == null)
         {
@@ -89,7 +90,7 @@ public partial class SettingsControlViewModel
 
         if (AccessMethod == 0)
         {
-            var encryptionKey = _bitwardenService.GetEncryptionKey(MasterPassword!, out TokenResponse? tokenResponse);
+            var (encryptionKey, tokenResponse) = await _bitwardenService.GetEncryptionKey(MasterPassword!);
             MasterPassword = null;
             Totp = null;
 
@@ -103,7 +104,7 @@ public partial class SettingsControlViewModel
         }
         else
         {
-            var encryptionKey = _bitwardenService.GetEncryptionKey(MasterPassword!, Totp, out TokenResponse? tokenResponse);
+            var (encryptionKey, tokenResponse) = await _bitwardenService.GetEncryptionKey(MasterPassword!, Totp);
             MasterPassword = null;
             Totp = null;
 
@@ -118,7 +119,7 @@ public partial class SettingsControlViewModel
             BitwardenClientConfiguration.client_secret = null;
         }
 
-        _bitwardenService.RefreshLocalDatabase();
+        await _bitwardenService.RefreshLocalDatabaseAsync();
 
         if (_save != null && BitwardenClientConfiguration != null)
         {

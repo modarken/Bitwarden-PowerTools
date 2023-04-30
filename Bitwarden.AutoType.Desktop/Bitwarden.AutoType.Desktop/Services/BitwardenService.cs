@@ -10,24 +10,26 @@ using Bitwarden.Core.API;
 using Bitwarden.Core.Crypto;
 using Bitwarden.Core.Models;
 using Bitwarden.Utilities;
+using Microsoft.Extensions.Logging;
 
 namespace Bitwarden.AutoType.Desktop.Services;
 
 public class BitwardenService : WPFBackgroundService
 {
-    //private readonly ILogger<BitwardenService> _logger;
+    private readonly ILogger<BitwardenService> _logger;
     private readonly BitwardenClientConfiguration _bitwardenClientConfiguration;
 
     private readonly Action<BitwardenClientConfiguration> _save;
+    private readonly List<Action<SyncResponse>> _syncResponseActions;
+    private readonly SemaphoreSlim _syncLock = new SemaphoreSlim(1, 1);
     private TokenResponse? _accessToken;
     private SyncResponse? _syncResponse;
     private DateTimeOffset? _revisionDate;
-    private readonly List<Action<SyncResponse>> _syncResponseActions;
-    private readonly object _syncLock = new();
 
-    public BitwardenService(BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
+    public BitwardenService(ILogger<BitwardenService> logger, BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
     {
-        //_logger = logger;
+        _logger = logger;
+
         _bitwardenClientConfiguration = bitwardenClientConfiguration;
         _save = save;
         _syncResponseActions = new List<Action<SyncResponse>>();
@@ -35,37 +37,44 @@ public class BitwardenService : WPFBackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // await Task.Delay(Timeout.Infinite, stoppingToken).ConfigureAwait(false);
         while (true)
         {
             try
             {
-                //_logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Refreshing Database.");
-                lock (_syncLock)
-                {
-                    RefreshLocalDatabase();
-                }
-                //_logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Database Refreshed.");
+                _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Refreshing Database.");
 
-                //_logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waiting TimeSpan.FromMinutes(15).");
+                await _syncLock.WaitAsync(); // Acquire the lock asynchronously
+                try
+                {
+                    await RefreshLocalDatabaseAsync()
+                       .ConfigureAwait(false);
+                }
+                finally
+                {
+                    _syncLock.Release(); // Release the lock
+                }
+
+                _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Database Refreshed.");
+
+                _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waiting TimeSpan.FromMinutes(15).");
                 await Task.Delay(TimeSpan.FromMinutes(15), stoppingToken).ConfigureAwait(false);
-                //logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waited TimeSpan.FromMinutes(15).");
+                _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waited TimeSpan.FromMinutes(15).");
             }
-            //catch (TaskCanceledException e)
-            catch (TaskCanceledException)
+            catch (TaskCanceledException e)
             {
-                //_logger.Log(LogLevel.Warning, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Exception:'{e.Message}'");
+                _logger.Log(LogLevel.Warning, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Exception:'{e.Message}'");
+                break;
             }
-            //catch (Exception e)
-            catch (Exception)
+            catch (Exception e)
+
             {
-                //_logger.Log(LogLevel.Error, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Exception:'{e.Message}'");
+                _logger.Log(LogLevel.Error, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Exception:'{e.Message}'");
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken).ConfigureAwait(false);
             }
         }
     }
 
-    private void RefreshAccessTokenIfNeeded()
+    private async Task RefreshAccessTokenIfNeededAsync()
     {
         // check if access token is valid, if not , make it null so it will be refreshed
         if (_accessToken != null)
@@ -89,23 +98,23 @@ public class BitwardenService : WPFBackgroundService
             TokenResponse? accessToken = default;
             if (_bitwardenClientConfiguration.client_id != null && _bitwardenClientConfiguration.client_secret != null)
             {
-                accessToken = BitwardenProtocol.PostAccessTokenFromAPIKey(
+                accessToken = await BitwardenProtocol.PostAccessTokenFromAPIKey(
                     _bitwardenClientConfiguration.base_address!,
                     _bitwardenClientConfiguration.client_id!,
                     _bitwardenClientConfiguration.client_secret!,
                     _bitwardenClientConfiguration.device_name!,
                     _bitwardenClientConfiguration.device_identifier!)
-                    .GetAwaiter().GetResult();
+                    .ConfigureAwait(false);
             }
 
             if (_bitwardenClientConfiguration.refresh_token != null)
             {
-                accessToken = BitwardenProtocol.PostAccessTokenFromRefreshToken(
+                accessToken = await BitwardenProtocol.PostAccessTokenFromRefreshToken(
                     _bitwardenClientConfiguration.base_address!,
                     _bitwardenClientConfiguration.refresh_token!,
                     _bitwardenClientConfiguration.device_name!,
                     _bitwardenClientConfiguration.device_identifier!)
-                    .GetAwaiter().GetResult();
+                    .ConfigureAwait(false);
             }
 
             if (accessToken == null)
@@ -117,13 +126,14 @@ public class BitwardenService : WPFBackgroundService
         }
     }
 
-    public void RefreshLocalDatabase()
+    public async Task RefreshLocalDatabaseAsync()
     {
-        RefreshAccessTokenIfNeeded();
+        await RefreshAccessTokenIfNeededAsync();
 
-        string? revisonDate = BitwardenProtocol.GetRevisionDate(
+        string? revisonDate = await BitwardenProtocol.GetRevisionDate(
             _bitwardenClientConfiguration!.base_address!,
-            _accessToken!.access_token!).GetAwaiter().GetResult();
+            _accessToken!.access_token!)
+            .ConfigureAwait(false);
 
         if (revisonDate == null)
         {
@@ -150,9 +160,10 @@ public class BitwardenService : WPFBackgroundService
 
         if (_syncResponse is null)
         {
-            SyncResponse? syncResponse = BitwardenProtocol.GetSync(
+            SyncResponse? syncResponse = await BitwardenProtocol.GetSync(
                 _bitwardenClientConfiguration!.base_address!,
-                _accessToken!.access_token!).GetAwaiter().GetResult();
+                _accessToken!.access_token!)
+                .ConfigureAwait(false);
 
             if (syncResponse is null)
             {
@@ -171,56 +182,58 @@ public class BitwardenService : WPFBackgroundService
         }
     }
 
-    public SyncResponse GetDatabase()
+    public async Task<SyncResponse> GetDatabase()
     {
-        lock (_syncLock)
+        await _syncLock.WaitAsync(); // Acquire the lock asynchronously
+        try
         {
             if (_syncResponse is null)
             {
-                RefreshLocalDatabase();
+                await RefreshLocalDatabaseAsync();
             }
-
             return _syncResponse ?? throw new ArgumentNullException(nameof(_syncResponse));
+        }
+        finally
+        {
+            _syncLock.Release(); // Release the lock
         }
     }
 
     public void RegisterOnDatabaseUpdated(Action<SyncResponse> onDatabaseUpdated)
     {
-        if (_syncResponseActions != null && onDatabaseUpdated != null)
-        {
-            _syncResponseActions.Add(onDatabaseUpdated);
-        }
+        _syncResponseActions.Add(onDatabaseUpdated);
     }
 
-    public string? GetEncryptionKey(string masterPassword, out TokenResponse? tokenResponse)
+    public async Task<(string? EncryptionKey, TokenResponse? TokenResponse)> GetEncryptionKey(string masterPassword)
     {
-        tokenResponse = default;
         if (_bitwardenClientConfiguration.base_address is null || _bitwardenClientConfiguration.email is null)
         {
-            return null;
+            return (null, null);
         }
 
-        var preLogin = BitwardenProtocol.PostPreLogin(_bitwardenClientConfiguration.base_address, _bitwardenClientConfiguration.email).GetAwaiter().GetResult();
+        var preLogin = await BitwardenProtocol.PostPreLogin(_bitwardenClientConfiguration.base_address, _bitwardenClientConfiguration.email)
+            .ConfigureAwait(false);
 
         if (preLogin is null)
         {
-            return null;
+            return (null, null);
         }
 
         var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, _bitwardenClientConfiguration.email, preLogin.KdfIterations);
 
         var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
 
-        tokenResponse = BitwardenProtocol.PostAccessTokenFromAPIKey(
+        var tokenResponse = await BitwardenProtocol.PostAccessTokenFromAPIKey(
             _bitwardenClientConfiguration.base_address,
             _bitwardenClientConfiguration.client_id,
             _bitwardenClientConfiguration.client_secret,
             _bitwardenClientConfiguration.device_identifier,
-            _bitwardenClientConfiguration.device_name).GetAwaiter().GetResult();
+            _bitwardenClientConfiguration.device_name)
+            .ConfigureAwait(false);
 
         if (tokenResponse is null)
         {
-            return null;
+            return (null, null);
         }
 
         var protectedKey = tokenResponse.Key;
@@ -228,55 +241,58 @@ public class BitwardenService : WPFBackgroundService
         var encryptionKeyBytes = BitwardenCrypto.DecryptEncryptionKey(protectedKey, masterKey);
         if (encryptionKeyBytes is null)
         {
-            return null;
+            return (null, null);
         }
 
         var encryptionKey = Convert.ToBase64String(encryptionKeyBytes);
 
-        return encryptionKey;
+        return (encryptionKey, tokenResponse);
     }
 
-    public string? GetEncryptionKey(string masterPassword, string? twoFactorToken, out TokenResponse? tokenResponse)
+    public async Task<(string? EncryptionKey, TokenResponse? TokenResponse)> GetEncryptionKey(string masterPassword, string? twoFactorToken)
     {
-        tokenResponse = default;
         if (_bitwardenClientConfiguration.base_address is null || _bitwardenClientConfiguration.email is null)
         {
-            return null;
+            return (null, null);
         }
 
-        var preLogin = BitwardenProtocol.PostPreLogin(_bitwardenClientConfiguration.base_address, _bitwardenClientConfiguration.email).GetAwaiter().GetResult();
+        var preLogin = await BitwardenProtocol.PostPreLogin(_bitwardenClientConfiguration.base_address, _bitwardenClientConfiguration.email)
+            .ConfigureAwait(false);
 
         if (preLogin is null)
         {
-            return null;
+            return (null, null);
         }
 
         var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, _bitwardenClientConfiguration.email, preLogin.KdfIterations);
         var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
 
+        TokenResponse? tokenResponse = null;
         if (twoFactorToken is null)
         {
-            tokenResponse = BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(
+            tokenResponse = await BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(
                 _bitwardenClientConfiguration.base_address,
                 _bitwardenClientConfiguration.email,
                 masterPasswordHash,
                 _bitwardenClientConfiguration.device_identifier,
-                _bitwardenClientConfiguration.device_name).GetAwaiter().GetResult();
+                _bitwardenClientConfiguration.device_name)
+                .ConfigureAwait(false);
         }
         else
         {
-            tokenResponse = BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(
+            tokenResponse = await BitwardenProtocol.PostAccessTokenFromMasterPasswordHash(
                 _bitwardenClientConfiguration.base_address,
                 _bitwardenClientConfiguration.email,
                 masterPasswordHash,
                 twoFactorToken,
                 _bitwardenClientConfiguration.device_identifier,
-                _bitwardenClientConfiguration.device_name).GetAwaiter().GetResult();
+                _bitwardenClientConfiguration.device_name)
+                .ConfigureAwait(false);
         }
 
         if (tokenResponse is null)
         {
-            return null;
+            return (null, null);
         }
 
         var protectedKey = tokenResponse.Key;
@@ -284,12 +300,12 @@ public class BitwardenService : WPFBackgroundService
         var encryptionKeyBytes = BitwardenCrypto.DecryptEncryptionKey(protectedKey, masterKey);
         if (encryptionKeyBytes is null)
         {
-            return null;
+            return (null, null);
         }
 
         var encryptionKey = Convert.ToBase64String(encryptionKeyBytes);
 
-        return encryptionKey;
+        return (encryptionKey, tokenResponse);
     }
 
     public byte[]? GetEncryptionKey()

@@ -15,7 +15,6 @@ using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.AutoType.Desktop.Windows.Native;
 using Bitwarden.Core.Crypto;
 using Bitwarden.Core.Models;
-using Bitwarden.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
@@ -53,11 +52,10 @@ public partial class AutoTypeViewModel : IDisposable
     {
     }
 
-
     [RelayCommand]
-    public void Refresh()
+    public async Task Refresh()
     {
-        _bitwardenService.RefreshLocalDatabase();
+        await _bitwardenService.RefreshLocalDatabaseAsync();
     }
 
     #endregion Bound
@@ -71,21 +69,21 @@ public partial class AutoTypeViewModel : IDisposable
         _hotkeyService = hotkeyService;
         _autoTypeService = autoTypeService;
         _bitwardenService = bitwardenService;
-        InitializeRegexList();
+        Task.Run(() => InitializeRegexListAsync()); // Run the method asynchronously
         _hotkeyService.RegisterOnHotKey(OnHotKeyHandler);
     }
 
     #region Database Management
 
-    private void InitializeRegexList()
+    private async Task InitializeRegexListAsync()
     {
         try
         {
-            OnDatabaseUpdated(_bitwardenService.GetDatabase());
+            OnDatabaseUpdated(await _bitwardenService.GetDatabase());
         }
         catch (Exception e)
         {
-            _logger.Log(LogLevel.Error, $"{nameof(AutoTypeViewModel)}.{nameof(InitializeRegexList)}() Exception:'{e.Message}'");
+            _logger.Log(LogLevel.Error, $"{nameof(AutoTypeViewModel)}.{nameof(InitializeRegexListAsync)}() Exception:'{e.Message}'");
         }
 
         _bitwardenService.RegisterOnDatabaseUpdated(OnDatabaseUpdated);
@@ -229,7 +227,10 @@ public partial class AutoTypeViewModel : IDisposable
         {
             tokenSource?.Dispose();
             // Unhook the event
-            UnhookWinEvent(winEventHook);
+            if (winEventHook != IntPtr.Zero)
+            {
+                UnhookWinEvent(winEventHook);
+            }
         }
     }
 
