@@ -74,6 +74,32 @@ public class BitwardenService : WPFBackgroundService
         }
     }
 
+    //private bool ValidateConfiguration()
+    //{
+    //    if ( string.IsNullOrWhiteSpace(_bitwardenClientConfiguration.base_address))
+    //    {
+    //        return false;
+    //    }
+    //    if (string.IsNullOrWhiteSpace(_bitwardenClientConfiguration.email))
+    //    {
+    //        return false;
+    //    }
+    //    //if (string.IsNullOrWhiteSpace(_bitwardenClientConfiguration.encryption_key))
+    //    //{
+    //    //    return false;
+    //    //}
+    //    if (string.IsNullOrWhiteSpace(_bitwardenClientConfiguration.device_name))
+    //    {
+    //        return false;
+    //    }
+    //    if (string.IsNullOrWhiteSpace(_bitwardenClientConfiguration.device_identifier))
+    //    {
+    //        return false;
+    //    }
+
+    //    return true;
+    //}
+
     private async Task RefreshAccessTokenIfNeededAsync()
     {
         // check if access token is valid, if not , make it null so it will be refreshed
@@ -225,10 +251,10 @@ public class BitwardenService : WPFBackgroundService
 
         var tokenResponse = await BitwardenProtocol.PostAccessTokenFromAPIKey(
             _bitwardenClientConfiguration.base_address,
-            _bitwardenClientConfiguration.client_id,
-            _bitwardenClientConfiguration.client_secret,
-            _bitwardenClientConfiguration.device_identifier,
-            _bitwardenClientConfiguration.device_name)
+            _bitwardenClientConfiguration.client_id!,
+            _bitwardenClientConfiguration.client_secret!,
+            _bitwardenClientConfiguration.device_identifier!,
+            _bitwardenClientConfiguration.device_name!)
             .ConfigureAwait(false);
 
         if (tokenResponse is null)
@@ -238,7 +264,7 @@ public class BitwardenService : WPFBackgroundService
 
         var protectedKey = tokenResponse.Key;
 
-        var encryptionKeyBytes = BitwardenCrypto.DecryptEncryptionKey(protectedKey, masterKey);
+        var encryptionKeyBytes = BitwardenCrypto.DecryptEncryptionKey(protectedKey!, masterKey);
         if (encryptionKeyBytes is null)
         {
             return (null, null);
@@ -274,8 +300,8 @@ public class BitwardenService : WPFBackgroundService
                 _bitwardenClientConfiguration.base_address,
                 _bitwardenClientConfiguration.email,
                 masterPasswordHash,
-                _bitwardenClientConfiguration.device_identifier,
-                _bitwardenClientConfiguration.device_name)
+                _bitwardenClientConfiguration.device_identifier!,
+                _bitwardenClientConfiguration.device_name!)
                 .ConfigureAwait(false);
         }
         else
@@ -285,8 +311,8 @@ public class BitwardenService : WPFBackgroundService
                 _bitwardenClientConfiguration.email,
                 masterPasswordHash,
                 twoFactorToken,
-                _bitwardenClientConfiguration.device_identifier,
-                _bitwardenClientConfiguration.device_name)
+                _bitwardenClientConfiguration.device_identifier!,
+                _bitwardenClientConfiguration.device_name!)
                 .ConfigureAwait(false);
         }
 
@@ -297,7 +323,7 @@ public class BitwardenService : WPFBackgroundService
 
         var protectedKey = tokenResponse.Key;
 
-        var encryptionKeyBytes = BitwardenCrypto.DecryptEncryptionKey(protectedKey, masterKey);
+        var encryptionKeyBytes = BitwardenCrypto.DecryptEncryptionKey(protectedKey!, masterKey);
         if (encryptionKeyBytes is null)
         {
             return (null, null);
