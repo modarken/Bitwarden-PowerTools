@@ -37,6 +37,7 @@ public class BitwardenService : WPFBackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        var errorCount = 0;
         while (true)
         {
             try
@@ -54,6 +55,8 @@ public class BitwardenService : WPFBackgroundService
                     _syncLock.Release(); // Release the lock
                 }
 
+                errorCount = 0;
+
                 _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Database Refreshed.");
 
                 _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waiting TimeSpan.FromMinutes(15).");
@@ -66,10 +69,18 @@ public class BitwardenService : WPFBackgroundService
                 break;
             }
             catch (Exception e)
-
             {
+                errorCount++;
                 _logger.Log(LogLevel.Error, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Exception:'{e.Message}'");
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken).ConfigureAwait(false);
+                if (errorCount > 10)
+                {
+                    errorCount = 11;
+                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(3), stoppingToken).ConfigureAwait(false);
+                }
             }
         }
     }

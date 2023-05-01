@@ -1,8 +1,46 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Bitwarden.AutoType.Desktop.Windows.Native;
+
+
+public static class WindowsAPI
+{
+    public static (IntPtr, Process) GetForegroundProcess()
+    {
+        IntPtr hWnd = WindowsDLLs.GetForegroundWindow();
+        _ = WindowsDLLs.GetWindowThreadProcessId(hWnd, out uint processId);
+        return (hWnd, Process.GetProcessById((int)processId));
+    }
+
+    public static string GetWindowTitle(IntPtr hWnd)
+    {
+        const int maxTitleLength = 256;
+        var titleBuilder = new StringBuilder(maxTitleLength);
+
+        if (WindowsDLLs.GetWindowText(hWnd, titleBuilder, maxTitleLength) > 0)
+        {
+            return titleBuilder.ToString();
+        }
+
+        return string.Empty;
+    }
+
+    public static string GetWindowClassName(IntPtr hWnd)
+    {
+        const int maxClassNameLength = 256;
+        StringBuilder className = new StringBuilder(maxClassNameLength);
+        int classNameLength = WindowsDLLs.GetClassName(hWnd, className, className.Capacity);
+        if (classNameLength == 0)
+        {
+            // An error occurred, handle it as needed
+            return string.Empty;
+        }
+        return className.ToString();
+    }
+}
 
 public static class WindowsDLLs
 {
@@ -43,4 +81,6 @@ public static class WindowsDLLs
     [DllImport("user32.dll")]
     public static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
 }

@@ -7,7 +7,6 @@ using Svg;
 using Svg.Transforms;
 
 namespace Bitwarden.AutoType.Desktop.Helpers;
-
 public static class SvgExtensions
 {
     public static SvgDocument CreateSvgDocumentFromPathData(string pathData, Color color)

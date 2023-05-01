@@ -64,13 +64,16 @@
                 </Button>
             </DockPanel>
         </DockPanel>
-        <DockPanel DockPanel.Dock="Bottom" Margin="10">
-            <views:SettingsControl DockPanel.Dock="Top"
-                                   x:Name="SettingsControlInstance"
-                                   DataContext="{helpers:ServiceLocator ServiceType={x:Type local:SettingsControlViewModel}}" />
-        </DockPanel>
-        <DockPanel DockPanel.Dock="Bottom">
-        </DockPanel>
-        <DockPanel />
+
+        <TabControl DockPanel.Dock="Top" Margin="10">
+            <TabItem Header="Target">
+                <views:TargetFinderSequenceCompoterControl />
+            </TabItem>
+            <TabItem Header="Settings">
+                <views:SettingsControl x:Name="SettingsControlInstance" DataContext="{helpers:ServiceLocator ServiceType={x:Type local:SettingsControlViewModel}}" />
+            </TabItem>
+        </TabControl>
+
+        <DockPanel DockPanel.Dock="Bottom" />
     </DockPanel>
 </mah:MetroWindow>

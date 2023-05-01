@@ -1,48 +1,27 @@
-1. export to keepass button
-2. AutoType
-3. Select HotKey
-4. On/Off
-5. Specify Vault
 
-
-1. Finish Configuration Tailoring
-
-    // to get the content, need to (D)Encrypt the ciphers.
-
-    // to access the ciphers, need the access token
-
-    // to get the access token, api client id and secret (from bitwarden server -> setup onetime)
-    // or
-    // to get the access token, need the refresh token
-    // to get the refresh token, need master key hash, optional 2fa key (from user TOTP generator)
-    // to get the master key hash, need the master key
-
-    // to (D)Encrypt the ciphers, need the unproteced symmetric key
-    // to get the unproteced symmetric key, need the protected symmetric key and the master key
-
-    // to get the protected symmetric key, need the access token
-
-    // to get the master key, need the master password (from user brain)
+- Select HotKey
+- Add Installer
+- export feature?
+    - keepass button
+- Have helper for adding AutoType to field.
 
 
 
 
+DONE - Add Feature for drop target to get window title
+   -> Auto make target window regex
+   -> Auto fill out default login
+DONE - Add different Targets, so one for Window Title, one for Window Class ect.
+DONE 2. AutoType
+DONE 4. On/Off
+DONE 5. Specify Vault
+DONE 1. Finish Configuration Tailoring
+CANCEL - Add option to have a default target, so if no target is specified it will use the default.
+CANCEL - Add option to have a default AutoType sequence, so if no AutoType is specified it will use the default.
 
 
+{"Target":"^.*notepad.*$","Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
 
-
-
-
-2. Add Installer
-
-3. Add Feature for drop target to get window title
-    -> Auto make target window regex
-    -> Auto fille out default login
-
-4. Have helper for adding AutoType to field.
-
-    CUSTOME FIELDS:
-
-    AutoType:Custom
-    {"Target":"^Riot Client Main$","Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
-    {"Target":"^.*Riot Client.*$","Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
+{"Target":"^.*notepad.*$", "Type":"Title", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
+{"Target":"^.*notepad.*$", "Type":"Process", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
+{"Target":"^.*notepad.*$", "Type":"Class", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}

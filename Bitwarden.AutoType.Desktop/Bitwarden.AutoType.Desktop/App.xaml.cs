@@ -44,12 +44,16 @@ public partial class App : Application
         SystemEvents.SessionEnding += OnSessionEnding;
 
         _host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
-        .ConfigureUserLocalAppDataJsonFile<Settings>(DesktopConstants.DefaultDataFolderName, "settings.json",
+        .ConfigureUserLocalAppDataJsonFile(BitwardenConstants.DefaultDataFolderName, "settings.json",
             out Settings? appSettings, out Action<Settings>? saveSettingsToFile, true)
+        .ConfigureUserLocalAppDataJsonFile(BitwardenConstants.DefaultDataFolderName, "autotype.settings.json",
+            out AutoTypeSettings? autoTypeSettings, out Action<AutoTypeSettings>? autoTypeSaveSettingsToFile, true)
         .ConfigureServices((hostContext, services) => // configuration
         {
             services.AddSingleton(appSettings!.BitwardenClientConfiguration!);
             services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { saveSettingsToFile!.Invoke(appSettings!); }));
+            services.AddSingleton(autoTypeSettings!);
+            services.AddSingleton(new Action<AutoTypeService>((c) => { autoTypeSaveSettingsToFile!.Invoke(autoTypeSettings!); }));
             RegisterRegularServices(services);
             RegisterHostedServices(services);
         })
@@ -85,8 +89,8 @@ public partial class App : Application
         await _host.StartAsync();
         var window = _host.Services.GetRequiredService<MainWindow>();
 
-        window.PositionWindow();
-        window.Show();
+        //window.PositionWindow();
+        //window.Show();
 
         var iconService = _host.Services.GetRequiredService<NotifyIconService>();
         iconService.Configure(window);

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -22,6 +20,14 @@ using static Bitwarden.AutoType.Desktop.Windows.Native.WindowsDLLs;
 
 namespace Bitwarden.AutoType.Desktop;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum TargetTypes
+{
+    Title,
+    Process,
+    Class
+}
+
 public class AutoTypeCustomField
 {
     [JsonIgnore]
@@ -31,6 +37,7 @@ public class AutoTypeCustomField
     public string? UserName { get; set; }
 
     public string? Target { get; set; }
+    public TargetTypes? Type { get; set; }
     public string? Sequence { get; set; }
 }
 
@@ -41,6 +48,8 @@ public partial class AutoTypeViewModel : IDisposable
     private readonly HotkeyService _hotkeyService;
     private readonly AutoTypeService _autoTypeService;
     private readonly BitwardenService _bitwardenService;
+    private readonly AutoTypeSettings _autoTypeSettings;
+    private readonly Action<AutoTypeSettings> _save;
     private Dictionary<AutoTypeCustomField, Cipher>? _regexLookup;
 
     #region Bound
@@ -50,6 +59,16 @@ public partial class AutoTypeViewModel : IDisposable
 
     partial void OnIsAutoTypeEnabledChanged(bool value)
     {
+        if (value)
+        {
+            _hotkeyService.Enable();
+        }
+        else
+        {
+            _hotkeyService.Disable();
+        }
+        _autoTypeSettings.AutoTypeOnOff = IsAutoTypeEnabled;
+        _save(_autoTypeSettings);
     }
 
     [RelayCommand]
@@ -63,12 +82,26 @@ public partial class AutoTypeViewModel : IDisposable
     public AutoTypeViewModel(ILogger<AutoTypeViewModel> logger,
         HotkeyService hotkeyService,
         AutoTypeService autoTypeService,
-        BitwardenService bitwardenService)
+        BitwardenService bitwardenService,
+        AutoTypeSettings autoTypeSettings,
+        Action<AutoTypeSettings> save)
     {
         _logger = logger;
         _hotkeyService = hotkeyService;
         _autoTypeService = autoTypeService;
         _bitwardenService = bitwardenService;
+        _autoTypeSettings = autoTypeSettings;
+        _save = save;
+
+        if (_autoTypeSettings.AutoTypeOnOff is null)
+        {
+            IsAutoTypeEnabled = true;
+        }
+        else
+        {
+            IsAutoTypeEnabled = _autoTypeSettings.AutoTypeOnOff.Value;
+        }
+
         Task.Run(() => InitializeRegexListAsync()); // Run the method asynchronously
         _hotkeyService.RegisterOnHotKey(OnHotKeyHandler);
     }
@@ -146,17 +179,27 @@ public partial class AutoTypeViewModel : IDisposable
 
     private void OnHotKeyHandler(WindowsHotKey windowsHotKey)
     {
-        var (currentHandle, currentProcess) = GetForegroundProcess();
+        if (IsAutoTypeEnabled == false)
+        {
+            return;
+        }
+
+        var (currentHandle, currentProcess) = WindowsAPI.GetForegroundProcess();
 
         if (currentProcess != null)
         {
-            string windowTitle = GetWindowTitle(currentHandle);
-            //string processName = currentProcess.ProcessName;
+            string windowTitle = WindowsAPI.GetWindowTitle(currentHandle);
+            string processName = currentProcess.ProcessName;
+            string windowClassName = WindowsAPI.GetWindowClassName(currentHandle);
 
-            var matchedRegex = _regexLookup!
-                .Where(r => (new Regex(r.Key.Target!, RegexOptions.IgnoreCase)).IsMatch(windowTitle))
-                .AsEnumerable()
-                //.ToList()
+            var matchedRegex =
+                _regexLookup!
+                .Where(r =>
+                    (r.Key.Type == TargetTypes.Title && new Regex(r.Key.Target!, RegexOptions.IgnoreCase).IsMatch(windowTitle))
+                    || (r.Key.Type == TargetTypes.Process && new Regex(r.Key.Target!, RegexOptions.IgnoreCase).IsMatch(processName))
+                    || (r.Key.Type == TargetTypes.Class && new Regex(r.Key.Target!, RegexOptions.IgnoreCase).IsMatch(windowClassName)))
+                .Union(_regexLookup! // in case the user has not specified a type, default to title
+                       .Where(r => r.Key.Type is null && new Regex(r.Key.Target!, RegexOptions.IgnoreCase).IsMatch(windowTitle)))
                 ;
 
             if (matchedRegex.Any())
@@ -192,21 +235,24 @@ public partial class AutoTypeViewModel : IDisposable
     {
         var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
 
+        // delegate to handle windows events and cancel the token when the window focus changes
         WinEventDelegate windEventHandler = (IntPtr hWinEventHook, uint eventType, IntPtr hWnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime) =>
         {
             if (eventType == WindowsConstants.EVENT_SYSTEM_FOREGROUND)
             {
                 // The window focus has changed
                 tokenSource?.Cancel();
-                // Console.WriteLine($"Window focus changed: {hWnd}");
             }
         };
+
         IntPtr winEventHook = default;
 
         try
         {
+            // Set the handle to the foreground
             _ = SetForegroundWindow(handle);
 
+            // hook into the windows events
             winEventHook = SetWinEventHook(
                 WindowsConstants.EVENT_SYSTEM_FOREGROUND,
                 WindowsConstants.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, windEventHandler, 0, 0,
@@ -226,7 +272,7 @@ public partial class AutoTypeViewModel : IDisposable
         finally
         {
             tokenSource?.Dispose();
-            // Unhook the event
+            // Unhook from windows events
             if (winEventHook != IntPtr.Zero)
             {
                 UnhookWinEvent(winEventHook);
@@ -252,30 +298,6 @@ public partial class AutoTypeViewModel : IDisposable
     }
 
     #endregion OnHotKey pressed
-
-    #region Helpers
-
-    private static (IntPtr, Process) GetForegroundProcess()
-    {
-        IntPtr hWnd = WindowsDLLs.GetForegroundWindow();
-        _ = WindowsDLLs.GetWindowThreadProcessId(hWnd, out uint processId);
-        return (hWnd, Process.GetProcessById((int)processId));
-    }
-
-    private string GetWindowTitle(IntPtr hWnd)
-    {
-        const int maxTitleLength = 256;
-        var titleBuilder = new StringBuilder(maxTitleLength);
-
-        if (WindowsDLLs.GetWindowText(hWnd, titleBuilder, maxTitleLength) > 0)
-        {
-            return titleBuilder.ToString();
-        }
-
-        return string.Empty;
-    }
-
-    #endregion Helpers
 
     #region IDisposable
 

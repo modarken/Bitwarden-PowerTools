@@ -1,5 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+#pragma warning disable
+
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
@@ -368,3 +370,5 @@ internal static class Helpers
 //};
 
 #endregion
+
+#pragma warning restore

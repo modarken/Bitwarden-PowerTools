@@ -9,5 +9,6 @@ namespace Bitwarden.AutoType.Desktop
     internal static class Constants
     {
         internal const string BitwardenClientConfigurationDeviceName = "autotype";
+        internal const string BitwardenDefaultSequence = "{USERNAME}{TAB}{PASSWORD}{ENTER}";
     }
 }

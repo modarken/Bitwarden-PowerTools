@@ -11,14 +11,23 @@ namespace Bitwarden.AutoType.Desktop.Services;
 
 public class HotkeyService : IDisposable
 {
-    private WindowsHotKey _hotKeyNew;
     private readonly List<Action<WindowsHotKey>> _hotKeyActions;
+    private WindowsHotKey? _hotKeyNew;
 
     public HotkeyService()
     {
         _hotKeyActions = new List<Action<WindowsHotKey>>();
+    }
+
+    public void Enable()
+    {
         _hotKeyNew = new WindowsHotKey(VirtualKeys.A, RegisterHotKeyModifiers.Ctrl | RegisterHotKeyModifiers.Alt, ExecuteOnHotKey);
         var success = _hotKeyNew.RegisterHotKey();
+    }
+
+    public void Disable()
+    {
+        _hotKeyNew?.Dispose();
     }
 
     public void RegisterOnHotKey(Action<WindowsHotKey> onHotkey)
