@@ -221,7 +221,7 @@ public partial class AutoTypeViewModel : IDisposable
 
                                 if (cipherName is not null)
                                 {
-                                    var id = cipher.Id;
+                                    var id = cipher!.Id;
 
                                     if (!ciphers.Any(c => c.Id == id))
                                     {
