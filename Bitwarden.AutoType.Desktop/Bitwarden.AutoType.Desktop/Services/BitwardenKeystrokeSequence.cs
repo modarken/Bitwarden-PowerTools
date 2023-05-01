@@ -17,7 +17,7 @@ public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
         USERNAME,
         PASSWORD,
         URL,
-        NOTES,
+        NOTES
     }
 
     private readonly Cipher _cipher;
@@ -28,14 +28,33 @@ public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
         _cipher = cipher;
         _decryptor = decryptor;
     }
+    // Each sequence is a string like "{NAME}", "{USERNAME}", "{PASSWORD}", "{URL}", "{NOTES}", {FIELD:ping}
 
+    // {TAB}, {ENTER}, {UP}, {DOWN}, {LEFT}, {RIGHT}, {SHIFT}, {CTRL}, {ALT}, {DELETE}, {BACKSPACE}, {HOME}, {END}, {PGUP}, {PGDN}, {ESC}, {INSERT}, {F1}, {F2}, {F3}, {F4}, {F5}, {F6}, {F7}, {F8}, {F9}, {F10}, {F11}, {F12}, {WIN}, {CAPSLOCK}, {SCROLLLOCK}, {NUMLOCK}, {PRTSC}, {BREAK}, {HELP}, {CLEAR}, {SLEEP}, {NUMPAD0}, {NUMPAD1}, {NUMPAD2}, {NUMPAD3}, {NUMPAD4}, {NUMPAD5}, {NUMPAD6}, {NUMPAD7}, {NUMPAD8}, {NUMPAD9}, {MULTIPLY}, {ADD}, {SEPARATOR}, {SUBTRACT}, {DECIMAL}, {DIVIDE}, {OEM_1}, {OEM_PLUS}, {OEM_COMMA}, {OEM_MINUS}, {OEM_PERIOD}, {OEM_2}, {OEM_3}, {OEM_4}, {OEM_5}, {OEM_6}, {OEM_7}, {OEM_8}, {OEM_102}, {PROCESSKEY}, {ATTN}, {CRSEL}, {EXSEL}, {EREOF}, {PLAY}, {ZOOM}, {NONAME}, {PA1}, {OEM_CLEAR}}
     private IEnumerable<EmulatedKeystroke>? ProcessRegExSequence(string sequence)
     {
         var keyword = sequence[1..^1].ToLower();
 
-        if (Enum.TryParse(keyword, true, out BitwardenPlaceholders placeHolder))
+        if (keyword.StartsWith("FIELD:", StringComparison.InvariantCultureIgnoreCase))
         {
-            // Console.WriteLine($"The input '{input}' matches the enum case: {color}");
+            var fieldName = keyword[6..];
+
+            var field = _cipher
+                .Fields?
+                .Where(f => f.Name is not null)
+                .Select(f => new { Name = _decryptor(f.Name!), f.Value })
+                .FirstOrDefault(a => a.Name!.Equals(fieldName, StringComparison.InvariantCultureIgnoreCase));
+
+            if (field is null || field.Value is null) return null;
+            var plainText = _decryptor(field.Value);
+            if (plainText is string)
+            {
+                var plainTextSequence = new KeystrokeSequence(plainText, Configuration);
+                return plainTextSequence.Provide();
+            }
+        }
+        else if (Enum.TryParse(keyword, true, out BitwardenPlaceholders placeHolder))
+        {
             var cipherText = placeHolder switch
             {
                 BitwardenPlaceholders.NAME => _cipher.Name,

@@ -248,10 +248,9 @@ public partial class AutoTypeViewModel : IDisposable
             Ciphers = null;
         }
 
+        _regexLookup = expressions;
 
         OnFilterSearchTextChanged(FilterSearchText);
-
-        _regexLookup = expressions;
     }
 
     #endregion Database Management

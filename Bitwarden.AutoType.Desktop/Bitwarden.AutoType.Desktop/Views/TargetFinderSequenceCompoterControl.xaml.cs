@@ -213,7 +213,6 @@ namespace Bitwarden.AutoType.Desktop.Views
         {
             var options = new JsonSerializerOptions
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = false,
             };
 
