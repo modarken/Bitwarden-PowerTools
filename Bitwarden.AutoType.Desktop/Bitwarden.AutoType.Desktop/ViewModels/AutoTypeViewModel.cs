@@ -217,7 +217,7 @@ public partial class AutoTypeViewModel : IDisposable
 
                                 autoTypeCustomField.Name = cipherName;
                                 autoTypeCustomField.UserName = userName;
-                                expressions.Add(autoTypeCustomField, cipher);
+                                expressions.Add(autoTypeCustomField, cipher!);
 
                                 if (cipherName is not null)
                                 {
