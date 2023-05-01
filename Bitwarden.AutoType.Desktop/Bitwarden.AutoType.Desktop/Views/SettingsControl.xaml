@@ -54,7 +54,9 @@
         <TextBox x:Name="ClientIDTextBox" Text="{Binding Path=BitwardenClientConfiguration.client_id, Mode=TwoWay}" Grid.Row="5" Grid.Column="2" Margin="0 0 0 5" Style="{StaticResource MahApps.Styles.TextBox}" />
 
         <TextBlock x:Name="ClientSecretTextBlock" Text="Client Secret:" Grid.Row="6" Grid.Column="0" Margin="0 0 0 5"/>
-        <TextBox x:Name="ClientSecretTextBox" Text="{Binding Path=BitwardenClientConfiguration.client_secret, Mode=TwoWay}" Grid.Row="6" Grid.Column="2" Margin="0 0 0 5" Style="{StaticResource MahApps.Styles.TextBox}" />
+        <PasswordBox x:Name="ClientSecretTextBox"  Grid.Row="6" Grid.Column="2" Margin="0 0 0 5"
+                     helpers:PasswordBoxBindingBehavior.PasswordBinding="{Binding BitwardenClientConfiguration.client_secret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource MahApps.Styles.PasswordBox}"/>
 
         <Button Grid.Row="7" Grid.Column="2" Margin="0 0 0 5" x:Name="SaveButton" Style="{DynamicResource MahApps.Styles.Button.Square}" Content="Save"
             Command="{Binding SaveConfigCommand}"></Button>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Services;
-using Bitwarden.Core.Models;
 using Bitwarden.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -125,6 +124,5 @@ public partial class SettingsControlViewModel
         {
             _save(BitwardenClientConfiguration);
         }
-
     }
 }
