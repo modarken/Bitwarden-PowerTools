@@ -1,23 +1,35 @@
-﻿using System;
+﻿namespace Bitwarden.AutoType.Desktop.Windows;
+
+using System;
+using System.Text.Json.Serialization;
 using System.Windows.Interop;
 using Bitwarden.AutoType.Desktop.Windows.Native;
 
-namespace Bitwarden.AutoType.Desktop.Windows;
-
+[Serializable]
 public sealed class WindowsHotKey : IDisposable
 {
     private ThreadMessageEventHandler? _hotKeyFilter;
     public int ID { get; set; }
-    public VirtualKeys Key { get; }
-    public RegisterHotKeyModifiers KeyModifiers { get; }
-    public Action<WindowsHotKey> Action { get; }
 
-    public WindowsHotKey(VirtualKeys key, RegisterHotKeyModifiers keyModifiers, Action<WindowsHotKey> action)
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public VirtualKeys Key { get; set; }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public RegisterHotKeyModifiers KeyModifiers { get; set; }
+
+    [JsonIgnore]
+    public Action<WindowsHotKey>? Action { get; set; }
+
+    public WindowsHotKey(VirtualKeys key, RegisterHotKeyModifiers keyModifiers)
     {
         Key = key;
         KeyModifiers = keyModifiers;
-        Action = action;
         ID = ((int)Key << 0xFF) + (int)KeyModifiers;
+    }
+
+    public void SetAction(Action<WindowsHotKey> action)
+    {
+        Action = action;
     }
 
     public bool RegisterHotKey()
@@ -47,3 +59,4 @@ public sealed class WindowsHotKey : IDisposable
         }
     }
 }
+

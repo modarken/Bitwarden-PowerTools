@@ -1,5 +1,6 @@
 
 - Select HotKey
+- Add select button on the hotkeyproess menu that pops up when their are multiple items that match the hotkey.
 - Add Installer
 - export feature?
     - keepass button

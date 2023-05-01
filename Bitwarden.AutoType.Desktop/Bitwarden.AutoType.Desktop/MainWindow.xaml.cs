@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System.Globalization;
+using System;
+using System.Windows;
+using Bitwarden.AutoType.Desktop.Windows;
 using MahApps.Metro.Controls;
 
 namespace Bitwarden.AutoType.Desktop;
