@@ -29,20 +29,24 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="15" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="15" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0" Content="Target Finder:" Style="{StaticResource LabelStyle}" />
-        <Border Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="FindWindowIconBorder" 
-                HorizontalAlignment="Left" Margin="20 0 0 0"
+        <Border Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="FindWindowIconBorder"
+                HorizontalAlignment="Left" Margin="20 0 0 5"
                 MouseLeftButtonDown="FindWindowIcon_MouseLeftButtonDown">
-            <iconPacks:PackIconMaterial Kind="Magnify" x:Name="FindWindowIcon" Width="32" Height="32" />
+            <StackPanel Orientation="Horizontal">
+                <iconPacks:PackIconMaterial Kind="Magnify" x:Name="FindWindowIcon" Width="32" Height="32" />
+                <TextBlock Text="Drag to find window" VerticalAlignment="Center" Margin="5,0,0,0" />
+            </StackPanel>
         </Border>
 
         <Label Grid.Row="1" Grid.Column="0" Content="Process Title:" Style="{StaticResource LabelStyle}" />
@@ -54,7 +58,8 @@
         <Label Grid.Row="3" Grid.Column="0" Content="Process Class:" Style="{StaticResource LabelStyle}" />
         <TextBox Grid.Row="3" Grid.Column="1" x:Name="ProcessClassNameTextBox" IsReadOnly="True" Style="{StaticResource TextBoxStyle}" />
 
-        <Separator Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" />
+        <Separator Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
+
         <Label Grid.Row="5" Grid.Column="0" Content="Type:" Style="{StaticResource LabelStyle}" />
         <ComboBox Grid.Row="5" Grid.Column="1" x:Name="EditableComboBoxTargetType" Margin="0 0 0 0"
                   ItemsSource="{Binding Source={StaticResource TargetTypesEnum}}" SelectedIndex="0"
@@ -66,8 +71,10 @@
         <Label Grid.Row="7" Grid.Column="0" Content="Keyboard:" Style="{StaticResource LabelStyle}" />
         <TextBox Grid.Row="7" Grid.Column="1" x:Name="EditableTextBoxSequence" TextChanged="EditableTextBoxSequence_TextChanged" Style="{StaticResource TextBoxStyle}" />
 
-        <Label Grid.Row="8" Grid.Column="0" Content="Custom Name:" Style="{StaticResource LabelStyle}" />
-        <Grid Grid.Row="8" Grid.Column="1">
+        <Separator Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
+
+        <Label Grid.Row="9" Grid.Column="0" Content="Custom Name:" Style="{StaticResource LabelStyle}" />
+        <Grid Grid.Row="9" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
@@ -78,13 +85,13 @@
             </Button>
         </Grid>
 
-        <Label Grid.Row="9" Grid.Column="0" Content="Custom Value:" Style="{StaticResource LabelStyle}" />
-        <Grid Grid.Row="9" Grid.Column="1">
+        <Label Grid.Row="10" Grid.Column="0" Content="Custom Value:" Style="{StaticResource LabelStyle}" />
+        <Grid Grid.Row="10" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="EditableTextBoxCustomFieldValue" Grid.Column="0" Margin="0 3 0 0" />
+            <TextBox x:Name="EditableTextBoxCustomFieldValue" Grid.Column="0" Margin="0 3 0 0" IsReadOnly="True" />
             <Button x:Name="CopyButton4" Grid.Column="1" Click="CopyButton_Click" Tag="{Binding ElementName=EditableTextBoxCustomFieldValue}" Style="{StaticResource CopyButtonStyle}">
                 <iconPacks:PackIconMaterial Kind="ContentCopy" />
             </Button>
