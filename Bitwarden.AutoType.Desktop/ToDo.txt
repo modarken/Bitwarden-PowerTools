@@ -1,10 +1,10 @@
 
 - Add Installer
-- export feature?
-    - keepass button
+- Add Help Menu for displaying the keyboard sequences available to choose from.
 - Have helper for adding AutoType to field.
 
-
+- Secondary Power Tool in charge of backups - export feature?
+    - keepass button
 
 
 DONE - Add select button on the hotkeyproess menu that pops up when their are multiple items that match the hotkey.
@@ -20,9 +20,8 @@ DONE 1. Finish Configuration Tailoring
 CANCEL - Add option to have a default target, so if no target is specified it will use the default.
 CANCEL - Add option to have a default AutoType sequence, so if no AutoType is specified it will use the default.
 
-
+Example Custom Values
 {"Target":"^.*notepad.*$","Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
-
 {"Target":"^.*notepad.*$", "Type":"Title", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
 {"Target":"^.*notepad.*$", "Type":"Process", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
 {"Target":"^.*notepad.*$", "Type":"Class", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -7,6 +8,7 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Bitwarden.AutoType.Desktop.Models;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.AutoType.Desktop.Views;
 using Bitwarden.AutoType.Desktop.Windows;
@@ -53,6 +55,47 @@ public partial class AutoTypeViewModel : IDisposable
     private Dictionary<AutoTypeCustomField, Cipher>? _regexLookup;
 
     #region Bound
+
+    [ObservableProperty]
+    private ObservableCollection<CipherDisplay>? _filteredCiphers;
+
+    [ObservableProperty]
+    private string? _filterSearchText;
+
+    void OnFilterSearchTextChanged()
+    {
+        OnFilterSearchTextChanged(FilterSearchText);
+    }
+
+    partial void OnFilterSearchTextChanged(string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            if (Ciphers is null)
+            {
+                FilteredCiphers = null;
+                return;
+            }
+
+            FilteredCiphers = new ObservableCollection<CipherDisplay>(Ciphers);
+        }
+        else
+        {
+            if (Ciphers is null)
+            {
+                FilteredCiphers = null;
+                return;
+            }
+
+            FilteredCiphers = new ObservableCollection<CipherDisplay>(
+                Ciphers.Where(c => c?.Name is not null && c.Name.Contains(value, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        OnPropertyChanged(nameof(FilteredCiphers));
+    }
+
+    [ObservableProperty]
+    private ObservableCollection<CipherDisplay>? _ciphers;
 
     [ObservableProperty]
     private bool _isAutoTypeEnabled = false;
@@ -126,8 +169,6 @@ public partial class AutoTypeViewModel : IDisposable
     {
         Dictionary<AutoTypeCustomField, Cipher> expressions = new();
 
-        var key = "AutoType:Custom";
-
         var decryptionKey = _bitwardenService.GetEncryptionKey();
 
         if (decryptionKey is null)
@@ -136,19 +177,25 @@ public partial class AutoTypeViewModel : IDisposable
         }
 
         var serializerOptions = new JsonSerializerOptions() { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+        var ciphers = new List<CipherDisplay>();
 
         if (syncResponse.Ciphers != null && decryptionKey != null)
         {
             // Iterate through ciphers and check for custom fields with the specified title name
             foreach (Cipher cipher in syncResponse.Ciphers)
             {
+                if (cipher is null)
+                {
+                    continue;
+                }
+
                 if (cipher.Fields != null && cipher.Fields.Count() > 0)
                 {
                     foreach (Field1 field in cipher.Fields)
                     {
                         var name = BitwardenCrypto.DecryptEntry(field.Name!, decryptionKey!, true);
 
-                        if (name is not null && name.Equals(key, StringComparison.OrdinalIgnoreCase))
+                        if (name is not null && name.Equals(Constants.BitwardenCustomFieldName, StringComparison.OrdinalIgnoreCase))
                         {
                             var value = BitwardenCrypto.DecryptEntry(field.Value!, decryptionKey!, true);
 
@@ -156,9 +203,31 @@ public partial class AutoTypeViewModel : IDisposable
                                 && JsonSerializer.Deserialize<AutoTypeCustomField>(value, serializerOptions)
                                 is AutoTypeCustomField autoTypeCustomField)
                             {
-                                autoTypeCustomField.UserName = BitwardenCrypto.DecryptEntry(cipher.Login!.Username!, decryptionKey!, true);
-                                autoTypeCustomField.Name = BitwardenCrypto.DecryptEntry(cipher.Name!, decryptionKey!, true);
+                                string? cipherName = null;
+                                if (cipher?.Name is string)
+                                {
+                                    cipherName = BitwardenCrypto.DecryptEntry(cipher!.Name, decryptionKey!, true);
+                                }
+
+                                string? userName = null;
+                                if (cipher?.Login?.Username is string)
+                                {
+                                    userName = BitwardenCrypto.DecryptEntry(cipher.Login!.Username!, decryptionKey!, true);
+                                }
+
+                                autoTypeCustomField.Name = cipherName;
+                                autoTypeCustomField.UserName = userName;
                                 expressions.Add(autoTypeCustomField, cipher);
+
+                                if (cipherName is not null)
+                                {
+                                    var id = cipher.Id;
+
+                                    if (!ciphers.Any(c => c.Id == id))
+                                    {
+                                        ciphers.Add(new CipherDisplay { Id = id, Name = cipherName, User = userName });
+                                    }
+                                }
                             }
                             else
                             {
@@ -169,6 +238,18 @@ public partial class AutoTypeViewModel : IDisposable
                 }
             }
         }
+
+        if (ciphers.Count > 0)
+        {
+            Ciphers = new ObservableCollection<CipherDisplay>(ciphers.OrderBy(c => c.Name));
+        }
+        else
+        {
+            Ciphers = null;
+        }
+
+
+        OnFilterSearchTextChanged(FilterSearchText);
 
         _regexLookup = expressions;
     }
