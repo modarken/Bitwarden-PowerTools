@@ -210,7 +210,7 @@ public partial class AutoTypeViewModel : IDisposable
                                 }
 
                                 string? userName = null;
-                                if (cipher?.Login?.Username is string)
+                                if (cipher?.Login?.Username is not null)
                                 {
                                     userName = BitwardenCrypto.DecryptEntry(cipher.Login!.Username!, decryptionKey!, true);
                                 }

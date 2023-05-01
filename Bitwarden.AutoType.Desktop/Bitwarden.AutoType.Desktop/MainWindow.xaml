@@ -19,10 +19,14 @@
                   Title="Bitwarden AutoType" Height="480" Width="390">
     <mah:MetroWindow.Resources>
         <DataTemplate x:Key="CipherTemplate">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="5,0,5,0" />
-                <TextBlock Text="{Binding User}" FontStyle="Italic" Margin="5,0,5,0" />
-            </StackPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="NameColumn" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="UserColumn" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Bold" Margin="5,0,5,0" />
+                <TextBlock Grid.Column="1" Text="{Binding User}" FontStyle="Italic" Margin="5,0,5,0" />
+            </Grid>
         </DataTemplate>
     </mah:MetroWindow.Resources>
     <DockPanel>
@@ -59,7 +63,6 @@
                               IsEnabled="{Binding IsUserPerformActionEnabled}"
                               IsOn="{Binding IsAutoTypeEnabled}" />
                 <Button DockPanel.Dock="Left"
-
                         x:Name="RefreshButton" Style="{DynamicResource MahApps.Styles.Button.Square}"
                         Height="35"
                         Width="100"
@@ -83,7 +86,9 @@
                     <ListBox x:Name="CipherListBox" Grid.Row="1" Margin="5"
                              ItemsSource="{Binding FilteredCiphers}"
                              ItemTemplate="{StaticResource CipherTemplate}"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             Grid.IsSharedSizeScope="True"/>
+
                 </Grid>
             </TabItem>
             <TabItem Header="Target">
