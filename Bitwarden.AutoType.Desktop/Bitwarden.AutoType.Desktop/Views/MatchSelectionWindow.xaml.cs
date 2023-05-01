@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using Bitwarden.Core.Models;
 using CommunityToolkit.Mvvm.Input;
@@ -64,6 +65,20 @@ namespace Bitwarden.AutoType.Desktop.Views
         private void SelectedMatchDoubleClicked()
         {
             if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
+            {
+                SelectedMatch = selectedMatch;
+                DialogResult = true;
+            }
+        }
+
+
+        private void ExecuteButton_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button == null) { return; }
+            var matchItem = button.CommandParameter;
+
+            if (matchItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
             {
                 SelectedMatch = selectedMatch;
                 DialogResult = true;

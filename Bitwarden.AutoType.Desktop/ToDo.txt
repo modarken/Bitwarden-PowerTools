@@ -1,6 +1,4 @@
 
-- Select HotKey
-- Add select button on the hotkeyproess menu that pops up when their are multiple items that match the hotkey.
 - Add Installer
 - export feature?
     - keepass button
@@ -9,6 +7,8 @@
 
 
 
+DONE - Add select button on the hotkeyproess menu that pops up when their are multiple items that match the hotkey.
+DONE - Select HotKey
 DONE - Add Feature for drop target to get window title
    -> Auto make target window regex
    -> Auto fill out default login

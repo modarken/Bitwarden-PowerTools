@@ -13,11 +13,11 @@ public class HotkeyService : IDisposable
     private WindowsHotKey? _hotKeyNew;
     private bool _isEnabled = false;
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-
     public HotkeyService()
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     {
+        _hotKeyActions = new List<Action<WindowsHotKey>>();
+        _autoTypeSettings = new AutoTypeSettings();
+        _save = new Action<AutoTypeSettings>((a)=> { });
     }
 
     public bool IsEnabled => _isEnabled;
@@ -31,7 +31,7 @@ public class HotkeyService : IDisposable
 
     public WindowsHotKey? GetHotkey()
     {
-        return _autoTypeSettings.WindowsHotKey;
+        return _autoTypeSettings?.WindowsHotKey;
     }
 
     public void SetHotKey(WindowsHotKey hotKey)
