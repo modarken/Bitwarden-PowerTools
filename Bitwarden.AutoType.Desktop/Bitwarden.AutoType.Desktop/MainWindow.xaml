@@ -28,7 +28,44 @@
                 <TextBlock Grid.Column="1" Text="{Binding User}" FontStyle="Italic" Margin="5,0,5,0" />
             </Grid>
         </DataTemplate>
+        <!--<iconPacks:PackIconModern x:Key="PinIcon" Kind="Pin" />
+        <iconPacks:PackIconModern x:Key="UnpinIcon" Kind="PinRemove" />-->
+        <!--<iconPacks:PackIconJamIcons x:Key="PinIcon" Kind="PinAltF" />
+        <iconPacks:PackIconJamIcons x:Key="UnpinIcon" Kind="PinAltF" />-->
+        <helpers:PinButtonIconConverter x:Key="PinButtonIconConverter" />
     </mah:MetroWindow.Resources>
+    <mah:MetroWindow.RightWindowCommands>
+        <mah:WindowCommands>
+            <Button Command="{Binding TogglePinCommand}" BorderThickness="0" Padding="0"  Background="{DynamicResource MahApps.Metro.Brushes.AccentColorBrush}">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}" BasedOn="{StaticResource MahApps.Styles.Button}">
+                        <Setter Property="Foreground" Value="{DynamicResource MahApps.Metro.Brushes.White}" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Grid Background="{TemplateBinding Background}">
+                                        <Rectangle Fill="Transparent" />
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}" />
+                                    </Grid>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+                <Button.Content>
+                    <!--<iconPacks:PackIconModern Kind="{
+                        Binding IsPinned,
+                        Converter={StaticResource PinButtonIconConverter},
+                        ConverterParameter={StaticResource PinIcon},
+                        FallbackValue={StaticResource UnpinIcon}}" />-->
+
+                    <iconPacks:PackIconJamIcons Kind="{
+                        Binding IsPinned,
+                        Converter={StaticResource PinButtonIconConverter}}" />
+                </Button.Content>
+            </Button>
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
     <DockPanel>
         <!--<DockPanel x:Name="bottomDockPanel" DockPanel.Dock="Bottom">
             <StatusBar Grid.Row="2">

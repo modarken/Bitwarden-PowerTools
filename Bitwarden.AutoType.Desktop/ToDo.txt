@@ -1,7 +1,6 @@
 
 - Add Installer
 - Hardening of the code
-- Have helper for adding AutoType to field.
 
 - Optional: Add specificity to the target, so you can specify the window title, window class, process name, ect.
     - Instead of just choosing one, you can choose multiple, and it will only match if all of them match.
@@ -10,6 +9,7 @@
 - Secondary Power Tool in charge of backups - export feature?
     - keepass button
 
+DONE - Have helper for adding AutoType to field.
 DONE - Add Help Menu for displaying the keyboard sequences available to choose from.
 DONE - Added TOTP field to AutoTypeSequence
 DONE - Added Field to specify the AutoType sequence

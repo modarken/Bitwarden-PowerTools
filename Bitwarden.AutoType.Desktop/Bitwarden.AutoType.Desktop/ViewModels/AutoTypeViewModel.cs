@@ -57,6 +57,15 @@ public partial class AutoTypeViewModel : IDisposable
     #region Bound
 
     [ObservableProperty]
+    private bool _isPinned;
+
+    [RelayCommand]
+    public void TogglePin()
+    {
+        IsPinned = !IsPinned;
+    }
+
+    [ObservableProperty]
     private ObservableCollection<CipherDisplay>? _filteredCiphers;
 
     [ObservableProperty]
