@@ -15,12 +15,8 @@ public class NotifyIconService
     private readonly Forms.NotifyIcon _notifyIcon;
     private readonly App _app;
     private readonly AutoTypeViewModel _autoTypeViewModel;
-
-    //private IMainWindowViewModel? _mainWindowViewModel;
     private MainWindow? _mainWindow;
 
-    //private Icon? _grayIcon;
-    //private Icon? _yellowIcon;
     private Icon? _bitwardenIcon;
 
     public NotifyIconService(Forms.NotifyIcon notifyIcon, App app, AutoTypeViewModel autoTypeViewModel)
@@ -33,33 +29,13 @@ public class NotifyIconService
              Color.WhiteSmoke);
 
         _bitwardenIcon = SvgExtensions.GetIconFromSvgDocument(svgDocument, 32, 32);
-
-        //_bitwardenIcon = GetEmbededResourceIcon($"{nameof(Bitwarden)}.{nameof(AutoType)}.{nameof(Desktop)}.Resources.Bitwarden.AutoType.ico");
-        //_grayIcon = GetEmbededResourceIcon("GhostMouse.Desktop.Resources.Material-Rodent.Gray.ico");
-        //_yellowIcon = GetEmbededResourceIcon("GhostMouse.Desktop.Resources.Material-Rodent.Yellow.ico");
     }
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "VSTHRD101:Avoid unsupported async delegates", Justification = "<Pending>")]
-    //public void Configure(MainWindow mainWindow, IMainWindowViewModel mainWindowViewModel)
     public void Configure(MainWindow mainWindow)
     {
         _mainWindow = mainWindow;
         _notifyIcon.Icon = _bitwardenIcon;
-
-        // _mainWindowViewModel = mainWindowViewModel;
-        // _notifyIcon.Icon = _grayIcon// ;
-
-        // // _mainWindowViewModel.OnIsMouseStartedChangedEvent += (s, e) =>
-        // // {
-        // //     if (e)
-        // //     {
-        // //         _notifyIcon.Icon = _yellowIcon;
-        // //     }
-        // //     else
-        // //     {
-        //         _notifyIcon.Icon = _grayIcon;
-        //     }
-        // };
 
         _notifyIcon.ContextMenuStrip = new Forms.ContextMenuStrip();
         _notifyIcon.ContextMenuStrip.Items.Add("Exit", null, (s, e) => { Application.Current.Shutdown(); });
@@ -88,13 +64,11 @@ public class NotifyIconService
                     switch (_mainWindow.Visibility)
                     {
                         case Visibility.Visible:
-                            //notifyIconLogger.LogTrace($"notifyIcon.Click: {Visibility.Collapsed}");
                             _mainWindow.Visibility = Visibility.Hidden;
                             break;
 
                         case Visibility.Hidden:
                         case Visibility.Collapsed:
-                            //notifyIconLogger.LogTrace($"notifyIcon.Click: {Visibility.Visible}");
                             _mainWindow.Visibility = Visibility.Visible;
                             _mainWindow.Activate();
                             break;

@@ -28,10 +28,6 @@
                 <TextBlock Grid.Column="1" Text="{Binding User}" FontStyle="Italic" Margin="5,0,5,0" />
             </Grid>
         </DataTemplate>
-        <!--<iconPacks:PackIconModern x:Key="PinIcon" Kind="Pin" />
-        <iconPacks:PackIconModern x:Key="UnpinIcon" Kind="PinRemove" />-->
-        <!--<iconPacks:PackIconJamIcons x:Key="PinIcon" Kind="PinAltF" />
-        <iconPacks:PackIconJamIcons x:Key="UnpinIcon" Kind="PinAltF" />-->
         <helpers:PinButtonIconConverter x:Key="PinButtonIconConverter" />
     </mah:MetroWindow.Resources>
     <mah:MetroWindow.RightWindowCommands>
@@ -53,12 +49,6 @@
                     </Style>
                 </Button.Style>
                 <Button.Content>
-                    <!--<iconPacks:PackIconModern Kind="{
-                        Binding IsPinned,
-                        Converter={StaticResource PinButtonIconConverter},
-                        ConverterParameter={StaticResource PinIcon},
-                        FallbackValue={StaticResource UnpinIcon}}" />-->
-
                     <iconPacks:PackIconJamIcons Kind="{
                         Binding IsPinned,
                         Converter={StaticResource PinButtonIconConverter}}" />
