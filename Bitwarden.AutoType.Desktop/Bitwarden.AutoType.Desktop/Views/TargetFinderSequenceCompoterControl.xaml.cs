@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Bitwarden.AutoType.Desktop.Helpers;
 
 namespace Bitwarden.AutoType.Desktop.Views
 {
@@ -255,6 +256,18 @@ namespace Bitwarden.AutoType.Desktop.Views
 
                 UpdateCustomField(EditableTextBoxTargetRegex.Text, targetType, EditableTextBoxSequence.Text);
             }
+        }
+
+        private void ShowSequenceButton_Click(object sender, RoutedEventArgs e)
+        {
+            // NotepadHelper.OpenNotepadAndTypeText(Constants.DefaultSequenceHelpText);
+            TextFileHelper.OpenTextFileAndTypeText("AutoType_Sequences", Constants.DefaultSequenceHelpText);
+        }
+
+        private void QuestionButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Your code to handle the question button click
+            TextFileHelper.OpenTextFileAndTypeText("How_to_add_AutoType_sequence_to_bitwarden", Constants.DefaultAddFieldToBitwardenHelpText);
         }
     }
 }

@@ -14,6 +14,9 @@
         <Style x:Key="TextBoxStyle" TargetType="TextBox">
             <Setter Property="Margin" Value="0,4,0,0" />
         </Style>
+        <Style x:Key="QuestionButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+            <Setter Property="Margin" Value="3,3,0,0" />
+        </Style>
         <Style x:Key="CopyButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
             <Setter Property="Margin" Value="3,3,0,0" />
         </Style>
@@ -29,11 +32,11 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="15" />
+            <RowDefinition Height="12" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="15" />
+            <RowDefinition Height="12" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -41,13 +44,22 @@
 
         <Label Grid.Row="0" Grid.Column="0" Content="Target Finder:" Style="{StaticResource LabelStyle}" />
         <Border Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="FindWindowIconBorder"
-                HorizontalAlignment="Left" Margin="20 0 0 5"
-                MouseLeftButtonDown="FindWindowIcon_MouseLeftButtonDown">
-            <StackPanel Orientation="Horizontal">
-                <iconPacks:PackIconMaterial Kind="Magnify" x:Name="FindWindowIcon" Width="32" Height="32" />
-                <TextBlock Text="Drag to find window" VerticalAlignment="Center" Margin="5,0,0,0" />
-            </StackPanel>
+        HorizontalAlignment="Stretch" Margin="20 0 0 5"
+        MouseLeftButtonDown="FindWindowIcon_MouseLeftButtonDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <iconPacks:PackIconMaterial Grid.Column="0" Kind="Magnify" x:Name="FindWindowIcon" Width="32" Height="32" />
+                <TextBlock Grid.Column="1" Text="Drag to find window" VerticalAlignment="Center" Margin="5,0,0,0" />
+                <Button Grid.Column="2" x:Name="QuestionButton" Click="QuestionButton_Click" Style="{StaticResource QuestionButtonStyle}">
+                    <iconPacks:PackIconMaterial Kind="HelpCircle" />
+                </Button>
+            </Grid>
         </Border>
+
 
         <Label Grid.Row="1" Grid.Column="0" Content="Process Title:" Style="{StaticResource LabelStyle}" />
         <TextBox Grid.Row="1" Grid.Column="1" x:Name="ProcessTitleTextBox" IsReadOnly="True" Style="{StaticResource TextBoxStyle}" />
@@ -69,7 +81,16 @@
         <TextBox Grid.Row="6" Grid.Column="1" x:Name="EditableTextBoxTargetRegex" TextChanged="EditableTextBoxTargetRegex_TextChanged" Style="{StaticResource TextBoxStyle}" />
 
         <Label Grid.Row="7" Grid.Column="0" Content="Keyboard:" Style="{StaticResource LabelStyle}" />
-        <TextBox Grid.Row="7" Grid.Column="1" x:Name="EditableTextBoxSequence" TextChanged="EditableTextBoxSequence_TextChanged" Style="{StaticResource TextBoxStyle}" />
+        <Grid Grid.Row="7" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" x:Name="EditableTextBoxSequence" Margin="0 3 0 0" TextChanged="EditableTextBoxSequence_TextChanged" VerticalContentAlignment="Center" Style="{StaticResource TextBoxStyle}" />
+            <Button x:Name="ShowSequenceButton" Grid.Column="1" Click="ShowSequenceButton_Click"  Style="{StaticResource QuestionButtonStyle}">
+                <iconPacks:PackIconMaterial Kind="BeakerQuestion" />
+            </Button>
+        </Grid>
 
         <Separator Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
 

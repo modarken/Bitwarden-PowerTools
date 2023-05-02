@@ -203,7 +203,7 @@ public class SpecialKeystrokeSequence : DelayKeystrokeSequence
             {
                 timeSpan = TimeSpan.FromMilliseconds(result);
             }
-            else if (Enum.TryParse(typeof(EmulatedKeystrokeTypes), unknown, true, out object? parsed))
+            else if (Enum.TryParse(typeof(EmulatedKeystrokeTypes), unknown, ignoreCase: true, out object? parsed))
             {
                 keystrokeType = (EmulatedKeystrokeTypes?)parsed;
             }

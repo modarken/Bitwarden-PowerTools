@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.Core.Models;
 
-namespace Bitwarden.AutoType.Desktop.Services;
+namespace Bitwarden.AutoType.Desktop.Helpers;
 
 public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
 {
@@ -17,7 +17,8 @@ public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
         USERNAME,
         PASSWORD,
         URL,
-        NOTES
+        NOTES,
+        TOTP
     }
 
     private readonly Cipher _cipher;
@@ -28,9 +29,7 @@ public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
         _cipher = cipher;
         _decryptor = decryptor;
     }
-    // Each sequence is a string like "{NAME}", "{USERNAME}", "{PASSWORD}", "{URL}", "{NOTES}", {FIELD:ping}
 
-    // {TAB}, {ENTER}, {UP}, {DOWN}, {LEFT}, {RIGHT}, {SHIFT}, {CTRL}, {ALT}, {DELETE}, {BACKSPACE}, {HOME}, {END}, {PGUP}, {PGDN}, {ESC}, {INSERT}, {F1}, {F2}, {F3}, {F4}, {F5}, {F6}, {F7}, {F8}, {F9}, {F10}, {F11}, {F12}, {WIN}, {CAPSLOCK}, {SCROLLLOCK}, {NUMLOCK}, {PRTSC}, {BREAK}, {HELP}, {CLEAR}, {SLEEP}, {NUMPAD0}, {NUMPAD1}, {NUMPAD2}, {NUMPAD3}, {NUMPAD4}, {NUMPAD5}, {NUMPAD6}, {NUMPAD7}, {NUMPAD8}, {NUMPAD9}, {MULTIPLY}, {ADD}, {SEPARATOR}, {SUBTRACT}, {DECIMAL}, {DIVIDE}, {OEM_1}, {OEM_PLUS}, {OEM_COMMA}, {OEM_MINUS}, {OEM_PERIOD}, {OEM_2}, {OEM_3}, {OEM_4}, {OEM_5}, {OEM_6}, {OEM_7}, {OEM_8}, {OEM_102}, {PROCESSKEY}, {ATTN}, {CRSEL}, {EXSEL}, {EREOF}, {PLAY}, {ZOOM}, {NONAME}, {PA1}, {OEM_CLEAR}}
     private IEnumerable<EmulatedKeystroke>? ProcessRegExSequence(string sequence)
     {
         var keyword = sequence[1..^1].ToLower();
@@ -62,11 +61,25 @@ public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
                 BitwardenPlaceholders.PASSWORD => _cipher.Login?.Password,
                 BitwardenPlaceholders.URL => _cipher.Login?.Uri,
                 BitwardenPlaceholders.NOTES => _cipher.Notes,
+                BitwardenPlaceholders.TOTP => _cipher.Login?.Totp,
                 _ => throw new ArgumentOutOfRangeException(nameof(placeHolder), placeHolder, null),
             };
 
             if (cipherText is string)
             {
+                if (placeHolder.Equals(BitwardenPlaceholders.TOTP))
+                {
+                    var totpSeed = _decryptor(cipherText);
+                    if (totpSeed is string)
+                    {
+                        string totpCode = TotpHelper.GenerateTotpCode(totpSeed);
+
+                        var totpSequence = new KeystrokeSequence(totpCode, Configuration);
+                        return totpSequence.Provide();
+                    }
+                    return null;
+                }
+
                 var plainText = _decryptor(cipherText);
                 if (plainText is string)
                 {

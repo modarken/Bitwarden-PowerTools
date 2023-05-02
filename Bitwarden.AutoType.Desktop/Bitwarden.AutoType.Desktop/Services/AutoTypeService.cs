@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.Core.Models;
 
