@@ -53,7 +53,7 @@ public class ToAutoTypeCustomFieldConverter : IValueConverter
 /// <summary>
 /// Interaction logic for MatchSelectionWindow.xaml
 /// </summary>
-public partial class MatchSelectionWindow : MetroWindow
+public partial class MatchSelectionWindow : MetroWindow, IDisposable
 {
     public KeyValuePair<AutoTypeCustomField, Cipher>? SelectedMatch { get; private set; }
 
@@ -116,5 +116,10 @@ public partial class MatchSelectionWindow : MetroWindow
             SelectedMatch = selectedMatch;
             DialogResult = true;
         }
+    }
+
+    public void Dispose()
+    {
+        this.Close();
     }
 }

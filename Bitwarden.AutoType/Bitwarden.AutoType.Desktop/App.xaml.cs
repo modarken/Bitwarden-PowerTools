@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
@@ -42,6 +41,9 @@ public partial class App : Application
     {
         AppDomain.CurrentDomain.UnhandledException += UnhandledException;
         SystemEvents.SessionEnding += OnSessionEnding;
+#pragma warning disable CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
+        Console.CancelKeyPress += Console_CancelKeyPress; // Add this line
+#pragma warning restore CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
 
         _host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
         .ConfigureUserLocalAppDataJsonFile(BitwardenConstants.DefaultDataFolderName, "settings.json",
@@ -81,7 +83,6 @@ public partial class App : Application
         var bitwardenService = new BitwardenService(logger, config, save);
         services.AddSingleton<BitwardenService>(bitwardenService);
         services.AddHostedService((sp) => bitwardenService);
-
     }
 
     private async void Application_Startup(object sender, StartupEventArgs e)
@@ -110,6 +111,16 @@ public partial class App : Application
     private async void OnSessionEnding(object sender, SessionEndingEventArgs e)
     {
         await CleanupAsync();
+    }
+
+    private async void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+    {
+        e.Cancel = true; // Prevent the process from being terminated immediately
+
+        await App.Current.Dispatcher.InvokeAsync(() =>
+        {
+            App.Current.Shutdown();
+        });
     }
 
     private async Task CleanupAsync()
