@@ -1,8 +1,20 @@
 ﻿<Project Sdk="WixToolset.Sdk/4.0.0">
+  <PropertyGroup>
+    <EnableProjectHarvesting>false</EnableProjectHarvesting>
+    <HarvestProjectsSuppressUniqueIds>true</HarvestProjectsSuppressUniqueIds>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="Directory.Build.props" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bitwarden.AutoType.Desktop\Bitwarden.AutoType.Desktop.csproj" />
+  </ItemGroup>
+  <!--
+  <ItemGroup>
+    <HarvestProject Include="..\Bitwarden.AutoType.Desktop\Bitwarden.AutoType.Desktop.csproj" ProjectOutputGroups="Binaries;Content;" />
+  </ItemGroup>
+  -->
+  <ItemGroup>
+    <PackageReference Include="WixToolset.Heat" Version="4.0.0" />
   </ItemGroup>
 </Project>

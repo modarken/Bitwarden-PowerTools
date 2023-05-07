@@ -2,7 +2,8 @@
 This file contains the declaration of all the localizable strings.
 -->
 <WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US">
-
+  <String Id="ManufacturerName" Value="Mojo.Systems" />
+  <String Id="ApplicationName" Value="Bitwarden.AutoType" />
   <String Id="DowngradeError" Value="A newer version of [ProductName] is already installed." />
-
+  <String Id="PublishPath" Value="$(var.Bitwarden.AutoType.Desktop.ProjectDir)\bin\Release\net7.0-windows\publish\win-x64" />
 </WixLocalization>

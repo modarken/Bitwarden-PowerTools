@@ -1,0 +1,28 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+
+  <Fragment>
+
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="Bitwarden.AutoType.Desktop.PublishComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="!(loc.PublishPath)\Bitwarden.AutoType.Desktop.exe" />
+      </Component>
+      <Component>
+        <File Source="!(loc.PublishPath)\D3DCompiler_47_cor3.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.PublishPath)\PenImc_cor3.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.PublishPath)\PresentationNative_cor3.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.PublishPath)\vcruntime140_cor3.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.PublishPath)\wpfgfx_cor3.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

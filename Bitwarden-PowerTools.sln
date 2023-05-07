@@ -19,7 +19,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bitwarden.API.Test", "Bitwa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@docs", "@docs", "{780E2A55-1EEE-41CB-9A0F-DE6C98F09EFC}"
 	ProjectSection(SolutionItems) = preProject
-		Bitwarden.AutoType\ToDo.txt = Bitwarden.AutoType\ToDo.txt
+		Bitwarden.AutoType\@docs\ToDo.txt = Bitwarden.AutoType\@docs\ToDo.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@docs", "@docs", "{72B19136-09C5-4E4B-9D0C-E569F7AD0708}"
+	ProjectSection(SolutionItems) = preProject
+		@docs\bitwarden.design.ipynb = @docs\bitwarden.design.ipynb
 	EndProjectSection
 EndProject
 Global
