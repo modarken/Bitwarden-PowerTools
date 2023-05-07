@@ -1,5 +1,0 @@
-﻿<Project Sdk="WixToolset.Sdk/4.0.0">
-  <ItemGroup>
-    <ProjectReference Include="..\Bitwarden.AutoType.Desktop\Bitwarden.AutoType.Desktop\Bitwarden.AutoType.Desktop.csproj" />
-  </ItemGroup>
-</Project>
