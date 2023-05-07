@@ -1,0 +1,9 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="Bitwarden.AutoType.Desktop.exe" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

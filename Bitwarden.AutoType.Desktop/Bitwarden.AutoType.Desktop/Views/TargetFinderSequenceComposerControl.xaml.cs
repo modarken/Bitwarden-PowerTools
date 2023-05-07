@@ -11,9 +11,9 @@ using Bitwarden.AutoType.Desktop.Helpers;
 namespace Bitwarden.AutoType.Desktop.Views
 {
     /// <summary>
-    /// Interaction logic for TargetFinderSequenceCompoterControl.xaml
+    /// Interaction logic for TargetFinderSequenceComposerControl.xaml
     /// </summary>
-    public partial class TargetFinderSequenceCompoterControl : UserControl
+    public partial class TargetFinderSequenceComposerControl : UserControl
     {
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr WindowFromPoint(POINT Point);
@@ -53,7 +53,7 @@ namespace Bitwarden.AutoType.Desktop.Views
             }
         }
 
-        public TargetFinderSequenceCompoterControl()
+        public TargetFinderSequenceComposerControl()
         {
             InitializeComponent();
             EditableTextBoxSequence.Text = Constants.BitwardenDefaultSequence;

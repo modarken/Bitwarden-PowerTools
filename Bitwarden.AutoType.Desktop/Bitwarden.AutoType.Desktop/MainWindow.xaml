@@ -81,22 +81,22 @@
         <DockPanel DockPanel.Dock="Bottom">
             <DockPanel Margin="10">
                 <mah:ToggleSwitch Header="AutoType"
-                              Margin="50 0 0 0"
-                              MinWidth="87"
-                              HorizontalAlignment="Center"
-                              VerticalAlignment="Center"
-                              OffContent="Off"
-                              OnContent="On"
-                              IsEnabled="{Binding IsUserPerformActionEnabled}"
-                              IsOn="{Binding IsAutoTypeEnabled}" />
+                                  Margin="50 0 0 0"
+                                  MinWidth="87"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  OffContent="Off"
+                                  OnContent="On"
+                                  IsEnabled="{Binding IsUserPerformActionEnabled}"
+                                  IsOn="{Binding IsAutoTypeEnabled}" />
                 <Button DockPanel.Dock="Left"
                         x:Name="RefreshButton" Style="{DynamicResource MahApps.Styles.Button.Square}"
                         Height="35"
                         Width="100"
                         Command="{Binding RefreshCommand}">
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Refresh" VerticalAlignment="Center" Margin="0,0,5,0" />
-                        <iconPacks:PackIconMaterial Kind="Refresh" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+                        <TextBlock Text="Sync" VerticalAlignment="Center" Margin="0,0,5,0" />
+                        <iconPacks:PackIconMaterial Kind="Sync" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
                     </StackPanel>
                 </Button>
             </DockPanel>
@@ -118,7 +118,7 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Target">
-                <views:TargetFinderSequenceCompoterControl Margin="0 10 0 0" />
+                <views:TargetFinderSequenceComposerControl Margin="0 10 0 0" />
             </TabItem>
             <TabItem Header="Hotkey">
                 <views:HotkeyControl x:Name="HotKeyControlInstance" DataContext="{helpers:ServiceLocator ServiceType={x:Type services:HotkeyService}}" Margin="0 10 0 0" />

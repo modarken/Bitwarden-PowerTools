@@ -5,7 +5,6 @@ using System.Text;
 
 namespace Bitwarden.AutoType.Desktop.Windows.Native;
 
-
 public static class WindowsAPI
 {
     public static (IntPtr, Process) GetForegroundProcess()
@@ -56,9 +55,6 @@ public static class WindowsDLLs
     public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
     [DllImport("user32.dll")]
-    public static extern bool SetForegroundWindow(IntPtr hWnd);
-
-    [DllImport("user32.dll")]
     public static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
     [DllImport("user32.dll")]
@@ -66,6 +62,10 @@ public static class WindowsDLLs
 
     [DllImport("user32.dll")]
     public static extern IntPtr GetForegroundWindow();
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
 
     [DllImport("user32.dll", SetLastError = true)]
     public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
@@ -83,4 +83,8 @@ public static class WindowsDLLs
 
     [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
     public static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool BlockInput([MarshalAs(UnmanagedType.Bool)] bool fBlockIt);
 }

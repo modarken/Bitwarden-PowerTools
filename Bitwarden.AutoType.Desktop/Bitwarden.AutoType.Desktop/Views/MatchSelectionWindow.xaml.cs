@@ -8,81 +8,113 @@ using Bitwarden.Core.Models;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls;
 
-namespace Bitwarden.AutoType.Desktop.Views
-{
-    public class ToAutoTypeCustomFieldConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is KeyValuePair<AutoTypeCustomField, Cipher> valueKeyValuePair)
-            {
-                return $"{valueKeyValuePair.Key.Name}   {valueKeyValuePair.Key.UserName}   {valueKeyValuePair.Key.Target}   {valueKeyValuePair.Key.Sequence}";
-            }
+namespace Bitwarden.AutoType.Desktop.Views;
 
-            return value?.ToString()!;
+public class ItemIndexConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is ListBoxItem listBoxItem)
+        {
+            var listBox = ItemsControl.ItemsControlFromItemContainer(listBoxItem);
+            var index = listBox.ItemContainerGenerator.IndexFromContainer(listBoxItem);
+            return index + 1;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+#pragma warning disable CS8603 // Possible null reference return.
+        return null;
+#pragma warning restore CS8603 // Possible null reference return.
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
+    }
+}
+
+public class ToAutoTypeCustomFieldConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is KeyValuePair<AutoTypeCustomField, Cipher> valueKeyValuePair)
         {
-            throw new NotImplementedException();
+            return $"{valueKeyValuePair.Key.Name}   {valueKeyValuePair.Key.UserName}   {valueKeyValuePair.Key.Sequence}   {valueKeyValuePair.Key.Target}";
+        }
+
+        return value?.ToString()!;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Interaction logic for MatchSelectionWindow.xaml
+/// </summary>
+public partial class MatchSelectionWindow : MetroWindow
+{
+    public KeyValuePair<AutoTypeCustomField, Cipher>? SelectedMatch { get; private set; }
+
+    public MatchSelectionWindow(IEnumerable<KeyValuePair<AutoTypeCustomField, Cipher>> matches)
+    {
+        DataContext = this;
+        InitializeComponent();
+        MatchListBox.ItemsSource = matches;
+    }
+
+    private void SelectButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
+        {
+            SelectedMatch = selectedMatch;
+            DialogResult = true;
+        }
+        else
+        {
+            MessageBox.Show("Please select a match.", "No Match Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
-    /// <summary>
-    /// Interaction logic for MatchSelectionWindow.xaml
-    /// </summary>
-    public partial class MatchSelectionWindow : MetroWindow
+    private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
-        public KeyValuePair<AutoTypeCustomField, Cipher>? SelectedMatch { get; private set; }
+        DialogResult = false;
+    }
 
-        public MatchSelectionWindow(IEnumerable<KeyValuePair<AutoTypeCustomField, Cipher>> matches)
+    [RelayCommand]
+    private void SelectedMatchDoubleClicked()
+    {
+        if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
         {
-            DataContext = this;
-            InitializeComponent();
-            MatchListBox.ItemsSource = matches;
+            SelectedMatch = selectedMatch;
+            DialogResult = true;
         }
+    }
 
-        private void SelectButton_Click(object sender, RoutedEventArgs e)
+    [RelayCommand]
+    private void NumberClicked(int key)
+    {
+        if (key >= 1 && key <= MatchListBox.Items.Count)
         {
-            if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
-            {
-                SelectedMatch = selectedMatch;
-                DialogResult = true;
-            }
-            else
-            {
-                MessageBox.Show("Please select a match.", "No Match Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            DialogResult = false;
-        }
-
-        // CommandParameter="{Binding MySourceItemId}"
-        [RelayCommand]
-        private void SelectedMatchDoubleClicked()
-        {
-            if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
+            if (MatchListBox.Items[key - 1] is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
             {
                 SelectedMatch = selectedMatch;
                 DialogResult = true;
             }
         }
+    }
 
+    private void ExecuteButton_Click(object sender, RoutedEventArgs e)
+    {
+        var button = sender as Button;
+        if (button == null) { return; }
+        var matchItem = button.CommandParameter;
 
-        private void ExecuteButton_Click(object sender, RoutedEventArgs e)
+        if (matchItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
         {
-            var button = sender as Button;
-            if (button == null) { return; }
-            var matchItem = button.CommandParameter;
-
-            if (matchItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
-            {
-                SelectedMatch = selectedMatch;
-                DialogResult = true;
-            }
+            SelectedMatch = selectedMatch;
+            DialogResult = true;
         }
     }
 }

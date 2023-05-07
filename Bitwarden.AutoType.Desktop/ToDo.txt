@@ -1,6 +1,14 @@
 
 - Add Installer
 
+- Add ability to specify target not by a single target type, but multiple.
+    - for example, you can specify a window title, window class, process name, ect.
+    - Instead of this "Target":"^.*notepad.*$", "Type":"Title"
+    - You would have this "Title":"^.*notepad.*$", "Class":"^.*notepad.*$", "Process":"^.*notepad.*$"
+    _ Things that need to change are:
+        - Match Selection Window
+        - TargetFinderSequenceComposer
+
 - Optional: Add specificity to the target, so you can specify the window title, window class, process name, ect.
     - Instead of just choosing one, you can choose multiple, and it will only match if all of them match.
     - This will allow you to have multiple windows open, and it will only match the one you want.
@@ -9,6 +17,17 @@
     - keepass button
 
 PARTIAL - Hardening of the code
+- Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+    - Make sure all the code is hardened, and that it is not possible to crash the program.
+
 DONE - Added pin ability
 DONE - Have helper for adding AutoType to field.
 DONE - Add Help Menu for displaying the keyboard sequences available to choose from.
@@ -24,6 +43,7 @@ DONE 2. AutoType
 DONE 4. On/Off
 DONE 5. Specify Vault
 DONE 1. Finish Configuration Tailoring
+
 CANCEL - Add option to have a default target, so if no target is specified it will use the default.
 CANCEL - Add option to have a default AutoType sequence, so if no AutoType is specified it will use the default.
 

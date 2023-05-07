@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using Bitwarden.AutoType.Desktop.Models;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.AutoType.Desktop.Views;
@@ -307,9 +308,16 @@ public partial class AutoTypeViewModel : IDisposable
 
     private void ShowPopup(IEnumerable<KeyValuePair<AutoTypeCustomField, Cipher>> matchedRegex, IntPtr handle)
     {
-        // Show the MatchSelectionWindow to let the user select the appropriate match
-        var matchSelectionWindow = new MatchSelectionWindow(matchedRegex);
+        // Check if a MatchSelectionWindow already exists
+        var matchSelectionWindow = Application.Current.Windows.OfType<MatchSelectionWindow>().FirstOrDefault();
+        if (matchSelectionWindow != null)
+        {
+            // If a MatchSelectionWindow already exists, close it
+            matchSelectionWindow.Close();
+        }
 
+        // Create a new instance of MatchSelectionWindow
+        matchSelectionWindow = new MatchSelectionWindow(matchedRegex);
         var userResult = matchSelectionWindow.ShowDialog();
 
         if (userResult == true)
@@ -322,7 +330,7 @@ public partial class AutoTypeViewModel : IDisposable
 
     private async void ExecuteMatchHandler(KeyValuePair<AutoTypeCustomField, Cipher>? match, IntPtr handle)
     {
-        var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         // delegate to handle windows events and cancel the token when the window focus changes
         WinEventDelegate windEventHandler = (IntPtr hWinEventHook, uint eventType, IntPtr hWnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime) =>
@@ -330,7 +338,7 @@ public partial class AutoTypeViewModel : IDisposable
             if (eventType == WindowsConstants.EVENT_SYSTEM_FOREGROUND)
             {
                 // The window focus has changed
-                tokenSource?.Cancel();
+                tokenSource.Cancel();
             }
         };
 
@@ -347,7 +355,7 @@ public partial class AutoTypeViewModel : IDisposable
                 WindowsConstants.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, windEventHandler, 0, 0,
                 WindowsConstants.WINEVENT_OUTOFCONTEXT);
 
-            await Task.Delay(TimeSpan.FromMilliseconds(300), tokenSource.Token); // in testing must sleep
+            await Task.Delay(TimeSpan.FromMilliseconds(250), tokenSource.Token); // in testing must sleep
             await ExecuteMatchFunctionAsync(match, tokenSource.Token);
         }
         catch (TaskCanceledException)
