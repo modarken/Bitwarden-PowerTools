@@ -1,4 +1,7 @@
 
+
+
+
 - Add Installer
 
 - Add ability to specify target not by a single target type, but multiple.
@@ -27,6 +30,9 @@ PARTIAL - Hardening of the code
     - Make sure all the code is hardened, and that it is not possible to crash the program.
     - Make sure all the code is hardened, and that it is not possible to crash the program.
     - Make sure all the code is hardened, and that it is not possible to crash the program.
+
+DONE - Cleanup the hotkey is active code, for some reason it's not working right.
+        - move the checkbox to the hotkey view.
 
 DONE - Added pin ability
 DONE - Have helper for adding AutoType to field.

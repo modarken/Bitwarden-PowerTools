@@ -156,7 +156,7 @@ public partial class AutoTypeViewModel : IDisposable
         }
 
         Task.Run(() => InitializeRegexListAsync()); // Run the method asynchronously
-        _hotkeyService.RegisterOnHotKey(OnHotKeyHandler);
+        _hotkeyService.RegisterOnHotKeyAction(OnHotKeyHandler);
     }
 
     #region Database Management

@@ -11,6 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -24,7 +25,7 @@
                  IsReadOnly="True"
                  Margin="5,0,0,0"
                  VerticalAlignment="Center"
-                 Text="{Binding HotkeyText, Mode=OneWay}" />
+                 Text="{Binding Path=HotkeyText, RelativeSource={RelativeSource AncestorType={x:Type local:HotkeyControl}}, Mode=OneWay}" />
         <StackPanel Grid.Row="1" Grid.Column="1"
                     Orientation="Horizontal"
                     Margin="5,5,0,0">
@@ -38,5 +39,10 @@
                     VerticalAlignment="Center"
                     Click="CancelButton_Click" />
         </StackPanel>
+        <CheckBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                  Margin="10 10 0 0" Content="Hotkey Active"
+                  IsChecked="{Binding Path=IsHotKeyActive, RelativeSource={RelativeSource AncestorType={x:Type local:HotkeyControl}}}"
+                  IsEnabled="False"
+                  Style="{StaticResource MahApps.Styles.CheckBox}" />
     </Grid>
 </UserControl>

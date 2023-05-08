@@ -5,9 +5,11 @@ using System.Windows.Input;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.AutoType.Desktop.Windows.Native;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Bitwarden.AutoType.Desktop.Views
 {
+    [INotifyPropertyChanged]
     public partial class HotkeyControl : UserControl
     {
         public event EventHandler ChangeHotkeyButtonClicked;
@@ -23,16 +25,21 @@ namespace Bitwarden.AutoType.Desktop.Views
             get => $"{_hotkey?.KeyModifiers} + {_hotkey?.Key}";
         }
 
+
+        [ObservableProperty]
+        private bool _isHotKeyActive = false;
+
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public HotkeyControl()
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             InitializeComponent();
-            DataContext = this;
             ChangeHotkeyButtonClicked += HotkeyControl_ChangeHotkeyButtonClicked;
             HotkeyChanged += HotkeyControl_HotkeyChanged;
             CancelButtonClicked += HotkeyControl_CancelButtonClicked;
+
         }
 
         private bool _wasEnabled = false;
@@ -135,11 +142,18 @@ namespace Bitwarden.AutoType.Desktop.Views
         {
             if (DataContext is HotkeyService hotkeyService)
             {
+                IsHotKeyActive = hotkeyService.IsActive;
+                hotkeyService.OnActiveChanged += HotkeyService_OnActiveChanged;
                 if (hotkeyService.GetHotkey() is WindowsHotKey windowsHotKey && _hotkey is null)
                 {
                     SetHotkey(windowsHotKey);
                 }
             }
+        }
+
+        private void HotkeyService_OnActiveChanged(object? sender, bool e)
+        {
+            IsHotKeyActive = e;
         }
     }
 }

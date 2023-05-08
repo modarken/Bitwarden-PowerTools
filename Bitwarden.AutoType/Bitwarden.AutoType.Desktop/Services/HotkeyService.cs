@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Windows;
 using Bitwarden.AutoType.Desktop.Windows.Native;
 
@@ -12,21 +14,57 @@ public class HotkeyService : IDisposable
     private readonly Action<AutoTypeSettings> _save;
     private WindowsHotKey? _hotKeyNew;
     private bool _isEnabled = false;
+    private bool _isActive = false;
+    private CancellationTokenSource? _cancellationTokenSource;
+
+    public event EventHandler<bool>? OnActiveChanged;
+
+    public bool IsActive => _isActive;
+    public bool IsEnabled => _isEnabled;
 
     public HotkeyService()
     {
         _hotKeyActions = new List<Action<WindowsHotKey>>();
         _autoTypeSettings = new AutoTypeSettings();
-        _save = new Action<AutoTypeSettings>((a)=> { });
+        _save = new Action<AutoTypeSettings>((a) => { });
     }
-
-    public bool IsEnabled => _isEnabled;
 
     public HotkeyService(AutoTypeSettings autoTypeSettings, Action<AutoTypeSettings> save)
     {
         _hotKeyActions = new List<Action<WindowsHotKey>>();
         _autoTypeSettings = autoTypeSettings;
         _save = save;
+        StartCheckingHotkey();
+    }
+
+    public void StartCheckingHotkey()
+    {
+        _cancellationTokenSource = new CancellationTokenSource();
+        Task.Run(async () =>
+        {
+            while (!_cancellationTokenSource.Token.IsCancellationRequested)
+            {
+                if (_isEnabled && !_isActive)
+                {
+                    CheckHotkey();
+                }
+                await Task.Delay(5000); // Wait for 1 second before checking again
+            }
+        }, _cancellationTokenSource.Token);
+    }
+
+    public void StopCheckingHotkey()
+    {
+        _cancellationTokenSource?.Cancel();
+    }
+
+    private void CheckHotkey()
+    {
+        if (IsEnabled)
+        {
+            Disable();
+            Enable();
+        }
     }
 
     public WindowsHotKey? GetHotkey()
@@ -53,18 +91,26 @@ public class HotkeyService : IDisposable
             // load hoktey from settings
             _hotKeyNew = _autoTypeSettings.WindowsHotKey;
         }
+
         _hotKeyNew.SetAction(ExecuteOnHotKey);
         var success = _hotKeyNew.RegisterHotKey();
+
+        _isActive = success;
+
+        OnActiveChanged?.Invoke(this, success);
+
         _isEnabled = true;
     }
 
     public void Disable()
     {
         _hotKeyNew?.Dispose();
+        _isActive = false;
         _isEnabled = false;
+        OnActiveChanged?.Invoke(this, false);
     }
 
-    public void RegisterOnHotKey(Action<WindowsHotKey> onHotkey)
+    public void RegisterOnHotKeyAction(Action<WindowsHotKey> onHotkey)
     {
         if (onHotkey != null)
         {
@@ -82,6 +128,8 @@ public class HotkeyService : IDisposable
 
     public void Dispose()
     {
+        _cancellationTokenSource?.Cancel();
+        _cancellationTokenSource?.Dispose();
         _hotKeyNew?.Dispose();
     }
 }

@@ -80,6 +80,7 @@
         </DockPanel>-->
         <DockPanel DockPanel.Dock="Bottom">
             <DockPanel Margin="10">
+
                 <mah:ToggleSwitch Header="AutoType"
                                   Margin="50 0 0 0"
                                   MinWidth="87"
@@ -89,6 +90,7 @@
                                   OnContent="On"
                                   IsEnabled="{Binding IsUserPerformActionEnabled}"
                                   IsOn="{Binding IsAutoTypeEnabled}" />
+
                 <Button DockPanel.Dock="Left"
                         x:Name="RefreshButton" Style="{DynamicResource MahApps.Styles.Button.Square}"
                         Height="35"
