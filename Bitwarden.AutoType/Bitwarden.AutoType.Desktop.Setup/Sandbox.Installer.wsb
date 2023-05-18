@@ -15,7 +15,12 @@
     </mappedfolder>
     <mappedfolder>
       <hostfolder>D:\Repos\Bitwarden-PowerTools\Bitwarden.AutoType\Bitwarden.AutoType.Desktop.Setup</hostfolder>
-      <SandboxFolder>C:\Users\WDAGUtilityAccount\\Bitwarden.AutoType.Desktop.Setup</SandboxFolder>
+      <SandboxFolder>C:\Users\WDAGUtilityAccount\Bitwarden.AutoType.Desktop.Setup</SandboxFolder>
+      <readonly>true</readonly>
+    </mappedfolder>
+    <mappedfolder>
+      <hostfolder>C:\Users\mathew\Downloads</hostfolder>
+      <SandboxFolder>C:\Users\WDAGUtilityAccount\Downloads</SandboxFolder>
       <readonly>true</readonly>
     </mappedfolder>
   </mappedfolders>

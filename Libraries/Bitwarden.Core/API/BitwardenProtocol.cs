@@ -1,8 +1,8 @@
 ﻿/*
  * Most useful sites:
- * https://bitwarden.com/crypto.html
  * https://github.com/jcs/rubywarden/blob/master/API.md
  * https://docs.cozy.io/en/cozy-stack/bitwarden/
+ * https://bitwarden.com/crypto.html
  * https://bitwarden.com/help/api/
  * https://bitwarden.com/help/vault-management-api/
  * https://bitwarden.com/help/public-api/
@@ -37,7 +37,19 @@ public static class BitwardenProtocol
             if (_baseAddress != baseAddress)
             {
                 _baseAddress = baseAddress;
-                _httpClient = new HttpClient
+
+
+                //var handler = new HttpClientHandler();
+                //handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                //handler.ServerCertificateCustomValidationCallback =
+                //    (httpRequestMessage, cert, cetChain, policyErrors) =>
+                //    {
+                //        return true;
+                //    };
+
+                //_httpClient = new HttpClient(handler)
+
+                _httpClient = new HttpClient()
                 {
                     BaseAddress = new System.Uri(baseAddress)
                 };

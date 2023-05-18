@@ -1,7 +1,5 @@
 
 
-
-
 - Add Installer
 
 - Add ability to specify target not by a single target type, but multiple.

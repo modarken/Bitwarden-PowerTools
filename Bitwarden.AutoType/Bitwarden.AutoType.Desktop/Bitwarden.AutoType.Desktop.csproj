@@ -7,7 +7,12 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>True</UseWindowsForms>
     <UserSecretsId>de054478-1190-4365-a42d-94fe77898644</UserSecretsId>
+    <ApplicationIcon>Bitwarden.AutoType.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Bitwarden.AutoType.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />

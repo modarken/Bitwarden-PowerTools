@@ -1,10 +1,241 @@
 <Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
-
-  <Fragment>
-
-  </Fragment>
   <Fragment>
     <ComponentGroup Id="Bitwarden.AutoType.Desktop.PublishComponents" Directory="INSTALLFOLDER">
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.AutoType.Desktop.exe" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.AutoType.Desktop.runtimeconfig.json" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.AutoType.Desktop.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.Core.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.Utilities.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\CommunityToolkit.Mvvm.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\ControlzEx.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\ExCSS.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Fizzler.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.BootstrapIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.BoxIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Codicons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Coolicons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Core.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Entypo.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.EvaIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.FeatherIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.FileIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Fontaudio.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.FontAwesome.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Fontisto.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.ForkAwesome.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Ionicons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.JamIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Material.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.MaterialDesign.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.MaterialLight.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Microns.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Modern.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Octicons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.PicolIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.PixelartIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.RadixIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.RemixIcon.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.RPGAwesome.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.SimpleIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Typicons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Unicons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.VaadinIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.WeatherIcons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Zondicons.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Configuration.Abstractions.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Configuration.Binder.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Configuration.CommandLine.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Configuration.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Configuration.EnvironmentVariables.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Configuration.FileExtensions.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Configuration.Json.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Configuration.UserSecrets.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.DependencyInjection.Abstractions.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.DependencyInjection.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.FileProviders.Abstractions.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.FileProviders.Physical.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.FileSystemGlobbing.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Hosting.Abstractions.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Hosting.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Logging.Abstractions.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Logging.Configuration.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Logging.Console.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Logging.Debug.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Logging.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Logging.EventLog.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Logging.EventSource.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Options.ConfigurationExtensions.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Options.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Primitives.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.IdentityModel.Abstractions.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.IdentityModel.JsonWebTokens.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.IdentityModel.Logging.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.IdentityModel.Tokens.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Xaml.Behaviors.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Otp.NET.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\runtime.osx.10.10-x64.CoreCompat.System.Drawing.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Svg.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\System.IdentityModel.Tokens.Jwt.dll"/>
+      </Component>
+      <!--
+      <Component>
+        <File Source="$(var.ProjectDir)bin\$(var.Configuration)\net7.0-windows\Bitwarden.AutoType.Desktop.exe" />
+      </Component>
       <Component>
         <File Source="!(loc.PublishPath)\Bitwarden.AutoType.Desktop.exe" />
       </Component>
@@ -23,6 +254,7 @@
       <Component>
         <File Source="!(loc.PublishPath)\wpfgfx_cor3.dll" />
       </Component>
+      -->
     </ComponentGroup>
   </Fragment>
 </Wix>

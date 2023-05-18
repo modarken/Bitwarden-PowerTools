@@ -6,15 +6,18 @@
   <ItemGroup>
     <None Include="Directory.Build.props" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Bitwarden.AutoType.Desktop\Bitwarden.AutoType.Desktop.csproj" />
-  </ItemGroup>
   <!--
   <ItemGroup>
     <HarvestProject Include="..\Bitwarden.AutoType.Desktop\Bitwarden.AutoType.Desktop.csproj" ProjectOutputGroups="Binaries;Content;" />
   </ItemGroup>
+  <ItemGroup>
+    <HarvestProject Include="..\Bitwarden.AutoType.Desktop\Bitwarden.AutoType.Desktop.csproj" DoNotHarvest="false" />
+  </ItemGroup>
   -->
   <ItemGroup>
     <PackageReference Include="WixToolset.Heat" Version="4.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bitwarden.AutoType.Desktop\Bitwarden.AutoType.Desktop.csproj" />
   </ItemGroup>
 </Project>

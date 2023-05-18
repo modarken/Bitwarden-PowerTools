@@ -1,11 +1,11 @@
-﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
   <Package Name="!(loc.ApplicationName)" Manufacturer="!(loc.ManufacturerName)" Version="1.0.0" UpgradeCode="f0bcafa2-cca6-479c-8b7e-a3061dcad6ea">
     <MajorUpgrade DowngradeErrorMessage="!(loc.DowngradeError)" />
     <MediaTemplate EmbedCab="yes" />
-
     <Feature Id="Main">
       <ComponentGroupRef Id="Bitwarden.AutoType.Desktop.PublishComponents" />
+      <ComponentRef Id="ApplicationShortcut" />
     </Feature>
-
   </Package>
 </Wix>
