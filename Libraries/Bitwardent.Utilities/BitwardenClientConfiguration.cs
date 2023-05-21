@@ -5,9 +5,34 @@ using Bitwarden.Core;
 
 namespace Bitwarden.Utilities;
 
-public class Settings
+public static class StringUtilities
 {
-    public BitwardenClientConfiguration? BitwardenClientConfiguration { get; set; } = new BitwardenClientConfiguration();
+    public static bool IsNullOrEmpty(this string? source)
+    {
+        return string.IsNullOrEmpty(source);
+    }
+}
+
+public static class BitwardenClientConfigurationExtensions
+{
+    public static bool Validate(this BitwardenClientConfiguration source)
+    {
+        if (source is null) { return false; }
+
+        if (source.base_address.IsNullOrEmpty() ||
+                source.email.IsNullOrEmpty() ||
+                source.encryption_key.IsNullOrEmpty() ||
+                source.device_name.IsNullOrEmpty() ||
+                source.device_identifier.IsNullOrEmpty() ||
+                (source.refresh_token.IsNullOrEmpty() &&
+                source.client_id.IsNullOrEmpty() &&
+                source.client_secret.IsNullOrEmpty()))
+        {
+            return false;
+        }
+
+        return true;
+    }
 }
 
 public class BitwardenClientConfiguration : IBitwardenClientConfiguration

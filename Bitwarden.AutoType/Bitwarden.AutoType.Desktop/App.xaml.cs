@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
+using Bitwarden.AutoType.Desktop.Models;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.Utilities;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,18 +47,19 @@ public partial class App : Application
 #pragma warning restore CS8622 // Nullability of reference types in type of parameter doesn't match the target delegate (possibly because of nullability attributes).
 
         _host = Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder()
-        .ConfigureUserLocalAppDataJsonFile(BitwardenConstants.DefaultDataFolderName, "settings.json",
-            out Settings? appSettings, out Action<Settings>? saveSettingsToFile, true)
+        .ConfigureUserLocalAppDataJsonFile(BitwardenConstants.DefaultDataFolderName, "client.settings.json",
+            out BitwardenClientConfiguration? clientSettings, out Action<BitwardenClientConfiguration>? saveClientSettingsToFile, true)
         .ConfigureUserLocalAppDataJsonFile(BitwardenConstants.DefaultDataFolderName, "autotype.settings.json",
             out AutoTypeSettings? autoTypeSettings, out Action<AutoTypeSettings>? autoTypeSaveSettingsToFile, true)
         .ConfigureServices((hostContext, services) => // configuration
         {
-            services.AddSingleton(appSettings!.BitwardenClientConfiguration!);
-            services.AddSingleton(new Action<BitwardenClientConfiguration>((c) => { saveSettingsToFile!.Invoke(appSettings!); }));
+            // verify all configuration is set or set state to not configured
+            var state = new StateController<AutoTypeConfigurationStates>();
+            state.SetState(clientSettings.Validate() ? AutoTypeConfigurationStates.Configured: AutoTypeConfigurationStates.NotConfigured);
+            services.AddSingleton(state);
             services.AddSingleton(autoTypeSettings!);
-            services.AddSingleton(new Action<AutoTypeService>((c) => { autoTypeSaveSettingsToFile!.Invoke(autoTypeSettings!); }));
             RegisterRegularServices(services);
-            RegisterHostedServices(services);
+            RegisterHostedServices(services, state, clientSettings, saveClientSettingsToFile);
         })
 
         .Build();
@@ -65,7 +67,6 @@ public partial class App : Application
 
     private void RegisterRegularServices(IServiceCollection services)
     {
-        services.AddSingleton<AutoTypeService>();
         services.AddSingleton<HotkeyService>();
         services.AddSingleton<AutoTypeViewModel>();
         services.AddSingleton<SettingsControlViewModel>();
@@ -75,13 +76,14 @@ public partial class App : Application
         services.AddSingleton(this);
     }
 
-    private void RegisterHostedServices(IServiceCollection services)
+    private void RegisterHostedServices(IServiceCollection services,
+        StateController<AutoTypeConfigurationStates> state,
+        BitwardenClientConfiguration clientSettings,
+        Action<BitwardenClientConfiguration> saveClientSettingsToFile)
     {
         var logger = services.BuildServiceProvider().GetService<ILogger<BitwardenService>>()!;
-        var config = services.BuildServiceProvider().GetService<BitwardenClientConfiguration>()!;
-        var save = services.BuildServiceProvider().GetService<Action<BitwardenClientConfiguration>>()!;
-        var bitwardenService = new BitwardenService(logger, config, save);
-        services.AddSingleton<BitwardenService>(bitwardenService);
+        var bitwardenService = new BitwardenService(logger, clientSettings, saveClientSettingsToFile, state);
+        services.AddSingleton(bitwardenService);
         services.AddHostedService((sp) => bitwardenService);
     }
 

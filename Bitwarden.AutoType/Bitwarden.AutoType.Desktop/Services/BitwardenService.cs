@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Helpers;
+using Bitwarden.AutoType.Desktop.Models;
 using Bitwarden.Core.API;
 using Bitwarden.Core.Crypto;
 using Bitwarden.Core.Models;
@@ -20,18 +21,22 @@ public class BitwardenService : WPFBackgroundService
     private readonly BitwardenClientConfiguration _bitwardenClientConfiguration;
 
     private readonly Action<BitwardenClientConfiguration> _save;
+    private readonly StateController<AutoTypeConfigurationStates> _state;
     private readonly List<Action<SyncResponse>> _syncResponseActions;
     private readonly SemaphoreSlim _syncLock = new SemaphoreSlim(1, 1);
     private TokenResponse? _accessToken;
     private SyncResponse? _syncResponse;
     private DateTimeOffset? _revisionDate;
 
-    public BitwardenService(ILogger<BitwardenService> logger, BitwardenClientConfiguration bitwardenClientConfiguration, Action<BitwardenClientConfiguration> save)
+    public BitwardenService(ILogger<BitwardenService> logger,
+        BitwardenClientConfiguration bitwardenClientConfiguration,
+        Action<BitwardenClientConfiguration> save,
+        StateController<AutoTypeConfigurationStates> state)
     {
         _logger = logger;
-
         _bitwardenClientConfiguration = bitwardenClientConfiguration;
         _save = save;
+        _state = state;
         _syncResponseActions = new List<Action<SyncResponse>>();
     }
 
@@ -44,11 +49,22 @@ public class BitwardenService : WPFBackgroundService
             {
                 _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Refreshing Database.");
 
+                while(_state.GetState() == AutoTypeConfigurationStates.NotConfigured)
+                {
+                    _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waiting TimeSpan.FromSeconds(30).");
+                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken).ConfigureAwait(false);
+                    _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waited TimeSpan.FromSeconds(30).");
+                }
+
                 await _syncLock.WaitAsync(); // Acquire the lock asynchronously
                 try
                 {
                     await RefreshLocalDatabaseAsync()
                        .ConfigureAwait(false);
+                }
+                catch
+                {
+                    throw;
                 }
                 finally
                 {
@@ -165,6 +181,11 @@ public class BitwardenService : WPFBackgroundService
 
     public async Task RefreshLocalDatabaseAsync()
     {
+        if (_state.GetState() == AutoTypeConfigurationStates.NotConfigured)
+        {
+            throw new Exception("Not configured to refresh local database.");
+        }
+
         await RefreshAccessTokenIfNeededAsync();
 
         string? revisonDate = await BitwardenProtocol.GetRevisionDate(

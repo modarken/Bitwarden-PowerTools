@@ -55,6 +55,7 @@ public class ToAutoTypeCustomFieldConverter : IValueConverter
 /// </summary>
 public partial class MatchSelectionWindow : MetroWindow, IDisposable
 {
+    // private bool _properlyDeactivated = false;
     public KeyValuePair<AutoTypeCustomField, Cipher>? SelectedMatch { get; private set; }
 
     public MatchSelectionWindow(IEnumerable<KeyValuePair<AutoTypeCustomField, Cipher>> matches)
@@ -62,13 +63,28 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
         DataContext = this;
         InitializeComponent();
         MatchListBox.ItemsSource = matches;
+
+        this.Loaded += (sender, e) =>
+        {
+            this.Activate(); // this was found to be necessary to bring the window to the front in certain situations (e.g. when the user has clicked on a different window after this window was already displayed)
+        };
+        //this.Deactivated += MatchSelectionWindow_Deactivated;
     }
+
+    //private void MatchSelectionWindow_Deactivated(object? sender, EventArgs e)
+    //{
+    //    if (_properlyDeactivated == false)
+    //    {
+    //        DialogResult = false;
+    //    }
+    //}
 
     private void SelectButton_Click(object sender, RoutedEventArgs e)
     {
         if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
         {
             SelectedMatch = selectedMatch;
+            //_properlyDeactivated = true;
             DialogResult = true;
         }
         else
@@ -79,6 +95,7 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
 
     private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
+        //_properlyDeactivated = true;
         DialogResult = false;
     }
 
@@ -88,6 +105,7 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
         if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
         {
             SelectedMatch = selectedMatch;
+            //_properlyDeactivated = true;
             DialogResult = true;
         }
     }
@@ -100,6 +118,7 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
             if (MatchListBox.Items[key - 1] is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
             {
                 SelectedMatch = selectedMatch;
+                //_properlyDeactivated = true;
                 DialogResult = true;
             }
         }
@@ -114,6 +133,7 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
         if (matchItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
         {
             SelectedMatch = selectedMatch;
+            //_properlyDeactivated = true;
             DialogResult = true;
         }
     }

@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows.Automation;
+using Bitwarden.AutoType.Desktop.Helpers;
+using Bitwarden.AutoType.Desktop.Models;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using static System.Windows.Forms.AxHost;
 
 namespace Bitwarden.AutoType.Desktop;
 
@@ -27,6 +31,7 @@ public partial class SettingsControlViewModel
 
     private readonly Action<BitwardenClientConfiguration>? _save;
     private readonly BitwardenService? _bitwardenService;
+    private readonly StateController<AutoTypeConfigurationStates> _state;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SettingsControlViewModel"/> class.
@@ -40,18 +45,21 @@ public partial class SettingsControlViewModel
         _bitwardenClientConfiguration = default;
         _save = default;
         _bitwardenService = default;
+        _state = new StateController<AutoTypeConfigurationStates>();
         AccessMethod = 0;
     }
 
-    public SettingsControlViewModel(ILogger<SettingsControlViewModel> logger, BitwardenClientConfiguration bitwardenClientConfiguration,
+    public SettingsControlViewModel(ILogger<SettingsControlViewModel> logger,
+        BitwardenClientConfiguration bitwardenClientConfiguration,
         Action<BitwardenClientConfiguration> save,
-        BitwardenService bitwardenService)
+        BitwardenService bitwardenService,
+        StateController<AutoTypeConfigurationStates> state)
     {
         _logger = logger;
         _bitwardenClientConfiguration = bitwardenClientConfiguration;
         _save = save;
         _bitwardenService = bitwardenService;
-
+        _state = state;
         ConfigureMode(bitwardenClientConfiguration);
     }
 
@@ -118,11 +126,13 @@ public partial class SettingsControlViewModel
             BitwardenClientConfiguration.client_secret = null;
         }
 
-        await _bitwardenService.RefreshLocalDatabaseAsync();
+        _state.SetState(BitwardenClientConfiguration.Validate() ? AutoTypeConfigurationStates.Configured : AutoTypeConfigurationStates.NotConfigured);
 
         if (_save != null && BitwardenClientConfiguration != null)
         {
             _save(BitwardenClientConfiguration);
         }
+
+        await _bitwardenService.RefreshLocalDatabaseAsync();
     }
 }

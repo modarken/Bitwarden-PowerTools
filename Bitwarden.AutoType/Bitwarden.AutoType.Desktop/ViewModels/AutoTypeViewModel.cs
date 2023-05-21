@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Models;
 using Bitwarden.AutoType.Desktop.Services;
 using Bitwarden.AutoType.Desktop.Views;
@@ -49,10 +50,10 @@ public partial class AutoTypeViewModel : IDisposable
 {
     private readonly ILogger<AutoTypeViewModel> _logger;
     private readonly HotkeyService _hotkeyService;
-    private readonly AutoTypeService _autoTypeService;
     private readonly BitwardenService _bitwardenService;
     private readonly AutoTypeSettings _autoTypeSettings;
     private readonly Action<AutoTypeSettings> _save;
+    private readonly StateController<AutoTypeConfigurationStates> _state;
     private Dictionary<AutoTypeCustomField, Cipher>? _regexLookup;
 
     #region Bound
@@ -134,18 +135,17 @@ public partial class AutoTypeViewModel : IDisposable
 
     public AutoTypeViewModel(ILogger<AutoTypeViewModel> logger,
         HotkeyService hotkeyService,
-        AutoTypeService autoTypeService,
         BitwardenService bitwardenService,
         AutoTypeSettings autoTypeSettings,
-        Action<AutoTypeSettings> save)
+        Action<AutoTypeSettings> save,
+        StateController<AutoTypeConfigurationStates> state)
     {
         _logger = logger;
         _hotkeyService = hotkeyService;
-        _autoTypeService = autoTypeService;
         _bitwardenService = bitwardenService;
         _autoTypeSettings = autoTypeSettings;
         _save = save;
-
+        _state = state;
         if (_autoTypeSettings.AutoTypeOnOff is null)
         {
             IsAutoTypeEnabled = true;
@@ -163,13 +163,20 @@ public partial class AutoTypeViewModel : IDisposable
 
     private async Task InitializeRegexListAsync()
     {
-        try
+        if (_state.GetState() == AutoTypeConfigurationStates.Configured)
         {
-            OnDatabaseUpdated(await _bitwardenService.GetDatabase());
+            try
+            {
+                OnDatabaseUpdated(await _bitwardenService.GetDatabase());
+            }
+            catch (Exception e)
+            {
+                _logger.Log(LogLevel.Error, $"{nameof(AutoTypeViewModel)}.{nameof(InitializeRegexListAsync)}() Exception:'{e.Message}'");
+            }
         }
-        catch (Exception e)
+        else
         {
-            _logger.Log(LogLevel.Error, $"{nameof(AutoTypeViewModel)}.{nameof(InitializeRegexListAsync)}() Exception:'{e.Message}'");
+            _logger.Log(LogLevel.Warning, $"{nameof(AutoTypeViewModel)}.{nameof(InitializeRegexListAsync)}() Not configured.");
         }
 
         _bitwardenService.RegisterOnDatabaseUpdated(OnDatabaseUpdated);
@@ -274,6 +281,11 @@ public partial class AutoTypeViewModel : IDisposable
             return;
         }
 
+        if (_regexLookup is null)
+        {
+            return;
+        }
+
         var (currentHandle, currentProcess) = WindowsAPI.GetForegroundProcess();
 
         if (currentProcess != null)
@@ -314,10 +326,12 @@ public partial class AutoTypeViewModel : IDisposable
         {
             // If a MatchSelectionWindow already exists, close it
             matchSelectionWindow.Close();
+            matchSelectionWindow = null;
         }
 
         // Create a new instance of MatchSelectionWindow
         matchSelectionWindow = new MatchSelectionWindow(matchedRegex);
+
         var userResult = matchSelectionWindow.ShowDialog();
 
         if (userResult == true)
@@ -390,7 +404,14 @@ public partial class AutoTypeViewModel : IDisposable
                 return BitwardenCrypto.DecryptEntry(s, decryptionKey!, true);
             };
 
-            await _autoTypeService.TypeSequenceAsync(actualMatch, func, token);
+            var config = new DefaultKeystrokeConfiguration
+            {
+                DelayBetweenKeystrokes = TimeSpan.FromMilliseconds(25),
+                PressKeyTime = TimeSpan.FromMilliseconds(15)
+            };
+
+            BitwardenKeystrokeSequence bitwardenKeystrokeSequence = new(actualMatch.Key.Sequence!, config, actualMatch.Value, func);
+            await WindowsKeyboard.SendKeystrokesAsync(bitwardenKeystrokeSequence, token); ;
         }
     }
 
