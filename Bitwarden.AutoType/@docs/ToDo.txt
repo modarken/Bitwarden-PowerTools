@@ -2,13 +2,19 @@
 
 - Add Installer
 
-- Add ability to specify target not by a single target type, but multiple.
+- Add Robustness by testing blocking of server with Clumsy
+    - e.g. outbound and ip.DstAddr = x.x.x.x or inbound and ip.SrcAddr = x.x.x.x
+
+- Enhancement: Add ability to specify target not by a single target type, but multiple.
     - for example, you can specify a window title, window class, process name, ect.
     - Instead of this "Target":"^.*notepad.*$", "Type":"Title"
     - You would have this "Title":"^.*notepad.*$", "Class":"^.*notepad.*$", "Process":"^.*notepad.*$"
     _ Things that need to change are:
         - Match Selection Window
         - TargetFinderSequenceComposer
+
+- Enhancment: Make the icon appear different color according to different states.
+    - e.g. green for on, red for off, yellow for error, ect.
 
 - Optional: Add specificity to the target, so you can specify the window title, window class, process name, ect.
     - Instead of just choosing one, you can choose multiple, and it will only match if all of them match.

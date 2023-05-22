@@ -128,7 +128,15 @@ public partial class AutoTypeViewModel : IDisposable
     [RelayCommand]
     public async Task Refresh()
     {
-        await _bitwardenService.RefreshLocalDatabaseAsync();
+        try
+        {
+            await _bitwardenService.RefreshLocalDatabaseAsync();
+
+        }
+        catch (Exception e)
+        {
+            _logger.Log(LogLevel.Error, $"{nameof(AutoTypeViewModel)}.{nameof(Refresh)}() Exception:'{e.Message}'");
+        }
     }
 
     #endregion Bound

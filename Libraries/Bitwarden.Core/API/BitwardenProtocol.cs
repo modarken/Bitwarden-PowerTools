@@ -39,20 +39,23 @@ public static class BitwardenProtocol
                 _baseAddress = baseAddress;
 
 
-                //var handler = new HttpClientHandler();
-                //handler.ClientCertificateOptions = ClientCertificateOption.Manual;
-                //handler.ServerCertificateCustomValidationCallback =
-                //    (httpRequestMessage, cert, cetChain, policyErrors) =>
-                //    {
-                //        return true;
-                //    };
+                var handler = new HttpClientHandler();
+                handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+                handler.ServerCertificateCustomValidationCallback =
+                    (httpRequestMessage, cert, cetChain, policyErrors) =>
+                    {
+                        return true;
+                    };
 
-                //_httpClient = new HttpClient(handler)
-
-                _httpClient = new HttpClient()
+                _httpClient = new HttpClient(handler)
                 {
                     BaseAddress = new System.Uri(baseAddress)
                 };
+
+                //_httpClient = new HttpClient()
+                //{
+                //    BaseAddress = new System.Uri(baseAddress)
+                //};
             }
 
             var response = await _httpClient!.SendAsync(request).ConfigureAwait(false);
