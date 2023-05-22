@@ -1,2 +1,3 @@
 cd D:\Repos\Bitwarden-PowerTools\Bitwarden.AutoType\Bitwarden.AutoType.Desktop.Setup\
-.\Sandbox.Installer.wsb
+.\Sandbox.Installer.Debug.wsb
+.\Sandbox.Installer.Release.wsb

@@ -5,6 +5,8 @@
 - Add Robustness by testing blocking of server with Clumsy
     - e.g. outbound and ip.DstAddr = x.x.x.x or inbound and ip.SrcAddr = x.x.x.x
 
+- Enhancement: Add config setting to start program on user login
+
 - Enhancement: Add ability to specify target not by a single target type, but multiple.
     - for example, you can specify a window title, window class, process name, ect.
     - Instead of this "Target":"^.*notepad.*$", "Type":"Title"
