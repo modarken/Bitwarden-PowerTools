@@ -108,6 +108,12 @@ namespace Bitwarden.AutoType.Desktop.Views
 
         private void FindWindowIcon_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            if (Mouse.Captured != null)
+            {
+                Mouse.Captured.MouseLeftButtonUp -= FindWindowIcon_MouseLeftButtonUp;
+                Mouse.Captured.MouseMove -= FindWindowIcon_MouseMove;
+            }
+
             Mouse.OverrideCursor = null;
             FindWindowIcon.ReleaseMouseCapture();
 
@@ -117,12 +123,6 @@ namespace Bitwarden.AutoType.Desktop.Views
             var hWnd = WindowFromPoint(point);
 
             UpdateTargetInfo(hWnd);
-
-            if (Mouse.Captured != null)
-            {
-                Mouse.Captured.MouseLeftButtonUp -= FindWindowIcon_MouseLeftButtonUp;
-                Mouse.Captured.MouseMove -= FindWindowIcon_MouseMove;
-            }
         }
 
         private void FindWindowIcon_MouseMove(object sender, MouseEventArgs e)
