@@ -109,6 +109,7 @@ public static class BitwardenProtocol
             {"scope", "api"},
             {"client_id", clientID},
             {"client_secret", clientSecret},
+            {"device_type", "client"},
             {"device_name", deviceName},
             {"device_identifier", deviceIdentifier},
         };

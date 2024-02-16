@@ -62,19 +62,19 @@ BitwardenClientConfiguration LoadConfig()
 {
     var serializerOptions = new JsonSerializerOptions() { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
     var dataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DesktopConstants.DefaultDataFolderName);
-    var fileName = "settings.json";
+    var fileName = "client.settings.json";
     var fullPath = Path.Combine(dataPath, fileName);
     var json = File.ReadAllText(fullPath, Encoding.UTF8);
     BitwardenClientConfiguration? bitwardenClientConfiguration;
-    if (JsonSerializer.Deserialize<Settings>(json, serializerOptions) is Settings t)
+    if (JsonSerializer.Deserialize<BitwardenClientConfiguration>(json, serializerOptions) is BitwardenClientConfiguration t)
     {
-        bitwardenClientConfiguration = t.BitwardenClientConfiguration;
+        //bitwardenClientConfiguration = t.BitwardenClientConfiguration;
     }
     else
     {
         throw new Exception("Unable to load instance from file");
     }
-    return bitwardenClientConfiguration;
+    return t;
 }
 
 TokenResponse TestViaAPIKey(BitwardenClientConfiguration bitwardenClientConfiguration)
@@ -251,7 +251,7 @@ static SecureString GetPassword()
 
 public static class DesktopConstants
 {
-    public static readonly string DefaultDataFolderName = "BitwardenAutoType";
+    public static readonly string DefaultDataFolderName = "Bitwarden-PowerTools";
 }
 
 internal static class Helpers
