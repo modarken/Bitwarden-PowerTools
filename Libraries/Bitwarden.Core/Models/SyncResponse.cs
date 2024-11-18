@@ -53,33 +53,103 @@ public class Profile
 
 public class Organization
 {
+    public bool AccessSecretsManager { get; set; }
+    public bool AllowAdminAccessToAllCollectionItems { get; set; }
     public bool Enabled { get; set; }
+    public bool FamilySponsorshipAvailable { get; set; }
+    public string? FamilySponsorshipFriendlyName { get; set; }
+    public DateTime? FamilySponsorshipLastSyncDate { get; set; }
+    public DateTime? FamilySponsorshipValidUntil { get; set; }
+    public bool FlexibleCollections { get; set; }
     public bool HasPublicAndPrivateKeys { get; set; }
     public string? Id { get; set; }
-    public object? Identifier { get; set; }
+    public string? Identifier { get; set; }
     public string? Key { get; set; }
-    public int MaxCollections { get; set; }
+    public bool KeyConnectorEnabled { get; set; }
+    public string? KeyConnectorUrl { get; set; }
+    public bool LimitCollectionCreationDeletion { get; set; }
+    public int? MaxCollections { get; set; }
     public int MaxStorageGb { get; set; }
     public string? Name { get; set; }
     public string? Object { get; set; }
-    public object? ProviderId { get; set; }
-    public object? ProviderName { get; set; }
+    public string? OrganizationUserId { get; set; }
+    public Permissions? Permissions { get; set; }
+    public int PlanProductType { get; set; }
+    public int ProductTierType { get; set; }
+    public string? ProviderId { get; set; }
+    public string? ProviderName { get; set; }
+    public string? ProviderType { get; set; }
     public bool ResetPasswordEnrolled { get; set; }
-    public int Seats { get; set; }
+    public int? Seats { get; set; }
     public bool SelfHost { get; set; }
     public bool SsoBound { get; set; }
     public int Status { get; set; }
     public int Type { get; set; }
     public bool Use2fa { get; set; }
+    public bool UseActivateAutofillPolicy { get; set; }
     public bool UseApi { get; set; }
+    public bool UseCustomPermissions { get; set; }
     public bool UseDirectory { get; set; }
     public bool UseEvents { get; set; }
     public bool UseGroups { get; set; }
+    public bool UseKeyConnector { get; set; }
+    public bool UsePasswordManager { get; set; }
     public bool UsePolicies { get; set; }
+    public bool UseResetPassword { get; set; }
+    public bool UseScim { get; set; }
+    public bool UseSecretsManager { get; set; }
     public bool UseSso { get; set; }
     public bool UseTotp { get; set; }
     public string? UserId { get; set; }
     public bool UsersGetPremium { get; set; }
+}
+//public class Organization
+//{
+//    public bool Enabled { get; set; }
+//    public bool HasPublicAndPrivateKeys { get; set; }
+//    public string? Id { get; set; }
+//    public object? Identifier { get; set; }
+//    public string? Key { get; set; }
+//    public int MaxCollections { get; set; }
+//    public int MaxStorageGb { get; set; }
+//    public string? Name { get; set; }
+//    public string? Object { get; set; }
+//    public object? ProviderId { get; set; }
+//    public object? ProviderName { get; set; }
+//    public bool ResetPasswordEnrolled { get; set; }
+//    public int Seats { get; set; }
+//    public bool SelfHost { get; set; }
+//    public bool SsoBound { get; set; }
+//    public int Status { get; set; }
+//    public int Type { get; set; }
+//    public bool Use2fa { get; set; }
+//    public bool UseApi { get; set; }
+//    public bool UseDirectory { get; set; }
+//    public bool UseEvents { get; set; }
+//    public bool UseGroups { get; set; }
+//    public bool UsePolicies { get; set; }
+//    public bool UseSso { get; set; }
+//    public bool UseTotp { get; set; }
+//    public string? UserId { get; set; }
+//    public bool UsersGetPremium { get; set; }
+//}
+
+public class Permissions
+{
+    public bool AccessEventLogs { get; set; }
+    public bool AccessImportExport { get; set; }
+    public bool AccessReports { get; set; }
+    public bool CreateNewCollections { get; set; }
+    public bool DeleteAnyCollection { get; set; }
+    public bool DeleteAssignedCollections { get; set; }
+    public bool EditAnyCollection { get; set; }
+    public bool EditAssignedCollections { get; set; }
+    public bool ManageGroups { get; set; }
+    public bool ManagePolicies { get; set; }
+    public bool ManageResetPassword { get; set; }
+    public bool ManageScim { get; set; }
+    public bool ManageSso { get; set; }
+    public bool ManageUsers { get; set; }
 }
 
 public class Cipher

@@ -38,7 +38,6 @@ public static class BitwardenProtocol
             {
                 _baseAddress = baseAddress;
 
-
                 var handler = new HttpClientHandler();
                 handler.ClientCertificateOptions = ClientCertificateOption.Manual;
                 handler.ServerCertificateCustomValidationCallback =
@@ -302,7 +301,12 @@ public static class BitwardenProtocol
 
         if (response.IsSuccessStatusCode)
         {
-            return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.ProfileResponse);
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            // return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.ProfileResponse);
+            return JsonSerializer.Deserialize<ProfileResponse>(responseString, options);
         }
 
         return null;
@@ -327,7 +331,8 @@ public static class BitwardenProtocol
 
         if (response.IsSuccessStatusCode)
         {
-            return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.SyncResponse);
+            // return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.SyncResponse);
+            return JsonSerializer.Deserialize<SyncResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
         return null;

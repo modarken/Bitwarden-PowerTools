@@ -274,8 +274,6 @@ internal static class Helpers
 
 #endregion Support
 
-
-
 #region Example Code to delete later
 
 // save.Invoke(bitwardenClientConfiguration);
