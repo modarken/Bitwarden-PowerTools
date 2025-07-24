@@ -26,9 +26,6 @@
         <File Source="!(loc.AutoTypeOutDir)\ExCSS.dll"/>
       </Component>
       <Component>
-        <File Source="!(loc.AutoTypeOutDir)\Fizzler.dll"/>
-      </Component>
-      <Component>
         <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.dll"/>
       </Component>
       <Component>
@@ -161,9 +158,6 @@
         <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.DependencyInjection.dll"/>
       </Component>
       <Component>
-        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Diagnostics"/>
-      </Component>
-      <Component>
         <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.FileProviders.Abstractions.dll"/>
       </Component>
       <Component>
@@ -227,13 +221,46 @@
         <File Source="!(loc.AutoTypeOutDir)\Otp.NET.dll"/>
       </Component>
       <Component>
-        <File Source="!(loc.AutoTypeOutDir)\runtime.osx.10.10-x64.CoreCompat.System.Drawing.dll"/>
-      </Component>
-      <Component>
         <File Source="!(loc.AutoTypeOutDir)\Svg.dll"/>
       </Component>
       <Component>
         <File Source="!(loc.AutoTypeOutDir)\System.IdentityModel.Tokens.Jwt.dll"/>
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.AutoType.Desktop.deps.json" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.AutoType.Desktop.pdb" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.Core.pdb" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Bitwarden.Utilities.pdb" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.CircumIcons.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.GameIcons.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.Lucide.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.MemoryIcons.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\MahApps.Metro.IconPacks.PhosphorIcons.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Diagnostics.Abstractions.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Diagnostics.dll" />
+      </Component>
+      <Component>
+        <File Source="!(loc.AutoTypeOutDir)\de\MahApps.Metro.resources.dll" />
       </Component>
       <!--
       <Component>
