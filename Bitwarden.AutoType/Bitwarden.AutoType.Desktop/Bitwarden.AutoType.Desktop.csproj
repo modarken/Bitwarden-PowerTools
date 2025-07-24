@@ -7,7 +7,10 @@
     <UseWindowsForms>True</UseWindowsForms>
     <UserSecretsId>de054478-1190-4365-a42d-94fe77898644</UserSecretsId>
     <ApplicationIcon>Bitwarden.AutoType.ico</ApplicationIcon>
-    <Version>1.0.1</Version>
+    <Version>1.2.0</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    <InformationalVersion>1.2.0</InformationalVersion>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Bitwarden.AutoType.ico" />
