@@ -262,29 +262,6 @@
       <Component>
         <File Source="!(loc.AutoTypeOutDir)\de\MahApps.Metro.resources.dll" />
       </Component>
-      <!--
-      <Component>
-        <File Source="$(var.ProjectDir)bin\$(var.Configuration)\net7.0-windows\Bitwarden.AutoType.Desktop.exe" />
-      </Component>
-      <Component>
-        <File Source="!(loc.PublishPath)\Bitwarden.AutoType.Desktop.exe" />
-      </Component>
-      <Component>
-        <File Source="!(loc.PublishPath)\D3DCompiler_47_cor3.dll" />
-      </Component>
-      <Component>
-        <File Source="!(loc.PublishPath)\PenImc_cor3.dll" />
-      </Component>
-      <Component>
-        <File Source="!(loc.PublishPath)\PresentationNative_cor3.dll" />
-      </Component>
-      <Component>
-        <File Source="!(loc.PublishPath)\vcruntime140_cor3.dll" />
-      </Component>
-      <Component>
-        <File Source="!(loc.PublishPath)\wpfgfx_cor3.dll" />
-      </Component>
-      -->
     </ComponentGroup>
   </Fragment>
 </Wix>

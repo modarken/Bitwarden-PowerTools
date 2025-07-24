@@ -10,7 +10,7 @@
     <File Path="@docs/Product.md" />
     <File Path="@docs/Specs.md" />
     <File Path="@docs/Standards.md" />
-    <File Path="Bitwarden.AutoType/@docs/ToDo.txt" />
+    <File Path="@docs/ToDo.txt" />
   </Folder>
   <Folder Name="/Bitwarden.AutoType/">
     <Project Path="Bitwarden.AutoType/Bitwarden.API.Test/Bitwarden.API.Test.csproj" />
