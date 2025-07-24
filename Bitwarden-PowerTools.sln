@@ -20,9 +20,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@docs", "@docs", "{72B19136-09C5-4E4B-9D0C-E569F7AD0708}"
 	ProjectSection(SolutionItems) = preProject
 		@docs\bitwarden.design.ipynb = @docs\bitwarden.design.ipynb
-		Product.md = Product.md
-		Standards.md = Standards.md
-		Specs.md = Specs.md
+		@docs\Product.md = @docs\Product.md
+		@docs\Specs.md = @docs\Specs.md
+		@docs\Standards.md = @docs\Standards.md
 		Bitwarden.AutoType\@docs\ToDo.txt = Bitwarden.AutoType\@docs\ToDo.txt
 	EndProjectSection
 EndProject
