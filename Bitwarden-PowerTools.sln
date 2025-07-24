@@ -17,14 +17,13 @@ Project("{B7DD6F7E-DEF8-4E67-B5B7-07EF123DB6F0}") = "Bitwarden.AutoType.Desktop.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bitwarden.API.Test", "Bitwarden.AutoType\Bitwarden.API.Test\Bitwarden.API.Test.csproj", "{99B96C4E-987B-450D-9423-C45CCED725C1}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@docs", "@docs", "{780E2A55-1EEE-41CB-9A0F-DE6C98F09EFC}"
-	ProjectSection(SolutionItems) = preProject
-		Bitwarden.AutoType\@docs\ToDo.txt = Bitwarden.AutoType\@docs\ToDo.txt
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "@docs", "@docs", "{72B19136-09C5-4E4B-9D0C-E569F7AD0708}"
 	ProjectSection(SolutionItems) = preProject
 		@docs\bitwarden.design.ipynb = @docs\bitwarden.design.ipynb
+		Product.md = Product.md
+		Standards.md = Standards.md
+		Specs.md = Specs.md
+		Bitwarden.AutoType\@docs\ToDo.txt = Bitwarden.AutoType\@docs\ToDo.txt
 	EndProjectSection
 EndProject
 Global
@@ -129,7 +128,6 @@ Global
 		{BECC4B46-16DA-4434-A092-D025D4A14F1B} = {DE8DE294-170F-4C45-9393-217F7672A87C}
 		{D82BD9F5-5902-4B0D-A495-3BF871497101} = {630CFB41-7629-42E9-A61A-D6F7BDBF4890}
 		{99B96C4E-987B-450D-9423-C45CCED725C1} = {630CFB41-7629-42E9-A61A-D6F7BDBF4890}
-		{780E2A55-1EEE-41CB-9A0F-DE6C98F09EFC} = {630CFB41-7629-42E9-A61A-D6F7BDBF4890}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9D09AF93-878B-4108-BF51-139E36726FA4}

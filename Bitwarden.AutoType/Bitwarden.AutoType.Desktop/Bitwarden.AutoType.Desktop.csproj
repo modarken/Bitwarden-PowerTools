@@ -7,19 +7,19 @@
     <UseWindowsForms>True</UseWindowsForms>
     <UserSecretsId>de054478-1190-4365-a42d-94fe77898644</UserSecretsId>
     <ApplicationIcon>Bitwarden.AutoType.ico</ApplicationIcon>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Bitwarden.AutoType.ico" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.0" />
-    <PackageReference Include="MahApps.Metro" Version="2.4.9" />
-    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
-    <PackageReference Include="Otp.NET" Version="1.3.0" />
-    <PackageReference Include="Svg" Version="3.4.4" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.7" />
+    <PackageReference Include="Otp.NET" Version="1.4.0" />
+    <PackageReference Include="Svg" Version="3.4.7" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\Bitwarden.Core\Bitwarden.Core.csproj" />

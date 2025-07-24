@@ -161,6 +161,9 @@
         <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.DependencyInjection.dll"/>
       </Component>
       <Component>
+        <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.Diagnostics"/>
+      </Component>
+      <Component>
         <File Source="!(loc.AutoTypeOutDir)\Microsoft.Extensions.FileProviders.Abstractions.dll"/>
       </Component>
       <Component>

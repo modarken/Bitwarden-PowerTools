@@ -272,7 +272,7 @@ public class BitwardenService : WPFBackgroundService
         var preLogin = await BitwardenProtocol.PostPreLogin(_bitwardenClientConfiguration.base_address, _bitwardenClientConfiguration.email)
             .ConfigureAwait(false);
 
-        if (preLogin is null)
+        if (preLogin is null || preLogin.KdfIterations <= 0)
         {
             return (null, null);
         }
