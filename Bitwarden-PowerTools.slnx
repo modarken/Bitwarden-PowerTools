@@ -1,0 +1,26 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/@docs/">
+    <File Path="@docs/bitwarden.design.ipynb" />
+    <File Path="@docs/Product.md" />
+    <File Path="@docs/Specs.md" />
+    <File Path="@docs/Standards.md" />
+    <File Path="Bitwarden.AutoType/@docs/ToDo.txt" />
+  </Folder>
+  <Folder Name="/Bitwarden.AutoType/">
+    <Project Path="Bitwarden.AutoType/Bitwarden.API.Test/Bitwarden.API.Test.csproj" />
+    <Project Path="Bitwarden.AutoType/Bitwarden.AutoType.Desktop.Setup/Bitwarden.AutoType.Desktop.Setup.wixproj" Type="b7dd6f7e-def8-4e67-b5b7-07ef123db6f0">
+      <Platform Solution="*|Any CPU" Project="x64" />
+    </Project>
+    <Project Path="Bitwarden.AutoType/Bitwarden.AutoType.Desktop/Bitwarden.AutoType.Desktop.csproj" />
+  </Folder>
+  <Folder Name="/Libraries/">
+    <Project Path="Libraries/Bitwarden.Core/Bitwarden.Core.csproj" />
+    <Project Path="Libraries/Bitwardent.Utilities/Bitwarden.Utilities.csproj" />
+  </Folder>
+</Solution>
