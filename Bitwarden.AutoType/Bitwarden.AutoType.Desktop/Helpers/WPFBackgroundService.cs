@@ -68,7 +68,7 @@ public abstract class WPFBackgroundService : IHostedService, IDisposable
         }
         finally
         {
-            Thread.Sleep(200); // Added because of Microsoft error - when not sleeping something breaks and Application exits immedatly
+            await Task.Delay(200).ConfigureAwait(false); // Added because of Microsoft error - when not sleeping something breaks and Application exits immediately
             // Wait until the task completes or the stop token triggers
             await Task.WhenAny(_executeTask, Task.Delay(Timeout.Infinite, cancellationToken)).ConfigureAwait(false);
         }

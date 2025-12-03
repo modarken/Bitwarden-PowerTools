@@ -5,19 +5,19 @@ namespace Bitwarden.Core.Crypto;
 
 public static class BitwardenCrypto
 {
-    public static byte[] DerriveMasterKey(string masterPassword, string email, int iterations)
+    public static byte[] DeriveMasterKey(string masterPassword, string email, int iterations)
     {
         return PBKDF2Hash(Encoding.ASCII.GetBytes(masterPassword), Encoding.ASCII.GetBytes(email.ToLower()), iterations);
     }
 
-    public static string DerriveMasterPasswordHash(string masterPassword, string email, int iterations)
+    public static string DeriveMasterPasswordHash(string masterPassword, string email, int iterations)
     {
         var masterHash = PBKDF2Hash(Encoding.ASCII.GetBytes(masterPassword), Encoding.ASCII.GetBytes(email.ToLower()), iterations);
         var masterPasswordHash = PBKDF2Hash(masterHash, Encoding.ASCII.GetBytes(masterPassword), 1);
         return Convert.ToBase64String(masterPasswordHash);
     }
 
-    public static string DerriveMasterPasswordHashFromMasterKey(byte[] masterKey, byte[] masterPasswordSalt)
+    public static string DeriveMasterPasswordHashFromMasterKey(byte[] masterKey, byte[] masterPasswordSalt)
     {
         var masterPasswordHash = PBKDF2Hash(masterKey, masterPasswordSalt, 1);
         return Convert.ToBase64String(masterPasswordHash);
@@ -53,7 +53,7 @@ public static class BitwardenCrypto
             var cipherMac = items[2];
             var stetchedMasterKey = StretchKey(masterKey);
             var masterMac = stetchedMasterKey[32..64];
-            var hash = new HMACSHA256(masterMac);
+            using var hash = new HMACSHA256(masterMac);
             var computedMac = hash.ComputeHash(cipherIV.Concat(cipherData).ToArray());
             if (!MacsEqual(masterMac, computedMac, cipherMac))
             {
@@ -79,7 +79,7 @@ public static class BitwardenCrypto
         // VERIFY
         if (verify)
         {
-            var hash = new HMACSHA256(macEncryptionKey);
+            using var hash = new HMACSHA256(macEncryptionKey);
             var computedMac = hash.ComputeHash(entryIV.Concat(entryData).ToArray());
             if (!MacsEqual(macEncryptionKey, computedMac, entryMac))
             {
@@ -111,9 +111,8 @@ public static class BitwardenCrypto
 
     public static byte[] PBKDF2Hash(byte[] password, byte[] salt, int iterations)
     {
-        // Generate the hash
-        Rfc2898DeriveBytes pbkdf2 = new(password, salt, iterations, new HashAlgorithmName("SHA256"));
-        return pbkdf2.GetBytes(32); //20 bytes length is 160 bits
+        // Generate the hash using the static Pbkdf2 method
+        return Rfc2898DeriveBytes.Pbkdf2(password, salt, iterations, HashAlgorithmName.SHA256, 32);
     }
 
     public static string ByteArrayToString(this byte[] ba)

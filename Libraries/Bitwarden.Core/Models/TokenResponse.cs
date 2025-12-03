@@ -2,7 +2,6 @@
 
 namespace Bitwarden.Core.Models;
 
-[JsonSerializable(typeof(TokenResponse))]
 public class TokenResponse
 {
     public int Kdf { get; set; }

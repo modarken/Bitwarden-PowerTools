@@ -35,10 +35,10 @@ void Test1()
 
     // used as the client side main secret. When hashed it can be sent to server for login
     // it can also be used to decrypt the vault (server side) protectedSymmetricKey which is generated on the server and used to (d)encrypt ciphers.
-    var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, userName, iterations);
+    var masterKey = BitwardenCrypto.DeriveMasterKey(masterPassword, userName, iterations);
     var masterKeyBase64 = Convert.ToBase64String(masterKey);
-    var masterPasswordHash1 = BitwardenCrypto.DerriveMasterPasswordHash(masterPassword, userName, iterations);
-    var masterPasswordHash2 = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
+    var masterPasswordHash1 = BitwardenCrypto.DeriveMasterPasswordHash(masterPassword, userName, iterations);
+    var masterPasswordHash2 = BitwardenCrypto.DeriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
 
     var stretchedmasterkey = BitwardenCrypto.StretchKey(masterKey);
     var stretchedmasterkeyBase64 = Convert.ToBase64String(stretchedmasterkey);
@@ -109,9 +109,9 @@ TokenResponse TestViaPasswordAndTOTP(BitwardenClientConfiguration bitwardenClien
 
     // We want to get the master password hash, this is whats sent to the server and checked for valid server access to get a token
     var masterPassword = GetPassword().ToUnsecureString();
-    var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, email, preLogin.KdfIterations);
+    var masterKey = BitwardenCrypto.DeriveMasterKey(masterPassword, email, preLogin.KdfIterations);
     var masterKeyBase64 = Convert.ToBase64String(masterKey);
-    var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
+    var masterPasswordHash = BitwardenCrypto.DeriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
 
     // Three methods to get an access token
     // var accessToken = BitwardenProtocol.PostAccessTokenFromAPIKey(baseAddesss, clientID, clientSecret, deviceName, deviceIdentifier).GetAwaiter().GetResult();
@@ -162,7 +162,7 @@ void TestUseAccessToken(BitwardenClientConfiguration config, TokenResponse token
             Console.WriteLine("Enter master password");
             // need to encryption decryption key
             var masterPassword = GetPassword().ToUnsecureString();
-            var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, config!.email!, tokenResponse.KdfIterations);
+            var masterKey = BitwardenCrypto.DeriveMasterKey(masterPassword, config!.email!, tokenResponse.KdfIterations);
 
             // the encryption key is stored on the server and is not to encrypt/decrypt all of the cipher text.
             var protectedEncyptionKey = tokenResponse.Key;

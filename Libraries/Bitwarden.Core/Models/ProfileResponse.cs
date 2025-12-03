@@ -25,7 +25,6 @@ namespace Bitwarden.Core.Models;
 //    public int _Status { get; set; }
 //}
 
-[JsonSerializable(typeof(ProfileResponse))]
 public class ProfileResponse
 {
     public string? Culture { get; set; }

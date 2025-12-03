@@ -2,7 +2,6 @@
 
 namespace Bitwarden.Core.Models;
 
-[JsonSerializable(typeof(SyncResponse))]
 public class SyncResponse
 {
     public Cipher[]? Ciphers { get; set; }

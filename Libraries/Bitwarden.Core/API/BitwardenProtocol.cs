@@ -90,18 +90,11 @@ public static class BitwardenProtocol
 
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        // response.EnsureSuccessStatusCode();
-
-        if (response.IsSuccessStatusCode)
-        {
-            return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.PreLoginResponse);
-        }
-        return null;
+        return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.PreLoginResponse);
     }
 
     public static async Task<TokenResponse?> PostAccessTokenFromAPIKey(string baseAddress, string clientID, string clientSecret, string deviceName = "", string deviceIdentifier = "")
     {
-        ;
         var content = new Dictionary<string, string>()
         {
             {"grant_type", "client_credentials"},
@@ -274,12 +267,7 @@ public static class BitwardenProtocol
 
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        if (response.IsSuccessStatusCode)
-        {
-            return responseString;
-        }
-
-        return null;
+        return responseString;
     }
 
     public static async Task<ProfileResponse?> GetProfile(string baseAddress, string? bearerToken)
@@ -299,17 +287,11 @@ public static class BitwardenProtocol
 
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        if (response.IsSuccessStatusCode)
+        var options = new JsonSerializerOptions
         {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            // return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.ProfileResponse);
-            return JsonSerializer.Deserialize<ProfileResponse>(responseString, options);
-        }
-
-        return null;
+            PropertyNameCaseInsensitive = true
+        };
+        return JsonSerializer.Deserialize<ProfileResponse>(responseString, options);
     }
 
     public static async Task<SyncResponse?> GetSync(string baseAddress, string? bearerToken)
@@ -329,12 +311,6 @@ public static class BitwardenProtocol
 
         var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-        if (response.IsSuccessStatusCode)
-        {
-            // return JsonSerializer.Deserialize(responseString, BitwardenModelsContext.Default.SyncResponse);
-            return JsonSerializer.Deserialize<SyncResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        }
-
-        return null;
+        return JsonSerializer.Deserialize<SyncResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
     }
 }

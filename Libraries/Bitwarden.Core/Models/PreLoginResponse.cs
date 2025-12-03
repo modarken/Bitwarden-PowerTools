@@ -2,7 +2,6 @@
 
 namespace Bitwarden.Core.Models;
 
-[JsonSerializable(typeof(PreLoginResponse))]
 public class PreLoginResponse
 {
     [JsonPropertyName("kdf")]

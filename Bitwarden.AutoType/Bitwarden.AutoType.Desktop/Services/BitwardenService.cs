@@ -62,10 +62,6 @@ public class BitwardenService : WPFBackgroundService
                     await RefreshLocalDatabaseAsync()
                        .ConfigureAwait(false);
                 }
-                catch
-                {
-                    throw;
-                }
                 finally
                 {
                     _syncLock.Release(); // Release the lock
@@ -277,9 +273,9 @@ public class BitwardenService : WPFBackgroundService
             return (null, null);
         }
 
-        var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, _bitwardenClientConfiguration.email, preLogin.KdfIterations);
+        var masterKey = BitwardenCrypto.DeriveMasterKey(masterPassword, _bitwardenClientConfiguration.email, preLogin.KdfIterations);
 
-        var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
+        var masterPasswordHash = BitwardenCrypto.DeriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
 
         var tokenResponse = await BitwardenProtocol.PostAccessTokenFromAPIKey(
             _bitwardenClientConfiguration.base_address,
@@ -322,8 +318,8 @@ public class BitwardenService : WPFBackgroundService
             return (null, null);
         }
 
-        var masterKey = BitwardenCrypto.DerriveMasterKey(masterPassword, _bitwardenClientConfiguration.email, preLogin.KdfIterations);
-        var masterPasswordHash = BitwardenCrypto.DerriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
+        var masterKey = BitwardenCrypto.DeriveMasterKey(masterPassword, _bitwardenClientConfiguration.email, preLogin.KdfIterations);
+        var masterPasswordHash = BitwardenCrypto.DeriveMasterPasswordHashFromMasterKey(masterKey, Encoding.ASCII.GetBytes(masterPassword));
 
         TokenResponse? tokenResponse = null;
         if (twoFactorToken is null)

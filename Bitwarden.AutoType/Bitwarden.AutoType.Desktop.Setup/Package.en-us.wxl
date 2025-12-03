@@ -5,6 +5,6 @@ This file contains the declaration of all the localizable strings.
   <String Id="ManufacturerName" Value="Mojo.Systems" />
   <String Id="ApplicationName" Value="Bitwarden.AutoType" />
   <String Id="DowngradeError" Value="A newer version of [ProductName] is already installed." />
-  <String Id="PublishPath" Value="$(var.Bitwarden.AutoType.Desktop.ProjectDir)\bin\Release\net9.0-windows\publish\win-x64" />
-  <String Id="AutoTypeOutDir" Value="$(var.Bitwarden.AutoType.Desktop.ProjectDir)\bin\$(var.Configuration)\net9.0-windows\" />
+  <String Id="PublishPath" Value="$(var.Bitwarden.AutoType.Desktop.ProjectDir)\bin\Release\net10.0-windows\publish\win-x64" />
+  <String Id="AutoTypeOutDir" Value="$(var.Bitwarden.AutoType.Desktop.ProjectDir)\bin\$(var.Configuration)\net10.0-windows\" />
 </WixLocalization>
