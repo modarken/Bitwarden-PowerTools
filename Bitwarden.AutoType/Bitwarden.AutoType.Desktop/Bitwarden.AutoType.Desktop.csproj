@@ -17,12 +17,12 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
-    <PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0" />
+    <PackageReference Include="MahApps.Metro" Version="2.4.11" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
-    <PackageReference Include="Otp.NET" Version="1.4.0" />
+    <PackageReference Include="Otp.NET" Version="1.4.1" />
     <PackageReference Include="Svg" Version="3.4.7" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\Bitwarden.Core\Bitwarden.Core.csproj" />

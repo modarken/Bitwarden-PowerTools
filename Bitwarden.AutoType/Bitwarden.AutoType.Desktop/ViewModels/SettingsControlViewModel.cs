@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Windows.Automation;
 using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Models;
 using Bitwarden.AutoType.Desktop.Services;
@@ -8,7 +7,6 @@ using Bitwarden.Utilities;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
-using static System.Windows.Forms.AxHost;
 
 namespace Bitwarden.AutoType.Desktop;
 

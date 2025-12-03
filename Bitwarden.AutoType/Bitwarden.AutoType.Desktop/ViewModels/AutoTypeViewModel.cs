@@ -45,6 +45,11 @@ public class AutoTypeCustomField
     public string? Sequence { get; set; }
 }
 
+/// <summary>
+/// Holds an AutoTypeCustomField with its pre-compiled Regex for efficient matching.
+/// </summary>
+public record CachedAutoTypeEntry(AutoTypeCustomField Field, Regex CompiledRegex, Cipher Cipher);
+
 [INotifyPropertyChanged]
 public partial class AutoTypeViewModel : IDisposable
 {
@@ -54,7 +59,7 @@ public partial class AutoTypeViewModel : IDisposable
     private readonly AutoTypeSettings _autoTypeSettings;
     private readonly Action<AutoTypeSettings> _save;
     private readonly StateController<AutoTypeConfigurationStates> _state;
-    private Dictionary<AutoTypeCustomField, Cipher>? _regexLookup;
+    private List<CachedAutoTypeEntry>? _regexLookup;
 
     #region Bound
 
@@ -192,7 +197,7 @@ public partial class AutoTypeViewModel : IDisposable
 
     private void OnDatabaseUpdated(SyncResponse syncResponse)
     {
-        Dictionary<AutoTypeCustomField, Cipher> expressions = new();
+        List<CachedAutoTypeEntry> expressions = new();
 
         var decryptionKey = _bitwardenService.GetEncryptionKey();
 
@@ -214,7 +219,7 @@ public partial class AutoTypeViewModel : IDisposable
                     continue;
                 }
 
-                if (cipher.Fields != null && cipher.Fields.Count() > 0)
+                if (cipher.Fields != null && cipher.Fields.Any())
                 {
                     foreach (Field1 field in cipher.Fields)
                     {
@@ -242,7 +247,8 @@ public partial class AutoTypeViewModel : IDisposable
 
                                 autoTypeCustomField.Name = cipherName;
                                 autoTypeCustomField.UserName = userName;
-                                expressions.Add(autoTypeCustomField, cipher!);
+                                var compiledRegex = new Regex(autoTypeCustomField.Target!, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                                expressions.Add(new CachedAutoTypeEntry(autoTypeCustomField, compiledRegex, cipher!));
 
                                 if (cipherName is not null)
                                 {
@@ -302,31 +308,26 @@ public partial class AutoTypeViewModel : IDisposable
             string processName = currentProcess.ProcessName;
             string windowClassName = WindowsAPI.GetWindowClassName(currentHandle);
 
-            var matchedRegex =
-                _regexLookup!
+            var matchedRegex = _regexLookup!
                 .Where(r =>
-                    (r.Key.Type == TargetTypes.Title && new Regex(r.Key.Target!, RegexOptions.IgnoreCase).IsMatch(windowTitle))
-                    || (r.Key.Type == TargetTypes.Process && new Regex(r.Key.Target!, RegexOptions.IgnoreCase).IsMatch(processName))
-                    || (r.Key.Type == TargetTypes.Class && new Regex(r.Key.Target!, RegexOptions.IgnoreCase).IsMatch(windowClassName)))
-                .Union(_regexLookup! // in case the user has not specified a type, default to title
-                       .Where(r => r.Key.Type is null && new Regex(r.Key.Target!, RegexOptions.IgnoreCase).IsMatch(windowTitle)))
-                ;
+                    (r.Field.Type == TargetTypes.Title && r.CompiledRegex.IsMatch(windowTitle))
+                    || (r.Field.Type == TargetTypes.Process && r.CompiledRegex.IsMatch(processName))
+                    || (r.Field.Type == TargetTypes.Class && r.CompiledRegex.IsMatch(windowClassName))
+                    || (r.Field.Type is null && r.CompiledRegex.IsMatch(windowTitle))) // default to title if no type specified
+                .ToList(); // Materialize once to avoid multiple enumerations
 
-            if (matchedRegex.Any())
+            if (matchedRegex.Count == 1)
             {
-                if (matchedRegex.Count() == 1)
-                {
-                    ExecuteMatchHandler(matchedRegex.First(), currentHandle);
-                }
-                else if (matchedRegex.Count() > 1)
-                {
-                    ShowPopup(matchedRegex, currentHandle);
-                }
+                ExecuteMatchHandler(matchedRegex[0], currentHandle);
+            }
+            else if (matchedRegex.Count > 1)
+            {
+                ShowPopup(matchedRegex, currentHandle);
             }
         }
     }
 
-    private void ShowPopup(IEnumerable<KeyValuePair<AutoTypeCustomField, Cipher>> matchedRegex, IntPtr handle)
+    private void ShowPopup(List<CachedAutoTypeEntry> matchedRegex, IntPtr handle)
     {
         // Check if a MatchSelectionWindow already exists
         var matchSelectionWindow = Application.Current.Windows.OfType<MatchSelectionWindow>().FirstOrDefault();
@@ -350,7 +351,7 @@ public partial class AutoTypeViewModel : IDisposable
 
     #region Windows Event Handling
 
-    private async void ExecuteMatchHandler(KeyValuePair<AutoTypeCustomField, Cipher>? match, IntPtr handle)
+    private async void ExecuteMatchHandler(CachedAutoTypeEntry? match, IntPtr handle)
     {
         var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
@@ -401,9 +402,9 @@ public partial class AutoTypeViewModel : IDisposable
 
     #endregion Windows Event Handling
 
-    private async Task ExecuteMatchFunctionAsync(KeyValuePair<AutoTypeCustomField, Cipher>? match, CancellationToken token = default)
+    private async Task ExecuteMatchFunctionAsync(CachedAutoTypeEntry? match, CancellationToken token = default)
     {
-        if (match is KeyValuePair<AutoTypeCustomField, Cipher> actualMatch)
+        if (match is CachedAutoTypeEntry actualMatch)
         {
             var decryptionKey = _bitwardenService.GetEncryptionKey();
 
@@ -418,7 +419,7 @@ public partial class AutoTypeViewModel : IDisposable
                 PressKeyTime = TimeSpan.FromMilliseconds(15)
             };
 
-            BitwardenKeystrokeSequence bitwardenKeystrokeSequence = new(actualMatch.Key.Sequence!, config, actualMatch.Value, func);
+            BitwardenKeystrokeSequence bitwardenKeystrokeSequence = new(actualMatch.Field.Sequence!, config, actualMatch.Cipher, func);
             await WindowsKeyboard.SendKeystrokesAsync(bitwardenKeystrokeSequence, token); ;
         }
     }

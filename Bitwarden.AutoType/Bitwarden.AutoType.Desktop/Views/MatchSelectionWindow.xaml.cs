@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Bitwarden.Core.Models;
 using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls;
 
@@ -36,9 +35,9 @@ public class ToAutoTypeCustomFieldConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is KeyValuePair<AutoTypeCustomField, Cipher> valueKeyValuePair)
+        if (value is CachedAutoTypeEntry entry)
         {
-            return $"{valueKeyValuePair.Key.Name}   {valueKeyValuePair.Key.UserName}   {valueKeyValuePair.Key.Sequence}   {valueKeyValuePair.Key.Target}";
+            return $"{entry.Field.Name}   {entry.Field.UserName}   {entry.Field.Sequence}   {entry.Field.Target}";
         }
 
         return value?.ToString()!;
@@ -56,9 +55,9 @@ public class ToAutoTypeCustomFieldConverter : IValueConverter
 public partial class MatchSelectionWindow : MetroWindow, IDisposable
 {
     // private bool _properlyDeactivated = false;
-    public KeyValuePair<AutoTypeCustomField, Cipher>? SelectedMatch { get; private set; }
+    public CachedAutoTypeEntry? SelectedMatch { get; private set; }
 
-    public MatchSelectionWindow(IEnumerable<KeyValuePair<AutoTypeCustomField, Cipher>> matches)
+    public MatchSelectionWindow(IEnumerable<CachedAutoTypeEntry> matches)
     {
         DataContext = this;
         InitializeComponent();
@@ -81,7 +80,7 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
 
     private void SelectButton_Click(object sender, RoutedEventArgs e)
     {
-        if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
+        if (MatchListBox.SelectedItem is CachedAutoTypeEntry selectedMatch)
         {
             SelectedMatch = selectedMatch;
             //_properlyDeactivated = true;
@@ -102,7 +101,7 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
     [RelayCommand]
     private void SelectedMatchDoubleClicked()
     {
-        if (MatchListBox.SelectedItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
+        if (MatchListBox.SelectedItem is CachedAutoTypeEntry selectedMatch)
         {
             SelectedMatch = selectedMatch;
             //_properlyDeactivated = true;
@@ -115,7 +114,7 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
     {
         if (key >= 1 && key <= MatchListBox.Items.Count)
         {
-            if (MatchListBox.Items[key - 1] is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
+            if (MatchListBox.Items[key - 1] is CachedAutoTypeEntry selectedMatch)
             {
                 SelectedMatch = selectedMatch;
                 //_properlyDeactivated = true;
@@ -130,10 +129,10 @@ public partial class MatchSelectionWindow : MetroWindow, IDisposable
         if (button == null) { return; }
         var matchItem = button.CommandParameter;
 
-        if (matchItem is KeyValuePair<AutoTypeCustomField, Cipher> selectedMatch)
+        if (matchItem is CachedAutoTypeEntry selectedMatch)
         {
             SelectedMatch = selectedMatch;
-            //_properlyDeactivated = true;
+            //_propertyDeactivated = true;
             DialogResult = true;
         }
     }
