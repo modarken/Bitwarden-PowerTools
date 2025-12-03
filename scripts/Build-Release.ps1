@@ -135,6 +135,7 @@ $vpkArgs = @(
     "--packDir", $PublishDir
     "--mainExe", $ExeName
     "--outputDir", $ReleasesDir
+    "--shortcuts", "StartMenuRoot,Startup"
 )
 
 # Add icon if exists

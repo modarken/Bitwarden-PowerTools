@@ -111,7 +111,8 @@ jobs:
             "--packDir", "./publish",
             "--mainExe", "${{ env.EXE_NAME }}",
             "--outputDir", "./releases",
-            "--icon", "./Bitwarden.AutoType/Bitwarden.AutoType.Desktop/Bitwarden.AutoType.ico"
+            "--icon", "./Bitwarden.AutoType/Bitwarden.AutoType.Desktop/Bitwarden.AutoType.ico",
+            "--shortcuts", "StartMenuRoot,Startup"
           )
           
           # Check if we have previous releases for delta
