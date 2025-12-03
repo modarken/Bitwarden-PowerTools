@@ -136,19 +136,13 @@ $vpkArgs = @(
     "--mainExe", $ExeName
     "--outputDir", $ReleasesDir
     "--shortcuts", "StartMenuRoot,Startup"
+    "--delta", "BestSize"
 )
 
 # Add icon if exists
 if (Test-Path $IconPath) {
     $vpkArgs += "--icon"
     $vpkArgs += $IconPath
-}
-
-# Add delta if previous releases exist and not disabled
-if (-not $NoDelta -and (Test-Path "$PrevReleasesDir\*.nupkg")) {
-    Write-Host "  Including delta from previous release" -ForegroundColor Gray
-    $vpkArgs += "--delta"
-    $vpkArgs += $PrevReleasesDir
 }
 
 & vpk @vpkArgs

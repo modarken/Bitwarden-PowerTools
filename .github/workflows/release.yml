@@ -82,26 +82,10 @@ jobs:
             -p:PublishSingleFile=false `
             -p:IncludeNativeLibrariesForSelfExtract=true
       
-      - name: Download previous release for delta
-        shell: pwsh
-        continue-on-error: true
-        run: |
-          # Try to download previous release artifacts for delta generation
-          New-Item -ItemType Directory -Force -Path ./releases-prev | Out-Null
-          try {
-            gh release download --pattern '*.nupkg' --pattern 'RELEASES' -D ./releases-prev
-            echo "Downloaded previous release for delta generation"
-          } catch {
-            echo "No previous release found - will create full package only"
-          }
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
       - name: Package with Velopack
         shell: pwsh
         run: |
           $version = "${{ steps.version.outputs.VERSION }}"
-          $deltaPath = "./releases-prev"
           
           # Build the vpk pack arguments
           $vpkArgs = @(
@@ -112,15 +96,9 @@ jobs:
             "--mainExe", "${{ env.EXE_NAME }}",
             "--outputDir", "./releases",
             "--icon", "./Bitwarden.AutoType/Bitwarden.AutoType.Desktop/Bitwarden.AutoType.ico",
-            "--shortcuts", "StartMenuRoot,Startup"
+            "--shortcuts", "StartMenuRoot,Startup",
+            "--delta", "BestSize"
           )
-          
-          # Check if we have previous releases for delta
-          if (Test-Path "$deltaPath/*.nupkg") {
-            $vpkArgs += "--delta"
-            $vpkArgs += $deltaPath
-            echo "Will generate delta package"
-          }
           
           # Package the application
           echo "Running: vpk $($vpkArgs -join ' ')"
