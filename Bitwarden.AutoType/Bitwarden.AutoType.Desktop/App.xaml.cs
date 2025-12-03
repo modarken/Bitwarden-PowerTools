@@ -51,6 +51,8 @@ public partial class App : Application
             out BitwardenClientConfiguration? clientSettings, out Action<BitwardenClientConfiguration>? saveClientSettingsToFile, true)
         .ConfigureUserLocalAppDataJsonFile(BitwardenConstants.DefaultDataFolderName, "autotype.settings.json",
             out AutoTypeSettings? autoTypeSettings, out Action<AutoTypeSettings>? autoTypeSaveSettingsToFile, true)
+        .ConfigureUserLocalAppDataJsonFile(BitwardenConstants.DefaultDataFolderName, "backup.settings.json",
+            out BackupSettings? backupSettings, out Action<BackupSettings>? saveBackupSettingsToFile, true)
         .ConfigureServices((hostContext, services) => // configuration
         {
             // verify all configuration is set or set state to not configured
@@ -58,8 +60,10 @@ public partial class App : Application
             state.SetState(clientSettings.Validate() ? AutoTypeConfigurationStates.Configured: AutoTypeConfigurationStates.NotConfigured);
             services.AddSingleton(state);
             services.AddSingleton(autoTypeSettings!);
+            services.AddSingleton(backupSettings!);
+            services.AddSingleton(saveBackupSettingsToFile!);
             RegisterRegularServices(services);
-            RegisterHostedServices(services, state, clientSettings, saveClientSettingsToFile);
+            RegisterHostedServices(services, state, clientSettings, saveClientSettingsToFile, backupSettings);
         })
 
         .Build();
@@ -73,18 +77,27 @@ public partial class App : Application
         services.AddSingleton<MainWindow>();
         services.AddSingleton<System.Windows.Forms.NotifyIcon>();
         services.AddSingleton<NotifyIconService>();
+        services.AddSingleton<BackupService>();
+        services.AddSingleton<UpdateService>();
         services.AddSingleton(this);
     }
 
     private void RegisterHostedServices(IServiceCollection services,
         StateController<AutoTypeConfigurationStates> state,
         BitwardenClientConfiguration clientSettings,
-        Action<BitwardenClientConfiguration> saveClientSettingsToFile)
+        Action<BitwardenClientConfiguration> saveClientSettingsToFile,
+        BackupSettings backupSettings)
     {
         var logger = services.BuildServiceProvider().GetService<ILogger<BitwardenService>>()!;
         var bitwardenService = new BitwardenService(logger, clientSettings, saveClientSettingsToFile, state);
         services.AddSingleton(bitwardenService);
         services.AddHostedService((sp) => bitwardenService);
+        
+        // Register backup scheduler if enabled
+        if (backupSettings.ScheduledBackupEnabled)
+        {
+            services.AddHostedService<BackupSchedulerService>();
+        }
     }
 
     private async void Application_Startup(object sender, StartupEventArgs e)
