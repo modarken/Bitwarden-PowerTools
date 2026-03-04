@@ -1,0 +1,4 @@
+# Update this path to match your local repository location
+# cd YOUR_REPO_PATH\Bitwarden.AutoType\Bitwarden.AutoType.Desktop.Setup\
+.\Sandbox.Installer.Debug.wsb
+.\Sandbox.Installer.Release.wsb

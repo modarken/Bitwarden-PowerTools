@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <Component Id="ApplicationShortcut" Guid="F501B07F-36FF-47A2-AAE2-190ABD1DBB14" Directory="ApplicationProgramsFolder">
+      <Shortcut Id="ApplicationStartMenuShortcut"
+                Name="Bitwarden AutoType"
+                Description="Bitwarden AutoType"
+                Target="[INSTALLFOLDER]Bitwarden.AutoType.Desktop.exe"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon="AutoType.ico"/>
+      <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+      <RegistryValue Root="HKCU" Key="Software\!(loc.ManufacturerName)\!(loc.ApplicationName)" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+    </Component>
+  </Fragment>
+</Wix>

@@ -1,0 +1,146 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on v1.0.0, v1.2.3, etc.
+  workflow_dispatch:  # Allow manual trigger
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.2.3)'
+        required: true
+        type: string
+
+permissions:
+  contents: write  # Required for creating releases
+
+env:
+  DOTNET_VERSION: '10.0.x'
+  PROJECT_PATH: 'Bitwarden.AutoType/Bitwarden.AutoType.Desktop/Bitwarden.AutoType.Desktop.csproj'
+  APP_ID: 'Bitwarden.AutoType'
+  EXE_NAME: 'Bitwarden.AutoType.Desktop.exe'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for release notes
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Install Velopack CLI
+        run: dotnet tool install -g vpk
+      
+      - name: Determine version
+        id: version
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $version = "${{ inputs.version }}"
+          } else {
+            $version = "${{ github.ref_name }}" -replace '^v', ''
+          }
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "Version: $version"
+      
+      - name: Update version in project
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $csproj = "${{ env.PROJECT_PATH }}"
+          $content = Get-Content $csproj -Raw
+          
+          # Update version properties
+          $content = $content -replace '<Version>.*?</Version>', "<Version>$version</Version>"
+          $content = $content -replace '<AssemblyVersion>.*?</AssemblyVersion>', "<AssemblyVersion>$version.0</AssemblyVersion>"
+          $content = $content -replace '<FileVersion>.*?</FileVersion>', "<FileVersion>$version.0</FileVersion>"
+          $content = $content -replace '<InformationalVersion>.*?</InformationalVersion>', "<InformationalVersion>$version</InformationalVersion>"
+          
+          Set-Content $csproj $content
+          echo "Updated version to $version"
+      
+      - name: Restore dependencies
+        run: dotnet restore
+      
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Publish
+        run: |
+          dotnet publish ${{ env.PROJECT_PATH }} `
+            --configuration Release `
+            --runtime win-x64 `
+            --self-contained true `
+            --output ./publish `
+            -p:PublishSingleFile=false `
+            -p:IncludeNativeLibrariesForSelfExtract=true
+      
+      - name: Package with Velopack
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          
+          # Build the vpk pack arguments
+          $vpkArgs = @(
+            "pack",
+            "--packId", "${{ env.APP_ID }}",
+            "--packVersion", $version,
+            "--packDir", "./publish",
+            "--mainExe", "${{ env.EXE_NAME }}",
+            "--outputDir", "./releases",
+            "--icon", "./Bitwarden.AutoType/Bitwarden.AutoType.Desktop/Bitwarden.AutoType.ico",
+            "--shortcuts", "StartMenuRoot,Startup",
+            "--delta", "BestSize"
+          )
+          
+          # Package the application
+          echo "Running: vpk $($vpkArgs -join ' ')"
+          & vpk @vpkArgs
+          
+          echo "Package created successfully"
+          Get-ChildItem ./releases
+      
+      - name: Create GitHub Release
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $tag = "v$version"
+          
+          # Generate release notes from commits since last tag
+          $releaseNotes = @"
+          ## Bitwarden AutoType v$version
+          
+          ### Installation
+          
+          **New Users:** Download ``${{ env.APP_ID }}-win-Setup.exe`` and run it.
+          
+          **Existing Users:** The app will auto-update, or use "Check for Updates" from the tray menu.
+          
+          ### Changes
+          
+          See commit history for details.
+          "@
+          
+          # Create the release
+          gh release create $tag `
+            ./releases/* `
+            --title "Bitwarden AutoType v$version" `
+            --notes "$releaseNotes"
+          
+          echo "Release created: $tag"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-packages
+          path: ./releases/*
+          retention-days: 30

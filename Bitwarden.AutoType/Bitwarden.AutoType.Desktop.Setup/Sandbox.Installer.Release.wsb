@@ -1,0 +1,31 @@
+<Configuration>
+  <VGpu>true</VGpu>
+  <Networking>true</Networking>
+  <AudioInput>false</AudioInput>
+  <PrinterRedirection>false</PrinterRedirection>
+  <ClipboardRedirection>true</ClipboardRedirection>
+  <VideoInput>false</VideoInput>
+  <!-- Uncomment the lines below if you want to use them -->
+  <!-- <MemoryInMB>4096</MemoryInMB> -->
+  <!-- <Language>en-US</Language> -->
+  <mappedfolders>
+    <!-- Update these paths to match your local repository location -->
+    <!-- <mappedfolder>
+      <hostfolder>YOUR_REPO_PATH\Bitwarden.AutoType\Bitwarden.AutoType.Desktop.Setup\bin\x64\Release\en-US</hostfolder>
+      <readonly>true</readonly>
+    </mappedfolder>
+    <mappedfolder>
+      <hostfolder>YOUR_REPO_PATH\Bitwarden.AutoType\Bitwarden.AutoType.Desktop.Setup</hostfolder>
+      <SandboxFolder>C:\Users\WDAGUtilityAccount\Bitwarden.AutoType.Desktop.Setup</SandboxFolder>
+      <readonly>true</readonly>
+    </mappedfolder>
+    <mappedfolder>
+      <hostfolder>C:\Users\YOUR_USERNAME\Downloads</hostfolder>
+      <SandboxFolder>C:\Users\WDAGUtilityAccount\Downloads</SandboxFolder>
+      <readonly>true</readonly>
+    </mappedfolder> -->
+  </mappedfolders>
+  <LogonCommand>
+    <Command>C:\Users\WDAGUtilityAccount\Bitwarden.AutoType.Desktop.Setup\Sandbox.Installer.cmd</Command>
+  </LogonCommand>
+</Configuration>

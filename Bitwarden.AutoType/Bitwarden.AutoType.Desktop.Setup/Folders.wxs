@@ -1,0 +1,16 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Name="!(bind.Property.Manufacturer)">
+        <Directory Id="INSTALLFOLDER" Name="!(bind.Property.ProductName)" />
+      </Directory>
+    </StandardDirectory>
+  </Fragment>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="Bitwarden AutoType" />
+    </StandardDirectory>
+  </Fragment>
+
+</Wix>

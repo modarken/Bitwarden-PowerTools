@@ -1,0 +1,73 @@
+﻿<mah:MetroWindow x:Class="Bitwarden.AutoType.Desktop.Views.MatchSelectionWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:local="clr-namespace:Bitwarden.AutoType.Desktop.Views"
+                 xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                 xmlns:netstandard="clr-namespace:System;assembly=netstandard"
+                 mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"  ResizeMode="NoResize"
+        ShowInTaskbar="False" Topmost="True" WindowStyle="ToolWindow"
+        Title="Select Match" Height="300" Width="750">
+    <Window.Resources>
+        <local:ItemIndexConverter x:Key="ItemIndexConverter" />
+        <local:ToAutoTypeCustomFieldConverter x:Key="ToAutoTypeCustomFieldConverter" />
+        <x:Array Type="netstandard:Int32" x:Key="IntKeyList">
+            <netstandard:Int32>1</netstandard:Int32>
+            <netstandard:Int32>2</netstandard:Int32>
+            <netstandard:Int32>3</netstandard:Int32>
+            <netstandard:Int32>4</netstandard:Int32>
+            <netstandard:Int32>5</netstandard:Int32>
+            <netstandard:Int32>6</netstandard:Int32>
+            <netstandard:Int32>7</netstandard:Int32>
+            <netstandard:Int32>8</netstandard:Int32>
+            <netstandard:Int32>9</netstandard:Int32>
+        </x:Array>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="D1" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[0]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        <KeyBinding Key="D2" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[1]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        <KeyBinding Key="D3" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[2]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        <KeyBinding Key="D4" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[3]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        <KeyBinding Key="D5" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[4]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        <KeyBinding Key="D6" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[5]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        <KeyBinding Key="D7" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[6]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        <KeyBinding Key="D8" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[7]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+        <KeyBinding Key="D9" CommandParameter="{Binding Source={StaticResource IntKeyList}, Path=[8]}" Command="{Binding NumberClickedCommand}" CommandTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" />
+    </Window.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListBox x:Name="MatchListBox" Grid.Row="0" Margin="10">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="0 4 0 4">
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Converter={StaticResource ItemIndexConverter}}"
+                                   Margin="0,0,5,0"
+                                   ToolTip="Press keyboard number to execute match selection."/>
+                        <Button Content="Select Match"
+                                Margin="5,0,5,0"
+                                Click="ExecuteButton_Click"
+                                CommandParameter="{Binding}" />
+                        <TextBlock VerticalAlignment="Center"
+                            Text="{Binding Path=., Mode=OneWay, Converter={StaticResource ToAutoTypeCustomFieldConverter}}">
+                            <TextBlock.InputBindings>
+                                <MouseBinding MouseAction="LeftDoubleClick"
+                                              Command="{Binding Path=SelectedMatchDoubleClickedCommand, RelativeSource={RelativeSource AncestorType={x:Type local:MatchSelectionWindow}}}" />
+                            </TextBlock.InputBindings>
+                        </TextBlock>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <Button x:Name="SelectButton" Content="Select" Margin="0,0,10,0" Width="75" Click="SelectButton_Click" />
+            <Button x:Name="CancelButton" Content="Cancel" Width="75" Click="CancelButton_Click" />
+        </StackPanel>
+    </Grid>
+</mah:MetroWindow>
