@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Bitwarden.AutoType.Desktop.Helpers;
 using Bitwarden.AutoType.Desktop.Models;
@@ -64,6 +65,23 @@ public partial class SettingsControlViewModel
     private void ConfigureMode(BitwardenClientConfiguration bitwardenClientConfiguration)
     {
         AccessMethod = string.IsNullOrEmpty(bitwardenClientConfiguration.refresh_token) ? 0 : 1;
+    }
+
+    [RelayCommand]
+    public void OpenStartupAppsSettings()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "ms-settings:startupapps",
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Unable to open Windows Startup Apps settings.");
+        }
     }
 
     [RelayCommand]
