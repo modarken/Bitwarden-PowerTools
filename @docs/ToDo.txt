@@ -12,11 +12,6 @@ Enhancements & Features
     - Things that need to change:
         - Match Selection Window
         - TargetFinderSequenceComposer
-- Enhancement: Make the icon appear different color according to different states.
-    - e.g. green for on, red for off, yellow for error, etc.
-- Enhancement: Expand tray status beyond the current quick actions and status rows.
-    - Current tray shows enabled/disabled state, last sync, last backup, and last issue.
-    - Future work can add richer warning/error visuals and more update-state detail.
 - Secondary Power Tool in charge of backups - export feature?
     - keepass button
 
@@ -41,6 +36,13 @@ OPTIONAL
 ==========================
 DONE
 ==========================
+- Improved tray visual states and failure handling.
+    -> Tray icon and status text now reflect enabled, disabled, setup-required, and error states
+    -> Failure messages are classified into clearer user-facing summaries for sync, backup, update, and recovery flows
+    -> Tray state now refreshes when configuration state changes
+- Clarified backup recovery workflow boundaries.
+    -> "Restore" wording was changed to manual recovery preparation
+    -> Backup file pickers now open in the configured backup folder instead of the default LocalAppData folder
 - Split saved settings from authorization state.
     -> Save account settings separately from authorization
     -> Master password is now one-time authorization input, not a saved setting

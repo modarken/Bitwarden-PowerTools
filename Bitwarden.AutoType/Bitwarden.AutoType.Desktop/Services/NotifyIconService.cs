@@ -485,7 +485,7 @@ public class NotifyIconService : IDisposable
             {
                 Title = "Select Backup File",
                 Filter = "Bitwarden Backup (*.bwbackup)|*.bwbackup|All files (*.*)|*.*",
-                InitialDirectory = _backupService.GetBackupFolder()
+                InitialDirectory = _backupService.GetConfiguredBackupFolder()
             };
 
             if (openFileDialog.ShowDialog() != true)
@@ -556,7 +556,7 @@ public class NotifyIconService : IDisposable
             {
                 Title = "Select Backup File",
                 Filter = "Bitwarden Backup (*.bwbackup)|*.bwbackup|All files (*.*)|*.*",
-                InitialDirectory = _backupService.GetBackupFolder()
+                InitialDirectory = _backupService.GetConfiguredBackupFolder()
             };
 
             if (openFileDialog.ShowDialog() != true)
@@ -732,7 +732,7 @@ public class NotifyIconService : IDisposable
             {
                 Title = "Select Backup File to Decrypt",
                 Filter = "Bitwarden Backup (*.bwbackup)|*.bwbackup|All files (*.*)|*.*",
-                InitialDirectory = _backupService.GetBackupFolder()
+                InitialDirectory = _backupService.GetConfiguredBackupFolder()
             };
 
             if (openFileDialog.ShowDialog() != true)
