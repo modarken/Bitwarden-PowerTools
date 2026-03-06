@@ -1,4 +1,6 @@
 using System;
+using System.Text.Json.Serialization;
+using Bitwarden.Utilities;
 
 namespace Bitwarden.AutoType.Desktop.Services;
 
@@ -31,6 +33,7 @@ public class BackupSettings
     /// Password for scheduled backups. If null, scheduled backups won't run.
     /// This is stored encrypted using DPAPI.
     /// </summary>
+    [JsonConverter(typeof(ProtectedDataConverter))]
     public string? ScheduledBackupPassword { get; set; }
 
     /// <summary>

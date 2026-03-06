@@ -19,19 +19,61 @@ public static class BitwardenClientConfigurationExtensions
     {
         if (source is null) { return false; }
 
-        if (source.base_address.IsNullOrEmpty() ||
-                source.email.IsNullOrEmpty() ||
-                source.encryption_key.IsNullOrEmpty() ||
-                source.device_name.IsNullOrEmpty() ||
-                source.device_identifier.IsNullOrEmpty() ||
-                (source.refresh_token.IsNullOrEmpty() &&
-                source.client_id.IsNullOrEmpty() &&
-                source.client_secret.IsNullOrEmpty()))
+        return source.HasSavedSettings()
+            && !source.authorization_invalidated
+            && !source.encryption_key.IsNullOrEmpty()
+            && !source.device_name.IsNullOrEmpty()
+            && !source.device_identifier.IsNullOrEmpty()
+            && source.HasStoredAuthorizationMaterial();
+    }
+
+    public static bool HasSavedSettings(this BitwardenClientConfiguration source)
+    {
+        if (source is null)
         {
             return false;
         }
 
-        return true;
+        return !source.base_address.IsNullOrEmpty()
+            && !source.email.IsNullOrEmpty();
+    }
+
+    public static bool HasStoredAuthorizationMaterial(this BitwardenClientConfiguration source)
+    {
+        if (source is null)
+        {
+            return false;
+        }
+
+        return !source.refresh_token.IsNullOrEmpty()
+            || (!source.client_id.IsNullOrEmpty() && !source.client_secret.IsNullOrEmpty());
+    }
+
+    public static bool HasStoredKdfMetadata(this BitwardenClientConfiguration source)
+    {
+        if (source is null)
+        {
+            return false;
+        }
+
+        return source.last_known_kdf.HasValue
+            && source.last_known_kdf_iterations.HasValue
+            && source.last_known_kdf_iterations.Value > 0;
+    }
+
+    public static bool HasUsableAuthorization(this BitwardenClientConfiguration source)
+    {
+        if (source is null)
+        {
+            return false;
+        }
+
+        return source.HasSavedSettings()
+            && !source.authorization_invalidated
+            && !source.encryption_key.IsNullOrEmpty()
+            && !source.device_name.IsNullOrEmpty()
+            && !source.device_identifier.IsNullOrEmpty()
+            && source.HasStoredAuthorizationMaterial();
     }
 }
 
@@ -95,6 +137,41 @@ public class BitwardenClientConfiguration : IBitwardenClientConfiguration
     /// The refresh token.
     /// </value>
     [JsonConverter(typeof(ProtectedDataConverter))] public string? refresh_token { get; set; }
+
+    /// <summary>
+    /// Gets or sets the authorization method used for the current stored authorization.
+    /// </summary>
+    public string? authorization_method { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the stored authorization has been invalidated.
+    /// </summary>
+    public bool authorization_invalidated { get; set; }
+
+    /// <summary>
+    /// Gets or sets a human-readable reason for the current authorization invalidation.
+    /// </summary>
+    public string? authorization_invalidated_reason { get; set; }
+
+    /// <summary>
+    /// Gets or sets the last known KDF type observed during successful authorization.
+    /// </summary>
+    public int? last_known_kdf { get; set; }
+
+    /// <summary>
+    /// Gets or sets the last known KDF iteration count observed during successful authorization.
+    /// </summary>
+    public int? last_known_kdf_iterations { get; set; }
+
+    /// <summary>
+    /// Gets or sets the last known KDF memory setting observed during successful authorization.
+    /// </summary>
+    public int? last_known_kdf_memory { get; set; }
+
+    /// <summary>
+    /// Gets or sets the last known KDF parallelism observed during successful authorization.
+    /// </summary>
+    public int? last_known_kdf_parallelism { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the device. Optional value to send to server.
