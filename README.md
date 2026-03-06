@@ -15,7 +15,7 @@ A powerful desktop application that brings KeePass-style auto-type functionality
 - 🛡️ **Smart Elevation**: Runs without admin by default, auto-detects when elevation is needed (RDP, UAC)
 - 💾 **Encrypted Backups**: Scheduled vault backups with AES-256-GCM encryption
 - 🔄 **Auto-Updates**: Automatic update checks and seamless installation
-- 📌 **System Tray**: Runs in background with customizable hotkey trigger
+- 📌 **System Tray**: Runs in background with quick actions, live status, and a customizable hotkey trigger
 
 ---
 
@@ -65,7 +65,14 @@ The application will start automatically after installation and appear in your s
 
 #### 1. Open Settings
 
-Right-click the system tray icon and select **Settings**.
+Right-click the system tray icon and select **Open Settings**.
+
+The tray menu also gives you direct access to:
+
+- **Enable Auto-Type** / **Disable Auto-Type**
+- **Sync Now**
+- **Backup** actions and backup status
+- **Last sync**, **last backup**, and **last issue** status lines
 
 ![Settings Menu](.github/images/tray-menu.png)
 <!-- TODO: Add screenshot of tray menu -->
@@ -206,6 +213,15 @@ Build custom sequences using these placeholders:
 ### Window Targeting
 
 Match windows using three different methods:
+
+### System Tray Status
+
+The tray icon is the app's control surface while it is running in the background.
+
+- Left-click the tray icon to show or hide the main window.
+- Right-click the tray icon to see the current Auto-Type status.
+- Use **Sync Now** to refresh vault data without opening the main window.
+- Use the tray status lines to check the last successful sync, last backup, and the last tray-reported issue.
 
 #### 1. Title (Recommended)
 
