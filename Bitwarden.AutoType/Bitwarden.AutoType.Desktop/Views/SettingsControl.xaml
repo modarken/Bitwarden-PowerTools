@@ -21,6 +21,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -68,7 +69,19 @@
                      helpers:PasswordBoxBindingBehavior.PasswordBinding="{Binding BitwardenClientConfiguration.client_secret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      Style="{StaticResource MahApps.Styles.PasswordBox}"/>
 
-        <Button Grid.Row="8" Grid.Column="2" Margin="0 0 0 5" x:Name="SaveButton" Style="{DynamicResource MahApps.Styles.Button.Square}" Content="Save"
+        <StackPanel Grid.Row="8" Grid.Column="2" Margin="0 4 0 5">
+            <Button Content="Open Windows Startup Apps"
+                    Command="{Binding OpenStartupAppsSettingsCommand}"
+                    HorizontalAlignment="Left"
+                    Style="{DynamicResource MahApps.Styles.Button}" />
+            <TextBlock Text="Use Windows Settings to enable or disable startup for Bitwarden AutoType."
+                       Foreground="Gray"
+                       TextWrapping="Wrap"
+                       FontSize="11"
+                       Margin="0,4,0,0" />
+        </StackPanel>
+
+        <Button Grid.Row="9" Grid.Column="2" Margin="0 0 0 5" x:Name="SaveButton" Style="{DynamicResource MahApps.Styles.Button.Square}" Content="Save"
             Command="{Binding SaveConfigCommand}"></Button>
     </Grid>
 </UserControl>

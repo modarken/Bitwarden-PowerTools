@@ -34,9 +34,10 @@ public class BitwardenKeystrokeSequence : SpecialKeystrokeSequence
     {
         var keyword = sequence[1..^1].ToLower();
 
-        if (keyword.StartsWith("FIELD:", StringComparison.InvariantCultureIgnoreCase))
+        if (keyword.StartsWith("FIELD:", StringComparison.InvariantCultureIgnoreCase)
+            || keyword.StartsWith("CUSTOM:", StringComparison.InvariantCultureIgnoreCase))
         {
-            var fieldName = keyword[6..];
+            var fieldName = keyword[(keyword.IndexOf(':') + 1)..];
 
             var field = _cipher
                 .Fields?

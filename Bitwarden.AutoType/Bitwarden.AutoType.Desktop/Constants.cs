@@ -11,11 +11,13 @@ internal static class Constants
         2. Review the detected Title, Process Name, and Class Name values.
         3. Use the target buttons to copy exact match regex values into the Include fields, then modify them if needed.
         4. Add Exclude fields only when you want to prevent a rule from matching a known title, process, or class.
-        5. Observe the "Keyboard" textbox to see the keyboard sequence that will be sent to the window, modify as needed.
-        6. When satisfied with the Include, Exclude, and Keyboard values, open Bitwarden.
-        7. Select an entry in Bitwarden to add the field to.
-        8. Add a Custom Field with the name of "AutoType:Custom", which is the "Custom Name" field in AutoType.
-        9. For the Custom Field value, copy and paste the "Custom Value" field from AutoType.
+        5. Observe the validation status below each field and fix any highlighted issues.
+        6. Use the test button to check the rule against the detected Title, Process Name, and Class Name.
+        7. Observe the "Keyboard" textbox to see the keyboard sequence that will be sent to the window, modify as needed.
+        8. When satisfied with the Include, Exclude, and Keyboard values, open Bitwarden.
+        9. Select an entry in Bitwarden to add the field to.
+        10. Add a Custom Field with the name of "AutoType:Custom", which is the "Custom Name" field in AutoType.
+        11. For the Custom Field value, copy and paste the "Custom Value" field from AutoType.
         """;
     internal const string DefaultSequenceHelpText =
         """
@@ -25,7 +27,8 @@ internal static class Constants
         {URL} - URL of the login item
         {NOTES} - Notes of the login item
         {TOTP} - Time-based one-time password of the login item
-        {CUSTOM:FieldName} - Custom field value of the login item, example {CUSTOM:pin}
+        {FIELD:FieldName} - Custom field value of the login item, example {FIELD:pin}
+        {CUSTOM:FieldName} - Alias for FIELD, example {CUSTOM:pin}
 
         {LEFTCURLYBRACE} - Left curly brace key
         {RIGHTCURLYBRACE} - Right curly brace key
