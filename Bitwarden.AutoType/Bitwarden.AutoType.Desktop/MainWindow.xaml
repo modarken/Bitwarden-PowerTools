@@ -16,7 +16,7 @@
                   ShowInTaskbar="False"
                   ShowMaxRestoreButton="False"
                   IgnoreTaskbarOnMaximize="True"
-                  Title="Bitwarden AutoType" Height="480" Width="390">
+                  Title="Bitwarden AutoType" Height="624" Width="390">
     <mah:MetroWindow.Resources>
         <DataTemplate x:Key="CipherTemplate">
             <Grid>

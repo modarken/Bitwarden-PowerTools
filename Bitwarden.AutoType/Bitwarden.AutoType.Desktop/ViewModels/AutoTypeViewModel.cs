@@ -42,13 +42,32 @@ public class AutoTypeCustomField
 
     public string? Target { get; set; }
     public TargetTypes? Type { get; set; }
+    public string? Title { get; set; }
+    public string? Process { get; set; }
+    public string? Class { get; set; }
+    public string? ExcludeTitle { get; set; }
+    public string? ExcludeProcess { get; set; }
+    public string? ExcludeClass { get; set; }
     public string? Sequence { get; set; }
 }
 
 /// <summary>
-/// Holds an AutoTypeCustomField with its pre-compiled Regex for efficient matching.
+/// Holds compiled target matchers for a rule.
 /// </summary>
-public record CachedAutoTypeEntry(AutoTypeCustomField Field, Regex CompiledRegex, Cipher Cipher);
+public record CompiledTargetMatcher(
+    Regex? Title,
+    Regex? Process,
+    Regex? Class,
+    Regex? ExcludeTitle,
+    Regex? ExcludeProcess,
+    Regex? ExcludeClass,
+    Regex? LegacyTarget,
+    TargetTypes? LegacyType);
+
+/// <summary>
+/// Holds an AutoTypeCustomField with its pre-compiled matchers for efficient matching.
+/// </summary>
+public record CachedAutoTypeEntry(AutoTypeCustomField Field, CompiledTargetMatcher Matcher, Cipher Cipher);
 
 [INotifyPropertyChanged]
 public partial class AutoTypeViewModel : IDisposable
@@ -246,42 +265,56 @@ public partial class AutoTypeViewModel : IDisposable
 
                         if (name is not null && name.Equals(Constants.BitwardenCustomFieldName, StringComparison.OrdinalIgnoreCase))
                         {
-                            var value = BitwardenCrypto.DecryptEntry(field.Value!, decryptionKey!, true);
-
-                            if (value is not null
-                                && JsonSerializer.Deserialize<AutoTypeCustomField>(value, serializerOptions)
-                                is AutoTypeCustomField autoTypeCustomField)
+                            try
                             {
-                                string? cipherName = null;
-                                if (cipher?.Name is string)
+                                var value = BitwardenCrypto.DecryptEntry(field.Value!, decryptionKey!, true);
+
+                                if (value is not null
+                                    && JsonSerializer.Deserialize<AutoTypeCustomField>(value, serializerOptions)
+                                    is AutoTypeCustomField autoTypeCustomField)
                                 {
-                                    cipherName = BitwardenCrypto.DecryptEntry(cipher!.Name, decryptionKey!, true);
-                                }
-
-                                string? userName = null;
-                                if (cipher?.Login?.Username is not null)
-                                {
-                                    userName = BitwardenCrypto.DecryptEntry(cipher.Login!.Username!, decryptionKey!, true);
-                                }
-
-                                autoTypeCustomField.Name = cipherName;
-                                autoTypeCustomField.UserName = userName;
-                                var compiledRegex = new Regex(autoTypeCustomField.Target!, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-                                expressions.Add(new CachedAutoTypeEntry(autoTypeCustomField, compiledRegex, cipher!));
-
-                                if (cipherName is not null)
-                                {
-                                    var id = cipher!.Id;
-
-                                    if (!ciphers.Any(c => c.Id == id))
+                                    string? cipherName = null;
+                                    if (cipher.Name is string)
                                     {
-                                        ciphers.Add(new CipherDisplay { Id = id, Name = cipherName, User = userName });
+                                        cipherName = BitwardenCrypto.DecryptEntry(cipher.Name, decryptionKey!, true);
+                                    }
+
+                                    string? userName = null;
+                                    if (cipher.Login?.Username is not null)
+                                    {
+                                        userName = BitwardenCrypto.DecryptEntry(cipher.Login.Username, decryptionKey!, true);
+                                    }
+
+                                    autoTypeCustomField.Name = cipherName;
+                                    autoTypeCustomField.UserName = userName;
+
+                                    if (!AutoTypeRuleMatcher.TryCreateMatcher(autoTypeCustomField, out var matcher, out var error))
+                                    {
+                                        throw new InvalidOperationException(error ?? "Unable to build matcher.");
+                                    }
+
+                                    expressions.Add(new CachedAutoTypeEntry(autoTypeCustomField, matcher!, cipher));
+
+                                    if (cipherName is not null)
+                                    {
+                                        var id = cipher.Id;
+
+                                        if (!ciphers.Any(c => c.Id == id))
+                                        {
+                                            ciphers.Add(new CipherDisplay { Id = id, Name = cipherName, User = userName });
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    throw new Exception("Unable to Deserialize field.Value");
+                                }
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                throw new Exception("Unable to Deserialize field.Value");
+                                _logger.LogWarning(ex,
+                                    "Skipping invalid AutoType rule for cipher '{CipherId}'",
+                                    cipher.Id ?? "unknown");
                             }
                         }
                     }
@@ -340,11 +373,7 @@ public partial class AutoTypeViewModel : IDisposable
             ShowElevationWarning = false;
 
             var matchedRegex = _regexLookup!
-                .Where(r =>
-                    (r.Field.Type == TargetTypes.Title && r.CompiledRegex.IsMatch(windowTitle))
-                    || (r.Field.Type == TargetTypes.Process && r.CompiledRegex.IsMatch(processName))
-                    || (r.Field.Type == TargetTypes.Class && r.CompiledRegex.IsMatch(windowClassName))
-                    || (r.Field.Type is null && r.CompiledRegex.IsMatch(windowTitle))) // default to title if no type specified
+                .Where(r => AutoTypeRuleMatcher.IsMatch(r, windowTitle, processName, windowClassName))
                 .ToList(); // Materialize once to avoid multiple enumerations
 
             if (matchedRegex.Count == 1)

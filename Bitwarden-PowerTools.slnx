@@ -19,6 +19,7 @@
       <Platform Solution="*|Any CPU" Project="x64" />
     </Project>
     <Project Path="Bitwarden.AutoType/Bitwarden.AutoType.Desktop/Bitwarden.AutoType.Desktop.csproj" />
+    <Project Path="Bitwarden.AutoType/Bitwarden.AutoType.Desktop.Tests/Bitwarden.AutoType.Desktop.Tests.csproj" />
   </Folder>
   <Folder Name="/Libraries/">
     <Project Path="Libraries/Bitwarden.Core/Bitwarden.Core.csproj" />
