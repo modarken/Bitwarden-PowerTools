@@ -329,6 +329,9 @@ Configure automatic encrypted backups of your Bitwarden vault:
 
 The scheduled backup password is stored locally using Windows DPAPI protection.
 
+Backups can be verified or decrypted for manual recovery.
+This app does not perform an in-place vault restore from backup files.
+
 ![Backup Settings](.github/images/settings-backup.png)
 <!-- TODO: Add screenshot of backup settings -->
 
@@ -531,7 +534,7 @@ The core auto-type functionality will **always remain free and open source** und
 
 Need help or want to discuss the project?
 
-- 📖 **Documentation**: You're reading it! Check [@docs/](@docs/) for technical details
+- 📖 **Documentation**: You're reading it! Check [@docs/README.md](@docs/README.md) for maintainer and technical docs
 - 🐛 **Bug Reports**: [Open an issue](https://github.com/modarken/Bitwarden-PowerTools/issues)
 - 💡 **Feature Requests**: [Start a discussion](https://github.com/modarken/Bitwarden-PowerTools/discussions)
 - 💬 **Questions**: Check [existing discussions](https://github.com/modarken/Bitwarden-PowerTools/discussions)
