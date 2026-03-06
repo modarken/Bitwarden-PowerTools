@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             xmlns:helpers="clr-namespace:Bitwarden.AutoType.Desktop.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
@@ -20,102 +19,181 @@
         <Style x:Key="CopyButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
             <Setter Property="Margin" Value="3,3,0,0" />
         </Style>
-        <ObjectDataProvider x:Key="TargetTypesEnum" MethodName="GetTargetTypesValues" ObjectType="{x:Type helpers:EnumHelper}" />
     </UserControl.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="12" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="12" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" Content="Target Finder:" Style="{StaticResource LabelStyle}" />
-        <Border Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="FindWindowIconBorder"
-                HorizontalAlignment="Stretch" Margin="20 0 0 5"
-                MouseLeftButtonDown="FindWindowIcon_MouseLeftButtonDown">
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="12" />
+            </Grid.RowDefinitions>
+
+            <Label Grid.Row="0" Grid.Column="0" Content="Target Finder:" Style="{StaticResource LabelStyle}" />
+            <Border Grid.Row="0" Grid.Column="1" Background="Transparent" x:Name="FindWindowIconBorder"
+                    HorizontalAlignment="Stretch" Margin="20 0 0 5"
+                    MouseLeftButtonDown="FindWindowIcon_MouseLeftButtonDown">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <iconPacks:PackIconMaterial Grid.Column="0" Kind="Magnify" x:Name="FindWindowIcon" Width="32" Height="32" />
+                    <TextBlock Grid.Column="1" Text="Drag to find window" VerticalAlignment="Center" Margin="5,0,0,0" />
+                    <Button Grid.Column="2" x:Name="QuestionButton" Click="QuestionButton_Click" Style="{StaticResource QuestionButtonStyle}">
+                        <iconPacks:PackIconMaterial Kind="HelpCircle" />
+                    </Button>
+                </Grid>
+            </Border>
+
+            <Label Grid.Row="1" Grid.Column="0" Content="Process Title:" Style="{StaticResource LabelStyle}" />
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="ProcessTitleTextBox" IsReadOnly="True" Style="{StaticResource TextBoxStyle}" />
+
+            <Label Grid.Row="2" Grid.Column="0" Content="Process Name:" Style="{StaticResource LabelStyle}" />
+            <TextBox Grid.Row="2" Grid.Column="1" x:Name="ProcessNameTextBox" IsReadOnly="True" Style="{StaticResource TextBoxStyle}" />
+
+            <Label Grid.Row="3" Grid.Column="0" Content="Process Class:" Style="{StaticResource LabelStyle}" />
+            <TextBox Grid.Row="3" Grid.Column="1" x:Name="ProcessClassNameTextBox" IsReadOnly="True" Style="{StaticResource TextBoxStyle}" />
+
+            <Separator Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1"
+                      VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      CanContentScroll="True">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="12" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Grid.Column="0" Content="Include Title:" Style="{StaticResource LabelStyle}" />
+                <Grid Grid.Row="0" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="IncludeTitleRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                    <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Title" ToolTip="Use exact detected title" Style="{StaticResource QuestionButtonStyle}">
+                        <iconPacks:PackIconMaterial Kind="Target" />
+                    </Button>
+                </Grid>
+
+                <Label Grid.Row="1" Grid.Column="0" Content="Include Process:" Style="{StaticResource LabelStyle}" />
+                <Grid Grid.Row="1" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="IncludeProcessRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                    <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Process" ToolTip="Use exact detected process" Style="{StaticResource QuestionButtonStyle}">
+                        <iconPacks:PackIconMaterial Kind="Target" />
+                    </Button>
+                </Grid>
+
+                <Label Grid.Row="2" Grid.Column="0" Content="Include Class:" Style="{StaticResource LabelStyle}" />
+                <Grid Grid.Row="2" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="IncludeClassRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                    <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Class" ToolTip="Use exact detected class" Style="{StaticResource QuestionButtonStyle}">
+                        <iconPacks:PackIconMaterial Kind="Target" />
+                    </Button>
+                </Grid>
+
+                <Label Grid.Row="3" Grid.Column="0" Content="Exclude Title:" Style="{StaticResource LabelStyle}" />
+                <TextBox Grid.Row="3" Grid.Column="1" x:Name="ExcludeTitleRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+
+                <Label Grid.Row="4" Grid.Column="0" Content="Exclude Process:" Style="{StaticResource LabelStyle}" />
+                <TextBox Grid.Row="4" Grid.Column="1" x:Name="ExcludeProcessRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+
+                <Label Grid.Row="5" Grid.Column="0" Content="Exclude Class:" Style="{StaticResource LabelStyle}" />
+                <TextBox Grid.Row="5" Grid.Column="1" x:Name="ExcludeClassRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+
+                <Separator Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
+
+                <Label Grid.Row="7" Grid.Column="0" Content="Keyboard:" Style="{StaticResource LabelStyle}" />
+                <Grid Grid.Row="7" Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="EditableTextBoxSequence" Margin="0 3 0 0" TextChanged="ComposerInput_TextChanged" VerticalContentAlignment="Center" Style="{StaticResource TextBoxStyle}" />
+                    <Button x:Name="ShowSequenceButton" Grid.Column="1" Click="ShowSequenceButton_Click"  Style="{StaticResource QuestionButtonStyle}">
+                        <iconPacks:PackIconMaterial Kind="BeakerQuestion" />
+                    </Button>
+                </Grid>
+            </Grid>
+        </ScrollViewer>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="12" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
+
+            <Label Grid.Row="1" Grid.Column="0" Content="Custom Name:" Style="{StaticResource LabelStyle}" />
+            <Grid Grid.Row="1" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <iconPacks:PackIconMaterial Grid.Column="0" Kind="Magnify" x:Name="FindWindowIcon" Width="32" Height="32" />
-                <TextBlock Grid.Column="1" Text="Drag to find window" VerticalAlignment="Center" Margin="5,0,0,0" />
-                <Button Grid.Column="2" x:Name="QuestionButton" Click="QuestionButton_Click" Style="{StaticResource QuestionButtonStyle}">
-                    <iconPacks:PackIconMaterial Kind="HelpCircle" />
+                <TextBox x:Name="EditableTextBoxCustomFieldName" Grid.Column="0" Margin="0 3 0 0" IsReadOnly="True" Text="AutoType:Custom" />
+                <Button x:Name="CopyButton1" Grid.Column="1" Click="CopyButton_Click" Tag="{Binding ElementName=EditableTextBoxCustomFieldName}" Style="{StaticResource CopyButtonStyle}">
+                    <iconPacks:PackIconMaterial Kind="ContentCopy" />
                 </Button>
             </Grid>
-        </Border>
 
-
-        <Label Grid.Row="1" Grid.Column="0" Content="Process Title:" Style="{StaticResource LabelStyle}" />
-        <TextBox Grid.Row="1" Grid.Column="1" x:Name="ProcessTitleTextBox" IsReadOnly="True" Style="{StaticResource TextBoxStyle}" />
-
-        <Label Grid.Row="2" Grid.Column="0" Content="Process Name:" Style="{StaticResource LabelStyle}" />
-        <TextBox Grid.Row="2" Grid.Column="1" x:Name="ProcessNameTextBox" IsReadOnly="True" Style="{StaticResource TextBoxStyle}" />
-
-        <Label Grid.Row="3" Grid.Column="0" Content="Process Class:" Style="{StaticResource LabelStyle}" />
-        <TextBox Grid.Row="3" Grid.Column="1" x:Name="ProcessClassNameTextBox" IsReadOnly="True" Style="{StaticResource TextBoxStyle}" />
-
-        <Separator Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
-
-        <Label Grid.Row="5" Grid.Column="0" Content="Type:" Style="{StaticResource LabelStyle}" />
-        <ComboBox Grid.Row="5" Grid.Column="1" x:Name="EditableComboBoxTargetType" Margin="0 0 0 0"
-                  ItemsSource="{Binding Source={StaticResource TargetTypesEnum}}" SelectedIndex="0"
-                  SelectionChanged="EditableComboBoxTargetType_SelectionChanged" />
-
-        <Label Grid.Row="6" Grid.Column="0" Content="Target Regex:" Style="{StaticResource LabelStyle}" />
-        <TextBox Grid.Row="6" Grid.Column="1" x:Name="EditableTextBoxTargetRegex" TextChanged="EditableTextBoxTargetRegex_TextChanged" Style="{StaticResource TextBoxStyle}" />
-
-        <Label Grid.Row="7" Grid.Column="0" Content="Keyboard:" Style="{StaticResource LabelStyle}" />
-        <Grid Grid.Row="7" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBox Grid.Column="0" x:Name="EditableTextBoxSequence" Margin="0 3 0 0" TextChanged="EditableTextBoxSequence_TextChanged" VerticalContentAlignment="Center" Style="{StaticResource TextBoxStyle}" />
-            <Button x:Name="ShowSequenceButton" Grid.Column="1" Click="ShowSequenceButton_Click"  Style="{StaticResource QuestionButtonStyle}">
-                <iconPacks:PackIconMaterial Kind="BeakerQuestion" />
-            </Button>
-        </Grid>
-
-        <Separator Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
-
-        <Label Grid.Row="9" Grid.Column="0" Content="Custom Name:" Style="{StaticResource LabelStyle}" />
-        <Grid Grid.Row="9" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBox x:Name="EditableTextBoxCustomFieldName" Grid.Column="0" Margin="0 3 0 0" IsReadOnly="True" Text="AutoType:Custom" />
-            <Button x:Name="CopyButton1" Grid.Column="1" Click="CopyButton_Click" Tag="{Binding ElementName=EditableTextBoxCustomFieldName}" Style="{StaticResource CopyButtonStyle}">
-                <iconPacks:PackIconMaterial Kind="ContentCopy" />
-            </Button>
-        </Grid>
-
-        <Label Grid.Row="10" Grid.Column="0" Content="Custom Value:" Style="{StaticResource LabelStyle}" />
-        <Grid Grid.Row="10" Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <TextBox x:Name="EditableTextBoxCustomFieldValue" Grid.Column="0" Margin="0 3 0 0" IsReadOnly="True" />
-            <Button x:Name="CopyButton4" Grid.Column="1" Click="CopyButton_Click" Tag="{Binding ElementName=EditableTextBoxCustomFieldValue}" Style="{StaticResource CopyButtonStyle}">
-                <iconPacks:PackIconMaterial Kind="ContentCopy" />
-            </Button>
+            <Label Grid.Row="2" Grid.Column="0" Content="Custom Value:" Style="{StaticResource LabelStyle}" />
+            <Grid Grid.Row="2" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="EditableTextBoxCustomFieldValue"
+                         Grid.Column="0"
+                         Margin="0 3 0 0"
+                         IsReadOnly="True"
+                         MinHeight="72"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto" />
+                <Button x:Name="CopyButton4" Grid.Column="1" Click="CopyButton_Click" Tag="{Binding ElementName=EditableTextBoxCustomFieldValue}" Style="{StaticResource CopyButtonStyle}">
+                    <iconPacks:PackIconMaterial Kind="ContentCopy" />
+                </Button>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -57,45 +59,8 @@ namespace Bitwarden.AutoType.Desktop.Views
         {
             InitializeComponent();
             EditableTextBoxSequence.Text = Constants.BitwardenDefaultSequence;
+            UpdateCustomField();
         }
-
-        #region EditableComboBoxTargetType
-
-        private void EditableComboBoxTargetType_Loaded(object sender, RoutedEventArgs e)
-        {
-            foreach (TargetTypes targetType in Enum.GetValues(typeof(TargetTypes)))
-            {
-                EditableComboBoxTargetType.Items.Add(targetType);
-            }
-
-            EditableComboBoxTargetType.SelectedIndex = 0;
-        }
-
-        private void EditableComboBoxTargetType_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var selectedType = EditableComboBoxTargetType.SelectedItem;
-
-            if (selectedType is TargetTypes targetType)
-            {
-                var target = targetType switch
-                {
-                    TargetTypes.Title => ProcessTitleTextBox.Text,
-                    TargetTypes.Process => ProcessNameTextBox.Text,
-                    TargetTypes.Class => ProcessClassNameTextBox.Text,
-                    _ => string.Empty
-                };
-
-                if (EditableTextBoxTargetRegex is null)
-                {
-                    return;
-                }
-
-                EditableTextBoxTargetRegex.Text = $"^{target}$";
-                UpdateCustomField(EditableTextBoxTargetRegex.Text, targetType, EditableTextBoxSequence.Text);
-            }
-        }
-
-        #endregion EditableComboBoxTargetType
 
         private void FindWindowIcon_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -165,35 +130,32 @@ namespace Bitwarden.AutoType.Desktop.Views
             var className = new StringBuilder(256);
             GetClassName(hWnd, className, className.Capacity);
             ProcessClassNameTextBox.Text = className.ToString();
-
-            var selectedType = EditableComboBoxTargetType.SelectedItem;
-
-            if (selectedType is TargetTypes targetType)
-            {
-                var target = targetType switch
-                {
-                    TargetTypes.Title => title.ToString(),
-                    TargetTypes.Process => targetProcess.ProcessName,
-                    TargetTypes.Class => className.ToString(),
-                    _ => string.Empty
-                };
-
-                EditableTextBoxTargetRegex.Text = $"^{target}$";
-                // dont need to update custom field here because it will be updated by EditableComboBoxTargetType_SelectionChanged
-                // leaving commented out for now in case we want to change this behavior
-                // UpdateCustomField(EditableTextBoxTargetRegex.Text, targetType, EditableTextBoxSequence.Text);
-            }
         }
 
-        private void UpdateCustomField(string target, TargetTypes targetType, string sequence)
+        private void UpdateCustomField()
         {
             var customField = new AutoTypeCustomField
             {
-                Target = target,
-                Type = targetType,
-                Sequence = sequence
+                Title = Normalize(IncludeTitleRegexTextBox.Text),
+                Process = Normalize(IncludeProcessRegexTextBox.Text),
+                Class = Normalize(IncludeClassRegexTextBox.Text),
+                ExcludeTitle = Normalize(ExcludeTitleRegexTextBox.Text),
+                ExcludeProcess = Normalize(ExcludeProcessRegexTextBox.Text),
+                ExcludeClass = Normalize(ExcludeClassRegexTextBox.Text),
+                Sequence = EditableTextBoxSequence.Text
             };
+
             EditableTextBoxCustomFieldValue.Text = SerializeAutoTypeCustomField(customField);
+        }
+
+        private static string? Normalize(string? value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? null : value;
+        }
+
+        private static string CreateExactRegex(string value)
+        {
+            return $"^{Regex.Escape(value)}$";
         }
 
         #region Helpers
@@ -215,6 +177,7 @@ namespace Bitwarden.AutoType.Desktop.Views
             var options = new JsonSerializerOptions
             {
                 WriteIndented = false,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             };
 
             return JsonSerializer.Serialize(obj, options);
@@ -222,40 +185,34 @@ namespace Bitwarden.AutoType.Desktop.Views
 
         #endregion Helpers
 
-        private void EditableTextBoxTargetRegex_TextChanged(object sender, TextChangedEventArgs e)
+        private void ComposerInput_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var selectedType = EditableComboBoxTargetType.SelectedItem;
-
-            if (selectedType is TargetTypes targetType)
-            {
-                var target = targetType switch
-                {
-                    TargetTypes.Title => ProcessTitleTextBox.Text,
-                    TargetTypes.Process => ProcessNameTextBox.Text,
-                    TargetTypes.Class => ProcessClassNameTextBox.Text,
-                    _ => string.Empty
-                };
-
-                UpdateCustomField(EditableTextBoxTargetRegex.Text, targetType, EditableTextBoxSequence.Text);
-            }
+            UpdateCustomField();
         }
 
-        private void EditableTextBoxSequence_TextChanged(object sender, TextChangedEventArgs e)
+        private void UseDetectedValueButton_Click(object sender, RoutedEventArgs e)
         {
-            var selectedType = EditableComboBoxTargetType.SelectedItem;
-
-            if (selectedType is TargetTypes targetType)
+            if (sender is not Button button || button.Tag is not string target)
             {
-                var target = targetType switch
-                {
-                    TargetTypes.Title => ProcessTitleTextBox.Text,
-                    TargetTypes.Process => ProcessNameTextBox.Text,
-                    TargetTypes.Class => ProcessClassNameTextBox.Text,
-                    _ => string.Empty
-                };
-
-                UpdateCustomField(EditableTextBoxTargetRegex.Text, targetType, EditableTextBoxSequence.Text);
+                return;
             }
+
+            switch (target)
+            {
+                case "Title" when !string.IsNullOrWhiteSpace(ProcessTitleTextBox.Text):
+                    IncludeTitleRegexTextBox.Text = CreateExactRegex(ProcessTitleTextBox.Text);
+                    break;
+                case "Process" when !string.IsNullOrWhiteSpace(ProcessNameTextBox.Text):
+                    IncludeProcessRegexTextBox.Text = CreateExactRegex(ProcessNameTextBox.Text);
+                    break;
+                case "Class" when !string.IsNullOrWhiteSpace(ProcessClassNameTextBox.Text):
+                    IncludeClassRegexTextBox.Text = CreateExactRegex(ProcessClassNameTextBox.Text);
+                    break;
+                default:
+                    return;
+            }
+
+            UpdateCustomField();
         }
 
         private void ShowSequenceButton_Click(object sender, RoutedEventArgs e)

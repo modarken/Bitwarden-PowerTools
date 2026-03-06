@@ -8,11 +8,11 @@ internal static class Constants
     internal const string DefaultAddFieldToBitwardenHelpText =
         """
         1. Find a target window by dragging the target icon over the window.
-        2. Determine the "Type" of the Window to match by, either the Title, Process Name, or Class Name of the window.
-        3. Select the combobox to choose the "Type" of the Window to match by.
-        4. Observe the "Target Regex" textbox to see the regex that will be used to match the window, modiify as needed.
-        5. Obseve the "Keyboard" textbox to see the keyboard sequence that will be sent to the window, modify as needed.
-        6. When satisifed with the "Target Regex" and "Keyboard" textbox values, Open Bitwarden.
+        2. Review the detected Title, Process Name, and Class Name values.
+        3. Use the target buttons to copy exact match regex values into the Include fields, then modify them if needed.
+        4. Add Exclude fields only when you want to prevent a rule from matching a known title, process, or class.
+        5. Observe the "Keyboard" textbox to see the keyboard sequence that will be sent to the window, modify as needed.
+        6. When satisfied with the Include, Exclude, and Keyboard values, open Bitwarden.
         7. Select an entry in Bitwarden to add the field to.
         8. Add a Custom Field with the name of "AutoType:Custom", which is the "Custom Name" field in AutoType.
         9. For the Custom Field value, copy and paste the "Custom Value" field from AutoType.
