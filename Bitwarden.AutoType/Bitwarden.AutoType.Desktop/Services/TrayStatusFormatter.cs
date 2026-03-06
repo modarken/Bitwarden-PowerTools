@@ -3,11 +3,41 @@ using System.Globalization;
 
 namespace Bitwarden.AutoType.Desktop.Services;
 
+public enum TrayVisualState
+{
+    Enabled,
+    Disabled,
+    Warning,
+    Error,
+}
+
 public static class TrayStatusFormatter
 {
-    public static string GetStatusText(bool isAutoTypeEnabled)
+    public static TrayVisualState GetVisualState(bool isAutoTypeEnabled, bool isConfigured, string? lastIssueSummary)
     {
-        return $"Status: {(isAutoTypeEnabled ? "Enabled" : "Disabled")}";
+        if (!string.IsNullOrWhiteSpace(lastIssueSummary))
+        {
+            return TrayVisualState.Error;
+        }
+
+        if (!isConfigured)
+        {
+            return TrayVisualState.Warning;
+        }
+
+        return isAutoTypeEnabled ? TrayVisualState.Enabled : TrayVisualState.Disabled;
+    }
+
+    public static string GetStatusText(TrayVisualState visualState)
+    {
+        return visualState switch
+        {
+            TrayVisualState.Enabled => "Status: Enabled",
+            TrayVisualState.Disabled => "Status: Disabled",
+            TrayVisualState.Warning => "Status: Setup required",
+            TrayVisualState.Error => "Status: Error",
+            _ => "Status: Unknown",
+        };
     }
 
     public static string GetSyncText(DateTimeOffset? lastSyncTimeUtc, IFormatProvider? formatProvider = null)
@@ -32,11 +62,16 @@ public static class TrayStatusFormatter
         return isAutoTypeEnabled ? "Disable Auto-Type" : "Enable Auto-Type";
     }
 
-    public static string GetNotifyIconText(bool isAutoTypeEnabled)
+    public static string GetNotifyIconText(TrayVisualState visualState)
     {
-        return isAutoTypeEnabled
-            ? "Bitwarden AutoType - Enabled"
-            : "Bitwarden AutoType - Disabled";
+        return visualState switch
+        {
+            TrayVisualState.Enabled => "Bitwarden AutoType - Enabled",
+            TrayVisualState.Disabled => "Bitwarden AutoType - Disabled",
+            TrayVisualState.Warning => "Bitwarden AutoType - Setup Required",
+            TrayVisualState.Error => "Bitwarden AutoType - Error",
+            _ => "Bitwarden AutoType",
+        };
     }
 
     private static string FormatTimestamp(DateTime? localTimestamp, IFormatProvider? formatProvider)

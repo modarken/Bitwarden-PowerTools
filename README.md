@@ -329,6 +329,9 @@ Configure automatic encrypted backups of your Bitwarden vault:
 
 The scheduled backup password is stored locally using Windows DPAPI protection.
 
+Backups can be verified or decrypted for manual recovery.
+This app does not perform an in-place vault restore from backup files.
+
 ![Backup Settings](.github/images/settings-backup.png)
 <!-- TODO: Add screenshot of backup settings -->
 

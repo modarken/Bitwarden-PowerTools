@@ -8,10 +8,24 @@ namespace Bitwarden.AutoType.Desktop.Tests;
 public class TrayStatusFormatterTests
 {
     [Fact]
-    public void GetStatusTextReflectsAutoTypeState()
+    public void GetVisualStatePrioritizesErrorOverOtherStates()
     {
-        Assert.Equal("Status: Enabled", TrayStatusFormatter.GetStatusText(true));
-        Assert.Equal("Status: Disabled", TrayStatusFormatter.GetStatusText(false));
+        Assert.Equal(TrayVisualState.Error, TrayStatusFormatter.GetVisualState(true, true, "Sync failed"));
+    }
+
+    [Fact]
+    public void GetVisualStateReturnsWarningWhenSetupIsIncomplete()
+    {
+        Assert.Equal(TrayVisualState.Warning, TrayStatusFormatter.GetVisualState(true, false, null));
+    }
+
+    [Fact]
+    public void GetStatusTextReflectsVisualState()
+    {
+        Assert.Equal("Status: Enabled", TrayStatusFormatter.GetStatusText(TrayVisualState.Enabled));
+        Assert.Equal("Status: Disabled", TrayStatusFormatter.GetStatusText(TrayVisualState.Disabled));
+        Assert.Equal("Status: Setup required", TrayStatusFormatter.GetStatusText(TrayVisualState.Warning));
+        Assert.Equal("Status: Error", TrayStatusFormatter.GetStatusText(TrayVisualState.Error));
     }
 
     [Fact]
@@ -40,5 +54,12 @@ public class TrayStatusFormatterTests
     {
         Assert.Equal("Disable Auto-Type", TrayStatusFormatter.GetToggleMenuText(true));
         Assert.Equal("Enable Auto-Type", TrayStatusFormatter.GetToggleMenuText(false));
+    }
+
+    [Fact]
+    public void GetNotifyIconTextReflectsVisualState()
+    {
+        Assert.Equal("Bitwarden AutoType - Enabled", TrayStatusFormatter.GetNotifyIconText(TrayVisualState.Enabled));
+        Assert.Equal("Bitwarden AutoType - Setup Required", TrayStatusFormatter.GetNotifyIconText(TrayVisualState.Warning));
     }
 }
