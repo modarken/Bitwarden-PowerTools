@@ -150,16 +150,18 @@ public class BackupSchedulerService : WPFBackgroundService
                 return;
             }
 
+            var configuredFolder = _backupService.GetConfiguredBackupFolder();
+
             // Create backup to configured folder
-            var filepath = await _backupService.CreateBackupAsync(
-                password, 
-                BackupLocation.Default, // Uses configured folder via settings
-                null);
+            var filepath = await _backupService.CreateBackupAsync(password, configuredFolder);
+
+            // Persist last backup time updates written by the backup service path.
+            _saveSettings(_backupSettings);
 
             _logger.LogInformation("Scheduled backup completed: {FilePath}", filepath);
 
             // Apply retention policy
-            ApplyRetentionPolicy();
+            ApplyRetentionPolicy(configuredFolder);
 
             // Show notification if enabled
             if (_backupSettings.ShowBackupNotifications)
@@ -178,11 +180,11 @@ public class BackupSchedulerService : WPFBackgroundService
         }
     }
 
-    private void ApplyRetentionPolicy()
+    private void ApplyRetentionPolicy(string targetFolder)
     {
         try
         {
-            var backups = _backupService.ListBackups();
+            var backups = _backupService.ListBackups(targetFolder);
             var now = DateTime.Now;
             var deletedCount = 0;
 

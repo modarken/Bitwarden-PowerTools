@@ -41,6 +41,11 @@ OPTIONAL
 ==========================
 DONE
 ==========================
+- Split saved settings from authorization state.
+    -> Save account settings separately from authorization
+    -> Master password is now one-time authorization input, not a saved setting
+    -> Added authorize, re-authorize, and clear stored authorization flows
+    -> Detect KDF changes and require re-authorization
 - Added richer tray quick actions and status rows.
     -> Toggle AutoType on/off from tray
     -> Sync now from tray

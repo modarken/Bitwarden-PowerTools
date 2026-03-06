@@ -87,13 +87,27 @@ In the Settings window:
 
 2. **Email**: Your Bitwarden account email
 
-3. **API Credentials**: 
-   - Log in to your Bitwarden web vault
-   - Go to **Settings** → **Security** → **Keys**
-   - Copy **Client ID** and **Client Secret**
-   - Paste them into the application
+3. Click **Save Settings**
 
-4. Click **Test Connection** to verify
+4. In **Authorization State**, choose one authorization path:
+    - **Authorize With API Key**
+       - Log in to your Bitwarden web vault
+       - Go to **Settings** → **Security** → **Keys**
+       - Copy **Client ID** and **Client Secret**
+       - Enter them together with your **Master Password** in the app
+    - **Authorize With Password**
+       - Enter your **Master Password** directly
+       - Enter **TOTP** only when your account requires it
+
+5. Click **Confirm Authorization**
+
+The app now separates:
+
+- saved account settings
+- stored authorization state
+- one-time authorization input
+
+If your Bitwarden account security settings change, the app will require re-authorization before the next sync.
 
 ![Settings Window](.github/images/settings-connection.png)
 <!-- TODO: Add screenshot of settings with connection details -->
@@ -268,8 +282,10 @@ Matches the window class (advanced):
 ### Credential Storage
 
 - ✅ API credentials are encrypted using **Windows DPAPI**
+- ✅ Scheduled backup passwords are encrypted using **Windows DPAPI**
 - ✅ Settings stored in `%LocalAppData%\Bitwarden-PowerTools`
-- ✅ Never stored in plaintext
+- ✅ Master password is treated as one-time input and is not stored
+- ✅ Sensitive stored values are protected per Windows user profile
 - ✅ Protected by your Windows user account
 
 ### Self-Hosted Bitwarden Servers
@@ -308,7 +324,10 @@ Configure automatic encrypted backups of your Bitwarden vault:
 1. Open **Settings** → **Backup**
 2. Enable **Scheduled Backups**
 3. Set backup frequency and location
-4. Backups are encrypted with AES-256-GCM
+4. Choose a backup password
+5. Backups are encrypted with AES-256-GCM
+
+The scheduled backup password is stored locally using Windows DPAPI protection.
 
 ![Backup Settings](.github/images/settings-backup.png)
 <!-- TODO: Add screenshot of backup settings -->
@@ -373,8 +392,9 @@ You can add multiple `AutoType:Custom` fields to a single Bitwarden entry for di
 1. ✅ Verify the server URL is correct:
    - Cloud: Must be `https://vault.bitwarden.com`
    - Self-hosted: Check with your administrator
-2. ✅ Check API credentials:
-   - Re-copy Client ID and Client Secret from web vault
+2. ✅ Re-authorize from the **Authorization State** section:
+   - Re-enter your master password
+   - Re-copy Client ID and Client Secret from web vault if you use API key authorization
    - Make sure there are no extra spaces
 3. ✅ Test network connectivity:
    - Open the Bitwarden web vault in a browser
@@ -382,6 +402,9 @@ You can add multiple `AutoType:Custom` fields to a single Bitwarden entry for di
 4. ✅ For self-hosted servers:
    - Ensure the server certificate is valid or trusted
    - Check that the server is reachable from your network
+5. ✅ If the app reports re-authorization is required:
+   - This can happen after account security changes such as KDF updates
+   - Complete the authorization flow again before syncing
 
 ### Update Errors
 

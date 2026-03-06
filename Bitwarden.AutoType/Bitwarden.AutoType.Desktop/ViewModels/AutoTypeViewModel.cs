@@ -208,9 +208,27 @@ public partial class AutoTypeViewModel : IDisposable
 
         Task.Run(() => InitializeRegexListAsync()); // Run the method asynchronously
         _hotkeyService.RegisterOnHotKeyAction(OnHotKeyHandler);
+        _state.StateChanged += OnConfigurationStateChanged;
     }
 
     #region Database Management
+
+    private void OnConfigurationStateChanged(object? sender, StateChangedEventArgs<AutoTypeConfigurationStates> e)
+    {
+        if (e.NewState == AutoTypeConfigurationStates.NotConfigured)
+        {
+            ClearCachedVaultData();
+        }
+    }
+
+    private void ClearCachedVaultData()
+    {
+        _regexLookup = null;
+        Ciphers = null;
+        FilteredCiphers = null;
+        OnPropertyChanged(nameof(Ciphers));
+        OnPropertyChanged(nameof(FilteredCiphers));
+    }
 
     private async Task InitializeRegexListAsync()
     {
@@ -490,6 +508,7 @@ public partial class AutoTypeViewModel : IDisposable
 
     public void Dispose()
     {
+        _state.StateChanged -= OnConfigurationStateChanged;
     }
 
     #endregion IDisposable

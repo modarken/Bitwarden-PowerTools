@@ -4,84 +4,164 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:helpers="clr-namespace:Bitwarden.AutoType.Desktop.Helpers"
-             xmlns:mah="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
              xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-             xmlns:fa="http://schemas.fontawesome.io/icons/"
-             xmlns:local="clr-namespace:Bitwarden.AutoType.Desktop.Views"
-             Loaded="UserControl_Loaded"
              mc:Ignorable="d"
-             d:DesignHeight="400" d:DesignWidth="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="5"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+             d:DesignHeight="700" d:DesignWidth="800">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,0,8">
+            <Border Padding="14" Margin="0,0,0,12" BorderThickness="1" CornerRadius="6" BorderBrush="#33000000">
+                <StackPanel>
+                    <TextBlock Text="Account Settings" FontSize="16" FontWeight="SemiBold" />
+                    <TextBlock Text="These values are saved on this device. Changing the server or account will require re-authorization."
+                               Margin="0,4,0,12"
+                               Foreground="Gray"
+                               TextWrapping="Wrap" />
 
-        <TextBlock Text="Base Address:" Grid.Row="0" Grid.Column="0" Margin="0 0 0 5"/>
-        <TextBox Text="{Binding Path=BitwardenClientConfiguration.base_address, Mode=TwoWay}" Grid.Row="0" Grid.Column="2" Margin="0 0 0 5" Style="{StaticResource MahApps.Styles.TextBox}" />
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-        <TextBlock Text="Email:" Grid.Row="1" Grid.Column="0" Margin="0 0 0 5"/>
-        <TextBox Text="{Binding Path=BitwardenClientConfiguration.email, Mode=TwoWay}" Grid.Row="1" Grid.Column="2" Margin="0 0 0 5" Style="{StaticResource MahApps.Styles.TextBox}" />
+                        <TextBlock Text="Base Address:" Grid.Row="0" Grid.Column="0" Margin="0,0,0,8" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="0" Grid.Column="2"
+                                 Margin="0,0,0,8"
+                                 Text="{Binding BitwardenClientConfiguration.base_address, Mode=TwoWay}"
+                                 Style="{StaticResource MahApps.Styles.TextBox}" />
 
-        <TextBlock Text="" Grid.Row="2" Grid.Column="0" Margin="0 0 0 5"/>
-        <CheckBox Grid.Row="2" Grid.Column="2" Margin="0 0 0 10"
-                  IsChecked="{Binding Path=BitwardenClientConfiguration.AllowInvalidCertificates, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-            <StackPanel Orientation="Horizontal">
-                <iconPacks:PackIconMaterial Kind="ShieldAlert" Foreground="Orange" Width="16" Height="16" Margin="0 0 5 0" VerticalAlignment="Center"/>
-                <TextBlock Text="Allow Invalid SSL Certificates (for self-hosted with self-signed certs)" VerticalAlignment="Center"/>
-            </StackPanel>
-        </CheckBox>
+                        <TextBlock Text="Email:" Grid.Row="1" Grid.Column="0" Margin="0,0,0,8" VerticalAlignment="Center" />
+                        <TextBox Grid.Row="1" Grid.Column="2"
+                                 Margin="0,0,0,8"
+                                 Text="{Binding BitwardenClientConfiguration.email, Mode=TwoWay}"
+                                 Style="{StaticResource MahApps.Styles.TextBox}" />
 
-        <TextBlock Text="Access Method:" Grid.Row="3" Grid.Column="0" Margin="0 0 0 5"/>
-        <ComboBox x:Name="AccessMethodComboBox" Grid.Row="3" Grid.Column="2" Margin="0 0 0 5"
-                  SelectedIndex="{Binding AccessMethod, Mode=TwoWay}"
-                  SelectionChanged="AccessMethodComboBox_SelectionChanged">
-            <ComboBoxItem Content="API Key"/>
-            <ComboBoxItem Content="Token"/>
-        </ComboBox>
+                        <TextBlock Grid.Row="2" Grid.Column="0" />
+                        <CheckBox Grid.Row="2" Grid.Column="2"
+                                  Margin="0,0,0,4"
+                                  IsChecked="{Binding BitwardenClientConfiguration.AllowInvalidCertificates, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="ShieldAlert" Foreground="Orange" Width="16" Height="16" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Allow Invalid SSL Certificates (for self-hosted with self-signed certs)" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </CheckBox>
+                    </Grid>
 
-        <TextBlock Text="Master Password:" Grid.Row="4" Grid.Column="0" Margin="0 0 0 5"/>
-        <PasswordBox x:Name="MasterPasswordBox" Grid.Row="4" Grid.Column="2" Margin="0 0 0 5"
-                     helpers:PasswordBoxBindingBehavior.PasswordBinding="{Binding MasterPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource MahApps.Styles.PasswordBox}"/>
+                    <WrapPanel Margin="0,12,0,0">
+                        <Button Content="Save Settings"
+                                Command="{Binding SaveSettingsCommand}"
+                                Margin="0,0,8,8"
+                                Style="{DynamicResource MahApps.Styles.Button.Square}" />
+                        <Button Content="Open Windows Startup Apps"
+                                Command="{Binding OpenStartupAppsSettingsCommand}"
+                                Margin="0,0,0,8"
+                                Style="{DynamicResource MahApps.Styles.Button}" />
+                    </WrapPanel>
 
-        <TextBlock x:Name="TOTPTextBlock" Text="TOTP:" Grid.Row="5" Grid.Column="0" Margin="0 0 0 5" Visibility="Collapsed"/>
-        <TextBox x:Name="TOTPTextBox" Grid.Row="5" Grid.Column="2" Margin="0 0 0 5" Text="{Binding Totp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource MahApps.Styles.TextBox}" Visibility="Collapsed" />
+                    <TextBlock Text="Use Windows Settings to enable or disable startup for Bitwarden AutoType."
+                               Foreground="Gray"
+                               TextWrapping="Wrap"
+                               FontSize="11"
+                               Margin="0,2,0,0" />
+                </StackPanel>
+            </Border>
 
-        <TextBlock x:Name="ClientIDTextBlock" Text="Client ID:" Grid.Row="6" Grid.Column="0" Margin="0 0 0 5"/>
-        <TextBox x:Name="ClientIDTextBox" Text="{Binding Path=BitwardenClientConfiguration.client_id, Mode=TwoWay}" Grid.Row="6" Grid.Column="2" Margin="0 0 0 5" Style="{StaticResource MahApps.Styles.TextBox}" />
+            <Border Padding="14" Margin="0,0,0,12" BorderThickness="1" CornerRadius="6" BorderBrush="#33000000">
+                <StackPanel>
+                    <TextBlock Text="Authorization State" FontSize="16" FontWeight="SemiBold" />
+                    <TextBlock Text="Authorization is stored separately from your saved account settings. The master password is only used during authorization."
+                               Margin="0,4,0,12"
+                               Foreground="Gray"
+                               TextWrapping="Wrap" />
 
-        <TextBlock x:Name="ClientSecretTextBlock" Text="Client Secret:" Grid.Row="7" Grid.Column="0" Margin="0 0 0 5"/>
-        <PasswordBox x:Name="ClientSecretTextBox"  Grid.Row="7" Grid.Column="2" Margin="0 0 0 5"
-                     helpers:PasswordBoxBindingBehavior.PasswordBinding="{Binding BitwardenClientConfiguration.client_secret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     Style="{StaticResource MahApps.Styles.PasswordBox}"/>
+                    <TextBlock Text="{Binding AuthorizationStatusText}" FontWeight="Bold" Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding AuthorizationMethodText}" Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding AuthorizationDetailText}" TextWrapping="Wrap" />
 
-        <StackPanel Grid.Row="8" Grid.Column="2" Margin="0 4 0 5">
-            <Button Content="Open Windows Startup Apps"
-                    Command="{Binding OpenStartupAppsSettingsCommand}"
-                    HorizontalAlignment="Left"
-                    Style="{DynamicResource MahApps.Styles.Button}" />
-            <TextBlock Text="Use Windows Settings to enable or disable startup for Bitwarden AutoType."
-                       Foreground="Gray"
-                       TextWrapping="Wrap"
-                       FontSize="11"
-                       Margin="0,4,0,0" />
+                    <WrapPanel Margin="0,12,0,0">
+                        <Button Content="Authorize With API Key"
+                                Command="{Binding BeginApiKeyAuthorizationCommand}"
+                                IsEnabled="{Binding CanStartAuthorization}"
+                                Margin="0,0,8,8"
+                                Style="{DynamicResource MahApps.Styles.Button.Square}" />
+                        <Button Content="Authorize With Password"
+                                Command="{Binding BeginPasswordAuthorizationCommand}"
+                                IsEnabled="{Binding CanStartAuthorization}"
+                                Margin="0,0,8,8"
+                                Style="{DynamicResource MahApps.Styles.Button.Square}" />
+                        <Button Content="Clear Stored Authorization"
+                                Command="{Binding ClearStoredAuthorizationCommand}"
+                                IsEnabled="{Binding CanClearStoredAuthorization}"
+                                Margin="0,0,0,8"
+                                Style="{DynamicResource MahApps.Styles.Button}" />
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Padding="14"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    BorderBrush="#33000000"
+                    Visibility="{Binding IsAuthorizationInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <StackPanel>
+                    <TextBlock Text="Authorization Input" FontSize="16" FontWeight="SemiBold" />
+                    <TextBlock Text="Enter one-time authorization input below. Nothing in this section is treated like a normal saved setting."
+                               Margin="0,4,0,12"
+                               Foreground="Gray"
+                               TextWrapping="Wrap" />
+
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Master Password:" Grid.Row="0" Grid.Column="0" Margin="0,0,0,8" VerticalAlignment="Center" />
+                        <PasswordBox Grid.Row="0" Grid.Column="2"
+                                     Margin="0,0,0,8"
+                                     helpers:PasswordBoxBindingBehavior.PasswordBinding="{Binding MasterPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MahApps.Styles.PasswordBox}" />
+
+                        <StackPanel Grid.Row="1" Grid.Column="2"
+                                    Visibility="{Binding IsApiKeyInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Text="Client ID:" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding AuthorizationClientId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Margin="0,0,0,8"
+                                     Style="{StaticResource MahApps.Styles.TextBox}" />
+                            <TextBlock Text="Client Secret:" Margin="0,0,0,4" />
+                            <PasswordBox helpers:PasswordBoxBindingBehavior.PasswordBinding="{Binding AuthorizationClientSecret, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource MahApps.Styles.PasswordBox}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="1" Grid.Column="2"
+                                    Visibility="{Binding IsPasswordInputVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock Text="TOTP (optional):" Margin="0,0,0,4" />
+                            <TextBox Text="{Binding Totp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MahApps.Styles.TextBox}" />
+                        </StackPanel>
+                    </Grid>
+
+                    <WrapPanel Margin="0,12,0,0">
+                        <Button Content="Confirm Authorization"
+                                Command="{Binding CompleteAuthorizationCommand}"
+                                Margin="0,0,8,0"
+                                Style="{DynamicResource MahApps.Styles.Button.Square}" />
+                        <Button Content="Cancel"
+                                Command="{Binding CancelAuthorizationInputCommand}"
+                                Style="{DynamicResource MahApps.Styles.Button}" />
+                    </WrapPanel>
+                </StackPanel>
+            </Border>
         </StackPanel>
-
-        <Button Grid.Row="9" Grid.Column="2" Margin="0 0 0 5" x:Name="SaveButton" Style="{DynamicResource MahApps.Styles.Button.Square}" Content="Save"
-            Command="{Binding SaveConfigCommand}"></Button>
-    </Grid>
+    </ScrollViewer>
 </UserControl>

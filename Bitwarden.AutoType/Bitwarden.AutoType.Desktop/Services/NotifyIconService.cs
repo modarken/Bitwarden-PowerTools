@@ -142,7 +142,7 @@ public class NotifyIconService : IDisposable
         
         backupMenu.DropDownItems.Add(new Forms.ToolStripSeparator());
         backupMenu.DropDownItems.Add("Backup Settings...", null, (s, e) => OpenBackupSettings());
-        backupMenu.DropDownItems.Add("Open Backup Folder", null, (s, e) => _backupService.OpenBackupFolder());
+        backupMenu.DropDownItems.Add("Open Backup Folder", null, (s, e) => _backupService.OpenBackupFolder(BackupLocation.Configured));
         _notifyIcon.ContextMenuStrip.Items.Add(backupMenu);
         
         _notifyIcon.ContextMenuStrip.Items.Add(new Forms.ToolStripSeparator());
