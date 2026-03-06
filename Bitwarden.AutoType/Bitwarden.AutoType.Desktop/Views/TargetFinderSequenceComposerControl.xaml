@@ -19,6 +19,11 @@
         <Style x:Key="CopyButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
             <Setter Property="Margin" Value="3,3,0,0" />
         </Style>
+        <Style x:Key="ValidationMessageStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,2,0,0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -91,63 +96,88 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0" Content="Include Title:" Style="{StaticResource LabelStyle}" />
-                <Grid Grid.Row="0" Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" x:Name="IncludeTitleRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
-                    <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Title" ToolTip="Use exact detected title" Style="{StaticResource QuestionButtonStyle}">
-                        <iconPacks:PackIconMaterial Kind="Target" />
-                    </Button>
-                </Grid>
+                <StackPanel Grid.Row="0" Grid.Column="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="IncludeTitleRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                        <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Title" ToolTip="Use exact detected title" Style="{StaticResource QuestionButtonStyle}">
+                            <iconPacks:PackIconMaterial Kind="Target" />
+                        </Button>
+                    </Grid>
+                    <TextBlock x:Name="IncludeTitleValidationTextBlock" Style="{StaticResource ValidationMessageStyle}" />
+                </StackPanel>
 
                 <Label Grid.Row="1" Grid.Column="0" Content="Include Process:" Style="{StaticResource LabelStyle}" />
-                <Grid Grid.Row="1" Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" x:Name="IncludeProcessRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
-                    <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Process" ToolTip="Use exact detected process" Style="{StaticResource QuestionButtonStyle}">
-                        <iconPacks:PackIconMaterial Kind="Target" />
-                    </Button>
-                </Grid>
+                <StackPanel Grid.Row="1" Grid.Column="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="IncludeProcessRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                        <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Process" ToolTip="Use exact detected process" Style="{StaticResource QuestionButtonStyle}">
+                            <iconPacks:PackIconMaterial Kind="Target" />
+                        </Button>
+                    </Grid>
+                    <TextBlock x:Name="IncludeProcessValidationTextBlock" Style="{StaticResource ValidationMessageStyle}" />
+                </StackPanel>
 
                 <Label Grid.Row="2" Grid.Column="0" Content="Include Class:" Style="{StaticResource LabelStyle}" />
-                <Grid Grid.Row="2" Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" x:Name="IncludeClassRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
-                    <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Class" ToolTip="Use exact detected class" Style="{StaticResource QuestionButtonStyle}">
-                        <iconPacks:PackIconMaterial Kind="Target" />
-                    </Button>
-                </Grid>
+                <StackPanel Grid.Row="2" Grid.Column="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="IncludeClassRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                        <Button Grid.Column="1" Click="UseDetectedValueButton_Click" Tag="Class" ToolTip="Use exact detected class" Style="{StaticResource QuestionButtonStyle}">
+                            <iconPacks:PackIconMaterial Kind="Target" />
+                        </Button>
+                    </Grid>
+                    <TextBlock x:Name="IncludeClassValidationTextBlock" Style="{StaticResource ValidationMessageStyle}" />
+                </StackPanel>
 
                 <Label Grid.Row="3" Grid.Column="0" Content="Exclude Title:" Style="{StaticResource LabelStyle}" />
-                <TextBox Grid.Row="3" Grid.Column="1" x:Name="ExcludeTitleRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                <StackPanel Grid.Row="3" Grid.Column="1">
+                    <TextBox x:Name="ExcludeTitleRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                    <TextBlock x:Name="ExcludeTitleValidationTextBlock" Style="{StaticResource ValidationMessageStyle}" />
+                </StackPanel>
 
                 <Label Grid.Row="4" Grid.Column="0" Content="Exclude Process:" Style="{StaticResource LabelStyle}" />
-                <TextBox Grid.Row="4" Grid.Column="1" x:Name="ExcludeProcessRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                <StackPanel Grid.Row="4" Grid.Column="1">
+                    <TextBox x:Name="ExcludeProcessRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                    <TextBlock x:Name="ExcludeProcessValidationTextBlock" Style="{StaticResource ValidationMessageStyle}" />
+                </StackPanel>
 
                 <Label Grid.Row="5" Grid.Column="0" Content="Exclude Class:" Style="{StaticResource LabelStyle}" />
-                <TextBox Grid.Row="5" Grid.Column="1" x:Name="ExcludeClassRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                <StackPanel Grid.Row="5" Grid.Column="1">
+                    <TextBox x:Name="ExcludeClassRegexTextBox" TextChanged="ComposerInput_TextChanged" Style="{StaticResource TextBoxStyle}" />
+                    <TextBlock x:Name="ExcludeClassValidationTextBlock" Style="{StaticResource ValidationMessageStyle}" />
+                </StackPanel>
 
                 <Separator Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
 
                 <Label Grid.Row="7" Grid.Column="0" Content="Keyboard:" Style="{StaticResource LabelStyle}" />
-                <Grid Grid.Row="7" Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" x:Name="EditableTextBoxSequence" Margin="0 3 0 0" TextChanged="ComposerInput_TextChanged" VerticalContentAlignment="Center" Style="{StaticResource TextBoxStyle}" />
-                    <Button x:Name="ShowSequenceButton" Grid.Column="1" Click="ShowSequenceButton_Click"  Style="{StaticResource QuestionButtonStyle}">
-                        <iconPacks:PackIconMaterial Kind="BeakerQuestion" />
-                    </Button>
-                </Grid>
+                <StackPanel Grid.Row="7" Grid.Column="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="EditableTextBoxSequence" Margin="0 3 0 0" TextChanged="ComposerInput_TextChanged" VerticalContentAlignment="Center" Style="{StaticResource TextBoxStyle}" />
+                        <Button x:Name="ShowSequenceButton" Grid.Column="1" Click="ShowSequenceButton_Click"  Style="{StaticResource QuestionButtonStyle}">
+                            <iconPacks:PackIconMaterial Kind="BeakerQuestion" />
+                        </Button>
+                    </Grid>
+                    <TextBlock x:Name="SequenceValidationTextBlock" Style="{StaticResource ValidationMessageStyle}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                        <Button x:Name="TestRuleButton" Click="TestRuleButton_Click" Content="Test Detected Target" Style="{StaticResource CopyButtonStyle}" />
+                        <TextBlock x:Name="TestResultTextBlock" VerticalAlignment="Center" Margin="8,0,0,0" Style="{StaticResource ValidationMessageStyle}" />
+                    </StackPanel>
+                </StackPanel>
             </Grid>
         </ScrollViewer>
 
@@ -160,12 +190,16 @@
                 <RowDefinition Height="12" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Separator Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="1 0 1 0" />
 
-            <Label Grid.Row="1" Grid.Column="0" Content="Custom Name:" Style="{StaticResource LabelStyle}" />
-            <Grid Grid.Row="1" Grid.Column="1">
+            <Label Grid.Row="1" Grid.Column="0" Content="Validation:" Style="{StaticResource LabelStyle}" />
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="ValidationSummaryTextBlock" Style="{StaticResource ValidationMessageStyle}" Margin="0,4,0,0" />
+
+            <Label Grid.Row="2" Grid.Column="0" Content="Custom Name:" Style="{StaticResource LabelStyle}" />
+            <Grid Grid.Row="2" Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -176,8 +210,8 @@
                 </Button>
             </Grid>
 
-            <Label Grid.Row="2" Grid.Column="0" Content="Custom Value:" Style="{StaticResource LabelStyle}" />
-            <Grid Grid.Row="2" Grid.Column="1">
+            <Label Grid.Row="3" Grid.Column="0" Content="Custom Value:" Style="{StaticResource LabelStyle}" />
+            <Grid Grid.Row="3" Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />

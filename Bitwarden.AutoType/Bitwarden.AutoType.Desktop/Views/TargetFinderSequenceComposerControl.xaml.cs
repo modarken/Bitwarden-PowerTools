@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -8,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Bitwarden.AutoType.Desktop.Helpers;
 
 namespace Bitwarden.AutoType.Desktop.Views
@@ -17,6 +19,11 @@ namespace Bitwarden.AutoType.Desktop.Views
     /// </summary>
     public partial class TargetFinderSequenceComposerControl : UserControl
     {
+        private static readonly Brush ErrorBrush = Brushes.IndianRed;
+        private static readonly Brush WarningBrush = Brushes.DarkOrange;
+        private static readonly Brush SuccessBrush = Brushes.ForestGreen;
+        private static readonly Brush NeutralBrush = Brushes.DimGray;
+
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr WindowFromPoint(POINT Point);
 
@@ -130,11 +137,21 @@ namespace Bitwarden.AutoType.Desktop.Views
             var className = new StringBuilder(256);
             GetClassName(hWnd, className, className.Capacity);
             ProcessClassNameTextBox.Text = className.ToString();
+
+            RefreshValidationState(BuildCustomField());
         }
 
         private void UpdateCustomField()
         {
-            var customField = new AutoTypeCustomField
+            var customField = BuildCustomField();
+
+            EditableTextBoxCustomFieldValue.Text = SerializeAutoTypeCustomField(customField);
+            RefreshValidationState(customField);
+        }
+
+        private AutoTypeCustomField BuildCustomField()
+        {
+            return new AutoTypeCustomField
             {
                 Title = Normalize(IncludeTitleRegexTextBox.Text),
                 Process = Normalize(IncludeProcessRegexTextBox.Text),
@@ -144,8 +161,6 @@ namespace Bitwarden.AutoType.Desktop.Views
                 ExcludeClass = Normalize(ExcludeClassRegexTextBox.Text),
                 Sequence = EditableTextBoxSequence.Text
             };
-
-            EditableTextBoxCustomFieldValue.Text = SerializeAutoTypeCustomField(customField);
         }
 
         private static string? Normalize(string? value)
@@ -215,6 +230,17 @@ namespace Bitwarden.AutoType.Desktop.Views
             UpdateCustomField();
         }
 
+        private void TestRuleButton_Click(object sender, RoutedEventArgs e)
+        {
+            var result = AutoTypeAuthoringValidator.TestDetectedWindow(
+                BuildCustomField(),
+                ProcessTitleTextBox.Text,
+                ProcessNameTextBox.Text,
+                ProcessClassNameTextBox.Text);
+
+            SetValidationText(TestResultTextBlock, result.Message, result.CanTest ? (result.IsMatch ? SuccessBrush : ErrorBrush) : NeutralBrush);
+        }
+
         private void ShowSequenceButton_Click(object sender, RoutedEventArgs e)
         {
             // NotepadHelper.OpenNotepadAndTypeText(Constants.DefaultSequenceHelpText);
@@ -225,6 +251,107 @@ namespace Bitwarden.AutoType.Desktop.Views
         {
             // Your code to handle the question button click
             TextFileHelper.OpenTextFileAndTypeText("How_to_add_AutoType_sequence_to_bitwarden", Constants.DefaultAddFieldToBitwardenHelpText);
+        }
+
+        private void RefreshValidationState(AutoTypeCustomField customField)
+        {
+            ApplyRegexValidation(IncludeTitleRegexTextBox, IncludeTitleValidationTextBlock, AutoTypeAuthoringValidator.ValidateRegexPattern(customField.Title));
+            ApplyRegexValidation(IncludeProcessRegexTextBox, IncludeProcessValidationTextBlock, AutoTypeAuthoringValidator.ValidateRegexPattern(customField.Process));
+            ApplyRegexValidation(IncludeClassRegexTextBox, IncludeClassValidationTextBlock, AutoTypeAuthoringValidator.ValidateRegexPattern(customField.Class));
+            ApplyRegexValidation(ExcludeTitleRegexTextBox, ExcludeTitleValidationTextBlock, AutoTypeAuthoringValidator.ValidateRegexPattern(customField.ExcludeTitle));
+            ApplyRegexValidation(ExcludeProcessRegexTextBox, ExcludeProcessValidationTextBlock, AutoTypeAuthoringValidator.ValidateRegexPattern(customField.ExcludeProcess));
+            ApplyRegexValidation(ExcludeClassRegexTextBox, ExcludeClassValidationTextBlock, AutoTypeAuthoringValidator.ValidateRegexPattern(customField.ExcludeClass));
+
+            var sequenceResult = AutoTypeAuthoringValidator.ValidateSequence(customField.Sequence);
+            ApplySequenceValidation(sequenceResult);
+
+            var ruleError = AutoTypeAuthoringValidator.ValidateRule(customField);
+            var hasRegexErrors = new[]
+            {
+                customField.Title,
+                customField.Process,
+                customField.Class,
+                customField.ExcludeTitle,
+                customField.ExcludeProcess,
+                customField.ExcludeClass
+            }.Any(value => AutoTypeAuthoringValidator.ValidateRegexPattern(value) is not null);
+
+            var hasBlockingIssues = ruleError is not null || hasRegexErrors || !sequenceResult.IsValid;
+
+            if (ruleError is not null)
+            {
+                SetValidationText(ValidationSummaryTextBlock, ruleError, ErrorBrush);
+            }
+            else if (hasBlockingIssues)
+            {
+                SetValidationText(ValidationSummaryTextBlock, "Fix the highlighted issues before copying this rule into Bitwarden.", ErrorBrush);
+            }
+            else if (sequenceResult.HasWarnings)
+            {
+                SetValidationText(ValidationSummaryTextBlock, "Rule is usable. Review the sequence warning before copying if the token was intentional.", WarningBrush);
+            }
+            else
+            {
+                SetValidationText(ValidationSummaryTextBlock, "Rule is ready to copy into Bitwarden.", SuccessBrush);
+            }
+
+            CopyButton4.IsEnabled = !hasBlockingIssues;
+            TestRuleButton.IsEnabled = !hasBlockingIssues;
+
+            if (string.IsNullOrWhiteSpace(ProcessTitleTextBox.Text)
+                && string.IsNullOrWhiteSpace(ProcessNameTextBox.Text)
+                && string.IsNullOrWhiteSpace(ProcessClassNameTextBox.Text))
+            {
+                SetValidationText(TestResultTextBlock, "Drag the finder over a window to test this rule.", NeutralBrush);
+            }
+            else
+            {
+                SetValidationText(TestResultTextBlock, "Use the test button to compare this rule against the detected target.", NeutralBrush);
+            }
+        }
+
+        private static void ApplyRegexValidation(TextBox textBox, TextBlock textBlock, string? error)
+        {
+            if (string.IsNullOrWhiteSpace(textBox.Text))
+            {
+                textBlock.Text = string.Empty;
+                textBox.ClearValue(BorderBrushProperty);
+                textBox.ToolTip = null;
+                return;
+            }
+
+            if (error is null)
+            {
+                textBlock.Text = string.Empty;
+                textBox.ClearValue(BorderBrushProperty);
+                textBox.ToolTip = null;
+                return;
+            }
+
+            SetValidationText(textBlock, error, ErrorBrush);
+            textBox.BorderBrush = ErrorBrush;
+            textBox.ToolTip = error;
+        }
+
+        private void ApplySequenceValidation(AutoTypeSequenceValidationResult result)
+        {
+            if (!result.IsValid)
+            {
+                SetValidationText(SequenceValidationTextBlock, result.Summary, ErrorBrush);
+                EditableTextBoxSequence.BorderBrush = ErrorBrush;
+                EditableTextBoxSequence.ToolTip = result.Summary;
+                return;
+            }
+
+            EditableTextBoxSequence.ToolTip = result.HasWarnings ? string.Join(Environment.NewLine, result.Warnings) : null;
+            EditableTextBoxSequence.BorderBrush = result.HasWarnings ? WarningBrush : SuccessBrush;
+            SetValidationText(SequenceValidationTextBlock, result.Summary, result.HasWarnings ? WarningBrush : SuccessBrush);
+        }
+
+        private static void SetValidationText(TextBlock textBlock, string message, Brush brush)
+        {
+            textBlock.Text = message;
+            textBlock.Foreground = brush;
         }
     }
 }
