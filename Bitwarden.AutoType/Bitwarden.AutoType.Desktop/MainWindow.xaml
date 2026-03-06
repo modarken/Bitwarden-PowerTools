@@ -133,7 +133,7 @@
             </DockPanel>
         </Border>
 
-        <TabControl DockPanel.Dock="Top" Margin="10">
+        <TabControl x:Name="MainTabControl" DockPanel.Dock="Top" Margin="10">
             <TabItem Header="Items">
                 <Grid Margin="0 10 0 0">
                     <Grid.RowDefinitions>

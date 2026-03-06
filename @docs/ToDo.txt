@@ -14,6 +14,9 @@ Enhancements & Features
         - TargetFinderSequenceComposer
 - Enhancement: Make the icon appear different color according to different states.
     - e.g. green for on, red for off, yellow for error, etc.
+- Enhancement: Expand tray status beyond the current quick actions and status rows.
+    - Current tray shows enabled/disabled state, last sync, last backup, and last issue.
+    - Future work can add richer warning/error visuals and more update-state detail.
 - Secondary Power Tool in charge of backups - export feature?
     - keepass button
 
@@ -38,6 +41,11 @@ OPTIONAL
 ==========================
 DONE
 ==========================
+- Added richer tray quick actions and status rows.
+    -> Toggle AutoType on/off from tray
+    -> Sync now from tray
+    -> Open Settings from tray
+    -> Show last sync, last backup, and last issue in tray menu
 - Add Installer
 - Cleanup the hotkey is active code, for some reason it's not working right.
     - Move the checkbox to the hotkey view.
