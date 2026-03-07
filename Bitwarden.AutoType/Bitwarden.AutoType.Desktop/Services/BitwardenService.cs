@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -47,6 +46,7 @@ public class BitwardenService : WPFBackgroundService
         {
             try
             {
+                stoppingToken.ThrowIfCancellationRequested();
                 _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Refreshing Database.");
 
                 while(_state.GetState() == AutoTypeConfigurationStates.NotConfigured)
@@ -56,7 +56,7 @@ public class BitwardenService : WPFBackgroundService
                     _logger.Log(LogLevel.Trace, $"{nameof(BitwardenService)}.{nameof(ExecuteAsync)}() Waited TimeSpan.FromSeconds(30).");
                 }
 
-                await _syncLock.WaitAsync(); // Acquire the lock asynchronously
+                await _syncLock.WaitAsync(stoppingToken).ConfigureAwait(false);
                 try
                 {
                     await RefreshLocalDatabaseAsync()
@@ -125,20 +125,15 @@ public class BitwardenService : WPFBackgroundService
 
     private async Task RefreshAccessTokenIfNeededAsync()
     {
-        // check if access token is valid, if not , make it null so it will be refreshed
-        if (_accessToken != null)
+        // Clear malformed or expired access tokens so the next request forces a refresh.
+        if (AccessTokenUtilities.ShouldRefresh(_accessToken, DateTimeOffset.UtcNow))
         {
-            var jwtHandler = new JwtSecurityTokenHandler();
-            var jwt = jwtHandler.ReadJwtToken(_accessToken.access_token);
-            var exp = jwt.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
-            if (exp != null)
+            if (_accessToken is not null)
             {
-                var expDate = DateTimeOffset.FromUnixTimeSeconds(long.Parse(exp!));
-                if (expDate < DateTimeOffset.UtcNow)
-                {
-                    _accessToken = null;
-                }
+                _logger.LogDebug("Access token missing, expired, or malformed. Requesting a fresh token.");
             }
+
+            _accessToken = null;
         }
 
         // if access token is null, get a new one
@@ -271,7 +266,7 @@ public class BitwardenService : WPFBackgroundService
     {
         if (_state.GetState() == AutoTypeConfigurationStates.NotConfigured)
         {
-            throw new Exception("Not configured to refresh local database.");
+            throw new InvalidOperationException("Not configured to refresh local database.");
         }
 
         await ValidateAuthorizationStateAsync().ConfigureAwait(false);

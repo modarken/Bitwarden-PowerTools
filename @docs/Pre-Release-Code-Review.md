@@ -8,7 +8,7 @@ Use these files instead:
 
 - `README.md` for current user-facing behavior and setup
 - `@docs/Building-and-Releasing.md` for the current maintainer release workflow
-- `@docs/ToDo.txt` for unfinished work only
+- `@docs/README.md` for the current maintainer docs index
 
 Why this file is retained:
 

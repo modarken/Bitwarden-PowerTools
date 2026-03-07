@@ -4,8 +4,9 @@
 
 A powerful desktop application that brings KeePass-style auto-type functionality to Bitwarden on Windows. Automatically fill credentials into any application using customizable keyboard shortcuts and intelligent window detection.
 
+![Auto-Type in Action](.github/images/autotype-demo.gif)
+
 ![Main Application Screenshot](.github/images/main-window.png)
-<!-- TODO: Add screenshot of main window -->
 
 ## ✨ Features
 
@@ -38,24 +39,15 @@ A powerful desktop application that brings KeePass-style auto-type functionality
 1. Go to the [Releases](https://github.com/modarken/Bitwarden-PowerTools/releases) page
 2. Download the latest `Bitwarden.AutoType-win-Setup.exe`
 
-![Download Release](.github/images/download-release.png)
-<!-- TODO: Add screenshot of GitHub releases page -->
-
 ### Step 2: Run the Installer
 
 1. Double-click `Bitwarden.AutoType-win-Setup.exe`
 2. Click **Yes** if Windows User Account Control prompts you
 3. Follow the installation wizard
 
-![Installation Wizard](.github/images/installer.png)
-<!-- TODO: Add screenshot of installer -->
-
 ### Step 3: Launch the Application
 
 The application will start automatically after installation and appear in your system tray.
-
-![System Tray Icon](.github/images/system-tray.png)
-<!-- TODO: Add screenshot of system tray icon -->
 
 ---
 
@@ -75,7 +67,6 @@ The tray menu also gives you direct access to:
 - **Last sync**, **last backup**, and **last issue** status lines
 
 ![Settings Menu](.github/images/tray-menu.png)
-<!-- TODO: Add screenshot of tray menu -->
 
 #### 2. Configure Bitwarden Connection
 
@@ -109,17 +100,11 @@ The app now separates:
 
 If your Bitwarden account security settings change, the app will require re-authorization before the next sync.
 
-![Settings Window](.github/images/settings-connection.png)
-<!-- TODO: Add screenshot of settings with connection details -->
-
 #### 3. Configure Hotkey (Optional)
 
 1. In Settings, go to the **Hotkey** section
 2. Set your preferred keyboard shortcut (default: `Ctrl+Shift+A`)
 3. Click **Save**
-
-![Hotkey Settings](.github/images/settings-hotkey.png)
-<!-- TODO: Add screenshot of hotkey configuration -->
 
 ---
 
@@ -139,7 +124,6 @@ If your Bitwarden account security settings change, the app will require re-auth
    - **Value**: JSON configuration (see below)
 
 ![Custom Field in Bitwarden](.github/images/bitwarden-custom-field.png)
-<!-- TODO: Add screenshot of Bitwarden custom field -->
 
 #### Step 2: Configure the Auto-Type Sequence
 
@@ -158,15 +142,14 @@ Paste this JSON into the **Value** field (customize as needed):
 - **ExcludeTitle / ExcludeProcess / ExcludeClass**: Optional regex filters that block a rule even when the include matchers pass.
 - **Sequence**: What to type (see [Keyboard Sequences](#keyboard-sequences) below)
 
+![Target Finder and Rule Composer](.github/images/target-finder-detected-window.png)
+
 #### Step 3: Use Auto-Type
 
 1. Open the target application (e.g., Gmail login page in browser)
 2. Click on the username/password field
 3. Press your configured hotkey (default: `Ctrl+Shift+A`)
 4. Your credentials will be automatically typed!
-
-![Auto-Type in Action](.github/images/autotype-demo.gif)
-<!-- TODO: Add animated GIF of auto-type working -->
 
 ---
 
@@ -291,6 +274,8 @@ Match multiple window properties at once. Every include rule must match, and any
 
 This is useful when a title match alone is too broad.
 
+![Target Composer](.github/images/target-composer.png)
+
 ---
 
 ## 🛡️ Security Considerations
@@ -324,9 +309,6 @@ The application runs **without administrator privileges** by default.
 
 When it detects a protected window that requires elevation (e.g., RDP credential dialog, UAC prompt, Windows Security), it displays a warning banner:
 
-![Elevation Warning](.github/images/elevation-warning.png)
-<!-- TODO: Add screenshot of elevation warning banner -->
-
 Click **Restart as Administrator** to enable auto-type for these protected windows.
 
 ---
@@ -348,9 +330,6 @@ The scheduled backup password is stored locally using Windows DPAPI protection.
 Backups can be verified or decrypted for manual recovery.
 This app does not perform an in-place vault restore from backup files.
 You can also export the current vault as plaintext JSON from the tray menu when you explicitly need a decrypted export.
-
-![Backup Settings](.github/images/settings-backup.png)
-<!-- TODO: Add screenshot of backup settings -->
 
 ### Multiple Auto-Type Configurations
 
@@ -398,9 +377,6 @@ You can add multiple `AutoType:Custom` fields to a single Bitwarden entry for di
 - These are **protected windows** that require elevation
 - Click **Restart as Administrator** when the yellow warning banner appears
 - Or: Right-click the app in Start Menu → **Run as Administrator**
-
-![Protected Window Warning](.github/images/protected-window.png)
-<!-- TODO: Add screenshot showing elevation needed -->
 
 ### Connection Issues
 
@@ -553,22 +529,6 @@ Need help or want to discuss the project?
 - 🐛 **Bug Reports**: [Open an issue](https://github.com/modarken/Bitwarden-PowerTools/issues)
 - 💡 **Feature Requests**: [Start a discussion](https://github.com/modarken/Bitwarden-PowerTools/discussions)
 - 💬 **Questions**: Check [existing discussions](https://github.com/modarken/Bitwarden-PowerTools/discussions)
-
----
-
-## 📸 Screenshots
-
-![Main Window](.github/images/main-window.png)
-<!-- TODO: Add main window screenshot -->
-
-![Settings - Connection](.github/images/settings-full.png)
-<!-- TODO: Add full settings window -->
-
-![Settings - Backup](.github/images/settings-backup-full.png)
-<!-- TODO: Add backup settings screenshot -->
-
-![Tray Menu](.github/images/tray-menu-full.png)
-<!-- TODO: Add complete tray menu -->
 
 ---
 
