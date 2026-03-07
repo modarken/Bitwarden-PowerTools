@@ -18,17 +18,25 @@
 .PARAMETER Install
     Install the packaged application after building.
 
+.PARAMETER ForceVersionReuse
+    Override safety checks that prevent reusing an existing release version or
+    building the same version that is already installed locally.
+
 .EXAMPLE
     .\Build-Release.ps1
     
 .EXAMPLE
     .\Build-Release.ps1 -Version "1.3.0" -Install
+
+.EXAMPLE
+    .\Build-Release.ps1 -Version "1.3.3" -ForceVersionReuse
 #>
 
 param(
     [string]$Version,
     [switch]$NoDelta,
-    [switch]$Install
+    [switch]$Install,
+    [switch]$ForceVersionReuse
 )
 
 $ErrorActionPreference = "Stop"
@@ -65,6 +73,47 @@ if (-not $Version) {
 Write-Host "Version: $Version" -ForegroundColor Yellow
 Write-Host ""
 
+function Test-RemoteTagExists {
+    param([string]$TagName)
+
+    $remoteTag = git ls-remote --tags origin $TagName 2>$null
+    return -not [string]::IsNullOrWhiteSpace($remoteTag)
+}
+
+function Test-GitHubReleaseExists {
+    param([string]$TagName)
+
+    try {
+        $null = Get-Command gh -ErrorAction Stop
+        & gh release view $TagName --json tagName 1>$null 2>$null
+        return $LASTEXITCODE -eq 0
+    }
+    catch {
+        return $false
+    }
+}
+
+function Test-LocalTagExists {
+    param([string]$TagName)
+
+    git rev-parse -q --verify "refs/tags/$TagName" 1>$null 2>$null
+    return $LASTEXITCODE -eq 0
+}
+
+function Get-InstalledAppVersion {
+    $installedExe = Join-Path $env:LOCALAPPDATA "Bitwarden.AutoType\current\Bitwarden.AutoType.Desktop.exe"
+    if (-not (Test-Path $installedExe)) {
+        return $null
+    }
+
+    $productVersion = (Get-Item $installedExe).VersionInfo.ProductVersion
+    if ([string]::IsNullOrWhiteSpace($productVersion)) {
+        return $null
+    }
+
+    return ($productVersion -split '\+')[0]
+}
+
 # Check if vpk is installed
 Write-Host "Checking Velopack CLI..." -ForegroundColor Gray
 try {
@@ -73,6 +122,22 @@ try {
 } catch {
     Write-Host "  Installing Velopack CLI..." -ForegroundColor Yellow
     dotnet tool install -g vpk
+}
+
+$tagName = "v$Version"
+$installedVersion = Get-InstalledAppVersion
+$localTagExists = Test-LocalTagExists $tagName
+$remoteTagExists = Test-RemoteTagExists $tagName
+$releaseExists = Test-GitHubReleaseExists $tagName
+
+if (-not $ForceVersionReuse) {
+    if ($localTagExists -or $remoteTagExists -or $releaseExists) {
+        throw "Version $Version already exists as a git tag or GitHub release. Choose a new version instead of reusing it, or rerun with -ForceVersionReuse if you really mean to override this safeguard."
+    }
+
+    if ($installedVersion -eq $Version) {
+        throw "Version $Version is already installed locally under %LocalAppData%\Bitwarden.AutoType. Reusing that version can block update testing because the updater only compares semantic version. Choose a higher version, uninstall the existing build, or rerun with -ForceVersionReuse if you really mean to override this safeguard."
+    }
 }
 
 # Clean previous build
@@ -176,6 +241,7 @@ if ($Install) {
 Write-Host ""
 Write-Host "To release to GitHub:" -ForegroundColor Cyan
 Write-Host "  git tag v$Version" -ForegroundColor White
+Write-Host "  git push origin main" -ForegroundColor White
 Write-Host "  git push origin v$Version" -ForegroundColor White
 Write-Host ""
 Write-Host "Or manually upload files from $ReleasesDir to a GitHub release." -ForegroundColor Gray

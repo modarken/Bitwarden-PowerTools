@@ -1,88 +1,12 @@
-==========================
-ACTIVE
-==========================
+Outstanding Work
+================
 
-Enhancements & Features
+Reliability & Hardening
 -----------------------
-- Enhancement: Add config setting to start program on user login
-- Enhancement: Add ability to specify target not by a single target type, but multiple.
-    - For example, you can specify a window title, window class, process name, etc.
-    - Instead of this: "Target":"^.*notepad.*$", "Type":"Title"
-    - You would have this: "Title":"^.*notepad.*$", "Class":"^.*notepad.*$", "Process":"^.*notepad.*$"
-    - Things that need to change:
-        - Match Selection Window
-        - TargetFinderSequenceComposer
-- Secondary Power Tool in charge of backups - export feature?
-    - keepass button
+- Harden remaining failure paths so the app is less likely to crash under unexpected runtime conditions.
+- Add robustness testing for blocked or degraded server connectivity.
+    - Example: use Clumsy to simulate blocked inbound or outbound traffic for the Bitwarden server.
 
-Testing & Robustness
---------------------
-- Add Robustness by testing blocking of server with Clumsy
-    - e.g. outbound and ip.DstAddr = x.x.x.x or inbound and ip.SrcAddr = x.x.x.x
-
-==========================
-PARTIAL
-==========================
-- Hardening of the code
-    - Make sure all the code is hardened, and that it is not possible to crash the program.
-
-==========================
-OPTIONAL
-==========================
-- Add specificity to the target, so you can specify the window title, window class, process name, etc.
-    - Instead of just choosing one, you can choose multiple, and it will only match if all of them match.
-    - This will allow you to have multiple windows open, and it will only match the one you want.
-
-==========================
-DONE
-==========================
-- Improved tray visual states and failure handling.
-    -> Tray icon and status text now reflect enabled, disabled, setup-required, and error states
-    -> Failure messages are classified into clearer user-facing summaries for sync, backup, update, and recovery flows
-    -> Tray state now refreshes when configuration state changes
-- Clarified backup recovery workflow boundaries.
-    -> "Restore" wording was changed to manual recovery preparation
-    -> Backup file pickers now open in the configured backup folder instead of the default LocalAppData folder
-- Split saved settings from authorization state.
-    -> Save account settings separately from authorization
-    -> Master password is now one-time authorization input, not a saved setting
-    -> Added authorize, re-authorize, and clear stored authorization flows
-    -> Detect KDF changes and require re-authorization
-- Added richer tray quick actions and status rows.
-    -> Toggle AutoType on/off from tray
-    -> Sync now from tray
-    -> Open Settings from tray
-    -> Show last sync, last backup, and last issue in tray menu
-- Add Installer
-- Cleanup the hotkey is active code, for some reason it's not working right.
-    - Move the checkbox to the hotkey view.
-- Added pin ability
-- Have helper for adding AutoType to field.
-- Add Help Menu for displaying the keyboard sequences available to choose from.
-- Added TOTP field to AutoTypeSequence
-- Added Field to specify the AutoType sequence
-- Add select button on the hotkeyproess menu that pops up when there are multiple items that match the hotkey.
-- Select HotKey
-- Add Feature for drop target to get window title
-    -> Auto make target window regex
-    -> Auto fill out default login
-- Add different Targets, so one for Window Title, one for Window Class, etc.
-- AutoType
-- On/Off
-- Specify Vault
-- Finish Configuration Tailoring
-
-==========================
-CANCELED
-==========================
-- Add option to have a default target, so if no target is specified it will use the default.
-- Add option to have a default AutoType sequence, so if no AutoType is specified it will use the default.
-
-==========================
-EXAMPLES
-==========================
-Example Custom Values
-{"Target":"^.*notepad.*$","Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
-{"Target":"^.*notepad.*$", "Type":"Title", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
-{"Target":"^.*notepad.*$", "Type":"Process", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
-{"Target":"^.*notepad.*$", "Type":"Class", "Sequence":"{USERNAME}{TAB}{PASSWORD}{ENTER}"}
+Potential Feature Work
+----------------------
+- Evaluate whether a separate backup-oriented utility or KeePass-oriented export flow is still worth building.

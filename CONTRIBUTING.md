@@ -45,10 +45,24 @@ See [@docs/Building-and-Releasing.md](@docs/Building-and-Releasing.md) for detai
 
 ## Pull Request Process
 
-1. Update README.md if you've changed functionality
-2. Add documentation if you've added features
+Use a conventional branch and PR flow:
+
+1. Branch from `main`
+2. Use a focused branch name such as `feature/...`, `fix/...`, or `docs/...`
+3. Keep the branch scoped to one change set
+4. Run the relevant validation before opening the PR
+5. Open a PR into `main`
+6. Merge the PR before doing any release tagging
+
+Before opening a PR:
+
+1. Update `README.md` if functionality changed
+2. Update maintainer docs in `@docs/` if workflow or release behavior changed
 3. Make sure the project builds without errors
-4. Describe what your PR does and why
+4. Include tests when the change affects behavior
+5. Describe what the PR does, why it exists, and how it was validated
+
+Release work should happen after PR merge on `main`, not on the feature branch. See `@docs/Building-and-Releasing.md`.
 
 ## Questions?
 

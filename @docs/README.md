@@ -5,10 +5,11 @@ This folder is for project and maintainer documentation that is still relevant t
 Current docs:
 
 - `Building-and-Releasing.md`: maintainer build and release steps.
+- `../CONTRIBUTING.md`: contributor and pull request workflow.
 - `ElevationDetection.md`: notes about protected windows and elevation behavior.
-- `Pre-Release-Code-Review.md`: release-readiness and code review notes.
+- `Pre-Release-Code-Review.md`: historical snapshot of the first public release review.
 - `SSL-Certificate-Configuration.md`: self-hosted and invalid-certificate guidance.
-- `ToDo.txt`: active backlog and shipped-feature notes.
+- `ToDo.txt`: unfinished backlog items only.
 - `bitwarden.design.ipynb`: design and exploratory notebook.
 
 Removed historical docs:

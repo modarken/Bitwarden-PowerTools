@@ -147,15 +147,15 @@ Paste this JSON into the **Value** field (customize as needed):
 
 ```json
 {
-  "Target": "^.*Gmail.*$",
-  "Type": "Title",
+   "Title": "^.*Gmail.*$",
+   "Process": "^chrome$",
   "Sequence": "{USERNAME}{TAB}{PASSWORD}{ENTER}"
 }
 ```
 
 **Explanation:**
-- **Target**: Regex pattern to match window title (e.g., `^.*Gmail.*$` matches any window with "Gmail" in the title)
-- **Type**: Matching method (`Title`, `Process`, or `Class`)
+- **Title / Process / Class**: Optional regex matchers for the current window. If you provide more than one, they must all match.
+- **ExcludeTitle / ExcludeProcess / ExcludeClass**: Optional regex filters that block a rule even when the include matchers pass.
 - **Sequence**: What to type (see [Keyboard Sequences](#keyboard-sequences) below)
 
 #### Step 3: Use Auto-Type
@@ -197,36 +197,37 @@ Build custom sequences using these placeholders:
 ```json
 // Simple login
 {
-  "Target": "^.*Login.*$",
-  "Type": "Title",
+   "Title": "^.*Login.*$",
   "Sequence": "{USERNAME}{TAB}{PASSWORD}{ENTER}"
 }
 
 // Login with TOTP
 {
-  "Target": "^.*Two-Factor Authentication.*$",
-  "Type": "Title",
+   "Title": "^.*Two-Factor Authentication.*$",
   "Sequence": "{TOTP}{ENTER}"
 }
 
 // Complex multi-step form
 {
-  "Target": "^.*Registration.*$",
-  "Type": "Title",
+   "Title": "^.*Registration.*$",
   "Sequence": "{CUSTOM:FirstName}{TAB}{CUSTOM:LastName}{TAB}{USERNAME}{TAB}{PASSWORD}{TAB}{PASSWORD}{ENTER}"
 }
 
 // With delays for slow forms
 {
-  "Target": "^.*Slow Form.*$",
-  "Type": "Title",
+   "Title": "^.*Slow Form.*$",
   "Sequence": "{USERNAME}{DELAY=500}{TAB}{DELAY=500}{PASSWORD}{DELAY=1000}{ENTER}"
 }
 ```
 
 ### Window Targeting
 
-Match windows using three different methods:
+You can target windows in two ways:
+
+- Legacy mode: `Target` with `Type`
+- Combined mode: any mix of `Title`, `Process`, `Class`, plus optional `ExcludeTitle`, `ExcludeProcess`, `ExcludeClass`
+
+Combined mode is the most precise option and is the recommended format for new rules.
 
 ### System Tray Status
 
@@ -274,6 +275,21 @@ Matches the window class (advanced):
   "Type": "Class"
 }
 ```
+
+#### 4. Combined Targeting
+
+Match multiple window properties at once. Every include rule must match, and any exclude rule will block the match.
+
+```json
+{
+   "Title": "^.*Gmail.*$",
+   "Process": "^chrome$",
+   "ExcludeTitle": ".*Incognito.*",
+   "Sequence": "{USERNAME}{TAB}{PASSWORD}{ENTER}"
+}
+```
+
+This is useful when a title match alone is too broad.
 
 ---
 
@@ -331,6 +347,7 @@ The scheduled backup password is stored locally using Windows DPAPI protection.
 
 Backups can be verified or decrypted for manual recovery.
 This app does not perform an in-place vault restore from backup files.
+You can also export the current vault as plaintext JSON from the tray menu when you explicitly need a decrypted export.
 
 ![Backup Settings](.github/images/settings-backup.png)
 <!-- TODO: Add screenshot of backup settings -->
@@ -342,15 +359,13 @@ You can add multiple `AutoType:Custom` fields to a single Bitwarden entry for di
 ```json
 // Custom Field 1: AutoType:Custom
 {
-  "Target": "^.*Login Page.*$",
-  "Type": "Title",
+   "Title": "^.*Login Page.*$",
   "Sequence": "{USERNAME}{TAB}{PASSWORD}{ENTER}"
 }
 
 // Custom Field 2: AutoType:Custom2
 {
-  "Target": "^.*Admin Panel.*$",
-  "Type": "Title",
+   "Title": "^.*Admin Panel.*$",
   "Sequence": "{CUSTOM:AdminUser}{TAB}{PASSWORD}{ENTER}"
 }
 ```
