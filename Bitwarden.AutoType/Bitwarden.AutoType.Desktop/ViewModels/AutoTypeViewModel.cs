@@ -80,6 +80,8 @@ public partial class AutoTypeViewModel : IDisposable
     private readonly StateController<AutoTypeConfigurationStates> _state;
     private List<CachedAutoTypeEntry>? _regexLookup;
 
+    public event EventHandler? NoMatchDetected;
+
     #region Bound
 
     [ObservableProperty]
@@ -401,6 +403,10 @@ public partial class AutoTypeViewModel : IDisposable
             else if (matchedRegex.Count > 1)
             {
                 ShowPopup(matchedRegex, currentHandle);
+            }
+            else
+            {
+                NoMatchDetected?.Invoke(this, EventArgs.Empty);
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
+using System.Security;
 using System.Threading.Tasks;
 
 namespace Bitwarden.AutoType.Desktop.Services;
@@ -32,11 +33,20 @@ public static class OperationFailureFormatter
                 "Complete account settings and authorization before trying again.");
         }
 
-        if (rootException is HttpRequestException || rootException is TaskCanceledException || rootException is TimeoutException)
+        if (rootException is HttpRequestException
+            || rootException is TaskCanceledException
+            || rootException is TimeoutException)
         {
             return new OperationFailureInfo(
                 fallbackSummary,
                 "The Bitwarden server could not be reached. Check your network connection, server URL, and SSL settings, then try again.");
+        }
+
+        if (rootException is OperationCanceledException)
+        {
+            return new OperationFailureInfo(
+                fallbackSummary,
+                "The operation was canceled before it finished. Try again if you still need to complete it.");
         }
 
         if (rootException is CryptographicException)
@@ -49,6 +59,20 @@ public static class OperationFailureFormatter
         if (rootException is DirectoryNotFoundException)
         {
             return new OperationFailureInfo(fallbackSummary, rootException.Message);
+        }
+
+        if (rootException is UnauthorizedAccessException || rootException is SecurityException)
+        {
+            return new OperationFailureInfo(
+                fallbackSummary,
+                "The app could not access the selected file or folder. Check the path and Windows permissions, then try again.");
+        }
+
+        if (rootException is IOException)
+        {
+            return new OperationFailureInfo(
+                fallbackSummary,
+                "The file operation could not be completed. Check whether the file or folder is in use, then try again.");
         }
 
         if (rootException is ArgumentNullException argumentNullException

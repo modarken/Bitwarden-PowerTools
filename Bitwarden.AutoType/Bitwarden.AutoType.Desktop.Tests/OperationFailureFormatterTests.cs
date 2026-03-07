@@ -1,5 +1,7 @@
 using System;
+using System.IO;
 using System.Net.Http;
+using System.Security;
 using System.Security.Cryptography;
 using Bitwarden.AutoType.Desktop.Services;
 using Xunit;
@@ -35,5 +37,28 @@ public class OperationFailureFormatterTests
 
         Assert.Equal("Decryption failed", failure.Summary);
         Assert.Contains("password is incorrect", failure.Detail);
+    }
+
+    [Fact]
+    public void FormatMapsCanceledOperationsToFriendlyMessage()
+    {
+        var failure = OperationFailureFormatter.Format("Backup failed", new OperationCanceledException("cancelled"));
+
+        Assert.Equal("Backup failed", failure.Summary);
+        Assert.Contains("canceled", failure.Detail, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Theory]
+    [InlineData(typeof(IOException))]
+    [InlineData(typeof(UnauthorizedAccessException))]
+    [InlineData(typeof(SecurityException))]
+    public void FormatMapsFileAccessFailuresToFriendlyMessage(Type exceptionType)
+    {
+        var exception = (Exception)Activator.CreateInstance(exceptionType, "disk problem")!;
+
+        var failure = OperationFailureFormatter.Format("Backup failed", exception);
+
+        Assert.Equal("Backup failed", failure.Summary);
+        Assert.Contains("file", failure.Detail, StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Bitwarden.AutoType.Desktop.Helpers;
@@ -39,6 +40,8 @@ public class NotifyIconService : IDisposable
     private Forms.ToolStripMenuItem? _lastBackupMenuItem;
     private Forms.ToolStripMenuItem? _lastIssueMenuItem;
     private Forms.ToolStripMenuItem? _toggleAutoTypeMenuItem;
+    private CancellationTokenSource? _noMatchPulseCancellationTokenSource;
+    private bool _isNoMatchPulseActive;
 
     public NotifyIconService(
         Forms.NotifyIcon notifyIcon, 
@@ -153,6 +156,7 @@ public class NotifyIconService : IDisposable
 
         _bitwardenService.RegisterOnDatabaseUpdated(OnDatabaseUpdated);
         _autoTypeViewModel.PropertyChanged += AutoTypeViewModel_PropertyChanged;
+        _autoTypeViewModel.NoMatchDetected += AutoTypeViewModel_NoMatchDetected;
         _state.StateChanged += OnConfigurationStateChanged;
 
         _app.Deactivated += async (s, e) =>
@@ -218,6 +222,11 @@ public class NotifyIconService : IDisposable
         _lastSyncTime = DateTimeOffset.UtcNow;
         _lastIssueSummary = null;
         QueueTrayStateRefresh();
+    }
+
+    private void AutoTypeViewModel_NoMatchDetected(object? sender, EventArgs e)
+    {
+        QueueNoMatchPulse();
     }
 
     private void ToggleAutoType()
@@ -304,8 +313,55 @@ public class NotifyIconService : IDisposable
         _lastIssueMenuItem.Text = TrayStatusFormatter.GetIssueText(_lastIssueSummary);
         _lastIssueMenuItem.Visible = !string.IsNullOrWhiteSpace(_lastIssueSummary);
         _toggleAutoTypeMenuItem.Text = TrayStatusFormatter.GetToggleMenuText(isAutoTypeEnabled);
-        _notifyIcon.Icon = GetCurrentIcon();
+        _notifyIcon.Icon = _isNoMatchPulseActive ? _warningIcon ?? GetCurrentIcon() : GetCurrentIcon();
         _notifyIcon.Text = TrayStatusFormatter.GetNotifyIconText(visualState);
+    }
+
+    private void QueueNoMatchPulse()
+    {
+        var dispatcher = Application.Current?.Dispatcher;
+        if (dispatcher is null)
+        {
+            return;
+        }
+
+        if (dispatcher.CheckAccess())
+        {
+            _ = PulseNoMatchIconAsync();
+            return;
+        }
+
+        dispatcher.BeginInvoke(new Action(() => _ = PulseNoMatchIconAsync()));
+    }
+
+    private async Task PulseNoMatchIconAsync()
+    {
+        _noMatchPulseCancellationTokenSource?.Cancel();
+        _noMatchPulseCancellationTokenSource?.Dispose();
+
+        var cancellationTokenSource = new CancellationTokenSource();
+        _noMatchPulseCancellationTokenSource = cancellationTokenSource;
+        _isNoMatchPulseActive = true;
+        RefreshTrayState();
+
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationTokenSource.Token);
+        }
+        catch (TaskCanceledException)
+        {
+        }
+        finally
+        {
+            if (ReferenceEquals(_noMatchPulseCancellationTokenSource, cancellationTokenSource))
+            {
+                _noMatchPulseCancellationTokenSource = null;
+                _isNoMatchPulseActive = false;
+                RefreshTrayState();
+            }
+
+            cancellationTokenSource.Dispose();
+        }
     }
 
     private void HandleOperationFailure(string summary, Exception ex, bool showBalloon)
@@ -916,7 +972,10 @@ public class NotifyIconService : IDisposable
         try
         {
             _autoTypeViewModel.PropertyChanged -= AutoTypeViewModel_PropertyChanged;
+            _autoTypeViewModel.NoMatchDetected -= AutoTypeViewModel_NoMatchDetected;
             _state.StateChanged -= OnConfigurationStateChanged;
+            _noMatchPulseCancellationTokenSource?.Cancel();
+            _noMatchPulseCancellationTokenSource?.Dispose();
             _notifyIcon.Visible = false;
         }
         finally { }
