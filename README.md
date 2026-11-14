@@ -25,7 +25,7 @@ A powerful desktop application that brings KeePass-style auto-type functionality
 | Requirement | Details |
 |------------|---------|
 | **Operating System** | Windows 10 (1809+) or Windows 11 |
-| **Runtime** | .NET 10.0 Runtime (included in installer) |
+| **Runtime** | .NET 11.0 Runtime (included in installer) |
 | **Bitwarden Account** | Cloud (bitwarden.com) or self-hosted instance |
 | **Disk Space** | ~50 MB |
 | **Permissions** | User-level (admin not required for most use cases) |
