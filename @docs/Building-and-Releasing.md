@@ -45,7 +45,7 @@ The application uses **Velopack** for packaging and distribution. The build proc
 
 ## Build Tools
 
-- **.NET SDK 10.0+** - Application framework
+- **.NET SDK 11.0+** - Application framework
 - **Velopack CLI (`vpk`)** - Packaging and installer creation
 - **GitHub Actions** - Automated CI/CD
 
@@ -194,7 +194,7 @@ This is the recommended approach for official releases. GitHub Actions automatic
 ### What GitHub Actions Does
 
 1. ✅ Checks out code
-2. ✅ Installs .NET SDK 10.0
+2. ✅ Installs .NET SDK 11.0
 3. ✅ Installs Velopack CLI tool
 4. ✅ Updates version numbers in project file
 5. ✅ Restores NuGet packages
@@ -215,7 +215,7 @@ The automated build is configured in `.github/workflows/release.yml`.
 
 **Environment Variables:**
 ```yaml
-DOTNET_VERSION: '10.0.x'
+DOTNET_VERSION: '11.0.x'
 PROJECT_PATH: 'Bitwarden.AutoType/Bitwarden.AutoType.Desktop/Bitwarden.AutoType.Desktop.csproj'
 APP_ID: 'Bitwarden.AutoType'
 EXE_NAME: 'Bitwarden.AutoType.Desktop.exe'
@@ -309,7 +309,7 @@ dotnet tool install -g vpk
 
 ### Build Fails - .NET SDK not found
 
-Install .NET 10.0 SDK:
+Install .NET 11.0 SDK:
 - Download from: https://dotnet.microsoft.com/download
 
 ### GitHub Actions fails

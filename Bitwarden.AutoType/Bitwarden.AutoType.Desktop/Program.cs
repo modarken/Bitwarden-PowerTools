@@ -1,5 +1,4 @@
 using System;
-using NuGet.Versioning;
 using Velopack;
 
 namespace Bitwarden.AutoType.Desktop;
@@ -26,7 +25,7 @@ public static class Program
         // - Update application (applying updates)
         // If running in a Velopack context, this may exit the app early
         VelopackApp.Build()
-            .WithFirstRun(v => OnFirstRun(v))
+            .OnFirstRun(v => OnFirstRun(v))
             .Run();
 
         // Normal WPF startup
